@@ -6150,54 +6150,53 @@ function woUpdateBadges(){
 
 
 function exportSnapshot(){
-  // Save current edits first.
-  if(typeof collectEditedRows === 'function') collectEditedRows();
+  // Save current edits first, then export a portable HTML snapshot.
+  try{ if(typeof collectEditedRows === 'function') collectEditedRows(); }catch(e){}
   try{
-    projectStartDate = document.getElementById('projectStartInput')?.value || projectStartDate;
-    projectEndDate = document.getElementById('projectEndInput')?.value || projectEndDate;
+    var ps = document.getElementById('projectStartInput');
+    var pe = document.getElementById('projectEndInput');
+    if(ps && ps.value) projectStartDate = ps.value;
+    if(pe && pe.value) projectEndDate = pe.value;
   }catch(e){}
-  if(typeof saveLocal === 'function') saveLocal();
-  if(typeof saveEndImpact === 'function') saveEndImpact();
+  try{ if(typeof saveLocal === 'function') saveLocal(); }catch(e){}
+  try{ if(typeof saveEndImpact === 'function') saveEndImpact(); }catch(e){}
+  try{ if(typeof saveAll === 'function') saveAll(); }catch(e){}
 
-  var keys = Object.keys(localStorage).filter(function(k){ return k.startsWith('sd26_'); });
-  if(!keys.length){ alert('No saved tracker data found.'); return; }
+  var keys = Object.keys(localStorage).filter(function(k){ return k.indexOf('sd26_') === 0; });
   var snap = {};
   keys.forEach(function(k){ snap[k] = localStorage.getItem(k); });
-  var lines = keys.map(function(k){ return '    '+JSON.stringify(k)+': '+JSON.stringify(snap[k]); }).join(',
-');
-  var newSeed = '// ── Portable Data Seed ──────────────────────────────────────────────────────
-'
-    + '// This block ensures the tracker loads with the correct data on any computer.
-'
-    + '(function(){
-'
-    + '  var seed = {
-'+lines+'
-  };
-'
-    + '  Object.keys(seed).forEach(function(k){ localStorage.setItem(k, seed[k]); });
-'
-    + '})();
-'
-    + '// ── End Portable Data Seed ──────────────────────────────────────────────────';
+  var lines = keys.map(function(k){
+    return '    ' + JSON.stringify(k) + ': ' + JSON.stringify(snap[k]);
+  }).join(',\\n');
 
-  var html = '<!DOCTYPE html>
-' + document.documentElement.outerHTML;
+  var newSeed = [
+    '// ── Portable Data Seed ──────────────────────────────────────────────────────',
+    '// This block ensures the tracker loads with the correct data on any computer.',
+    '(function(){',
+    '  try {',
+    '    var seed = {',
+    lines,
+    '    };',
+    '    Object.keys(seed).forEach(function(k){ localStorage.setItem(k, seed[k]); });',
+    '  } catch(e) { console.warn("Portable seed load skipped", e); }',
+    '})();',
+    '// ── End Portable Data Seed ──────────────────────────────────────────────────'
+  ].join('\\n');
+
+  var html = '<!DOCTYPE html>\\n' + document.documentElement.outerHTML;
   var startMarker = '// ── Portable Data Seed';
   var endMarker = '// ── End Portable Data Seed ──────────────────────────────────────────────────';
   var s = html.indexOf(startMarker);
   var e = html.indexOf(endMarker, s);
-  if(s < 0 || e < 0){
-    alert('Could not find the portable data seed block. Export was not created.');
-    return;
+  if(s >= 0 && e >= 0){
+    e = e + endMarker.length;
+    html = html.slice(0, s) + newSeed + html.slice(e);
   }
-  e = e + endMarker.length;
-  html = html.slice(0, s) + newSeed + html.slice(e);
 
   var blob = new Blob([html], {type:'text/html;charset=utf-8'});
   var a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
-  a.download = '2026_Shutdown_Tracker_'+new Date().toISOString().slice(0,10)+'.html';
+  a.download = '2026_Shutdown_Tracker_' + new Date().toISOString().slice(0,10) + '.html';
   document.body.appendChild(a);
   a.click();
   setTimeout(function(){ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 0);
