@@ -544,7 +544,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.05.2</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.05.3</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3664,7 +3664,7 @@ APPENDIX 6.5B)</div>
       <div class="progress-kpi">
         <div class="progress-kpi-label">Lookahead</div>
         <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
-        <div class="progress-kpi-sub">Next 7 days</div>
+        <div class="progress-kpi-sub">Next 14 days</div>
       </div>
     </div>
     <div class="progress-grid">
@@ -5661,6 +5661,8 @@ function renderDashboard(){
   const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const todayDate = new Date(todayIso + 'T00:00:00');
+  const twoWeekEndDate = new Date(todayDate);
+  twoWeekEndDate.setDate(twoWeekEndDate.getDate() + 14);
   const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -5679,8 +5681,24 @@ function renderDashboard(){
     if(!startIso) return false;
     const startDate = new Date(startIso+'T00:00:00');
     const delta = Math.floor((startDate - todayDate) / 86400000);
-    return delta >= 0 && delta <= 7 && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+    return delta >= 0 && delta <= 14 && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
   }).sort((a,b)=>(normalizeDateValue(a.start)||'').localeCompare(normalizeDateValue(b.start)||''));
+  function dateInUpcomingTwoWeeks(v){
+    const iso = normalizeDateValue(v);
+    if(!iso) return false;
+    const d = new Date(iso+'T00:00:00');
+    return d >= todayDate && d <= twoWeekEndDate;
+  }
+  function taskTouchesUpcomingTwoWeeks(t){
+    const startIso = normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.end);
+    if(startIso && endIso){
+      const startDate = new Date(startIso+'T00:00:00');
+      const endDate = new Date(endIso+'T00:00:00');
+      return startDate <= twoWeekEndDate && endDate >= todayDate;
+    }
+    return dateInUpcomingTwoWeeks(startIso || endIso);
+  }
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5834,7 +5852,7 @@ function renderDashboard(){
   }
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
-    const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending'));
+    const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending') && taskTouchesUpcomingTwoWeeks(t));
     const maintItems = (primary.length ? primary : lookaheadTasks).slice(0,6);
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
@@ -5846,12 +5864,13 @@ function renderDashboard(){
         <td>—</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 7-day lookahead tasks.</td></tr>';
+    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
     const rtsItems = activeLeaf
       .filter(t=>startupMap[t.id]!=null)
+      .filter(t=>dateInUpcomingTwoWeeks(startupMap[t.id]))
       .sort((a,b)=>{
         const ad = normalizeDateValue(startupMap[a.id]) || normalizeDateValue(a.end) || '';
         const bd = normalizeDateValue(startupMap[b.id]) || normalizeDateValue(b.end) || '';
@@ -5866,7 +5885,7 @@ function renderDashboard(){
         <td>${displayDate(startUpDate)||'TBD'}</td>
         <td>${t.actionComment||t.notes||'Start-Up checked in End column'}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No Start-Up checked items from End column.</td></tr>';
+    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No Start-Up checked items in the next 14 days.</td></tr>';
   }
 
   const systemEl = document.getElementById('d-progress-system');
@@ -5900,7 +5919,7 @@ function renderDashboard(){
     }else if(lookaheadTasks.length){
       focusEl.innerHTML = `<div class="progress-list">${lookaheadTasks.slice(0,5).map(shortTask).join('')}</div>`;
     }else{
-      focusEl.innerHTML = '<div class="progress-empty">No delayed, overdue, or 7-day lookahead items.</div>';
+      focusEl.innerHTML = '<div class="progress-empty">No delayed, overdue, or 14-day lookahead items.</div>';
     }
   }
 
