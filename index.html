@@ -254,6 +254,7 @@ select.status-sel{font-size:12px;padding:3px 6px;border:1px solid #ccc;border-ra
 .progress-bar{background:#e0e0e0;border-radius:4px;height:8px;overflow:hidden;margin-top:4px}
 .progress-fill{height:8px;background:#2e7d32;border-radius:4px;transition:width 0.3s}
 footer{text-align:center;padding:12px;font-size:11px;color:#999}
+.app-version{display:inline-flex;align-items:center;margin-left:10px;padding:2px 8px;border-radius:999px;background:#f0c040;color:#1a3a5c;font-size:11px;font-weight:800;letter-spacing:0.02em}
 /* Scope of Work visual table */
 .sow-tbl-wrap{background:#fff;border-radius:8px;border:2px solid #1a3a5c;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.12)}
 .sow-tbl-title{background:#1a3a5c;color:#fff;text-align:center;font-size:15px;font-weight:800;padding:12px;letter-spacing:0.08em;text-transform:uppercase}
@@ -543,7 +544,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.05.2</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3727,7 +3728,7 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel">
       <div class="huddle-panel-title">Return to Service / Delay Description</div>
       <table class="huddle-table">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>New</th><th>Delay Description</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead>
         <tbody id="d-rts-rows"></tbody>
       </table>
     </div>
@@ -5849,18 +5850,23 @@ function renderDashboard(){
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
-    const rtsCandidates = delayedTasks
-      .concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)))
-      .concat(activeLeaf.filter(t=>/cond|full rel|release|return/i.test(t.task||'') && (statusMap[t.id]||t.status||'Pending')!=='Complete'))
-      .filter((t,i,arr)=>arr.findIndex(x=>x.id===t.id)===i)
-      .slice(0,6);
-    rtsEl.innerHTML = rtsCandidates.length ? rtsCandidates.map(t=>`<tr>
-      <td>${taskProgressPct(t)}%</td>
-      <td>${huddleSystemForTask(t)}</td>
-      <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
-      <td>—</td>
-      <td>${t.actionComment||t.notes||'Review schedule impact / owner update'}</td>
-    </tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No return-to-service delays or release impacts.</td></tr>';
+    const rtsItems = activeLeaf
+      .filter(t=>startupMap[t.id]!=null)
+      .sort((a,b)=>{
+        const ad = normalizeDateValue(startupMap[a.id]) || normalizeDateValue(a.end) || '';
+        const bd = normalizeDateValue(startupMap[b.id]) || normalizeDateValue(b.end) || '';
+        return ad.localeCompare(bd);
+      });
+    rtsEl.innerHTML = rtsItems.length ? rtsItems.map(t=>{
+      const startUpDate = startupMap[t.id] || t.end;
+      return `<tr>
+        <td>${taskProgressPct(t)}%</td>
+        <td>${huddleSystemForTask(t)}</td>
+        <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+        <td>${displayDate(startUpDate)||'TBD'}</td>
+        <td>${t.actionComment||t.notes||'Start-Up checked in End column'}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No Start-Up checked items from End column.</td></tr>';
   }
 
   const systemEl = document.getElementById('d-progress-system');
