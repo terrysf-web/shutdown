@@ -179,16 +179,24 @@ header span{font-size:12px;opacity:0.7}
 .stat-val.green{color:#2e7d32}
 .stat-val.blue{color:#1565c0}
 .stat-val.red{color:#c62828}
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;align-items:center}
-.filters input,.filters select{font-size:13px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#222}
-.filters input{min-width:200px}
+.filters{display:grid;grid-template-columns:minmax(220px,1.4fr) repeat(3,minmax(130px,.8fr)) auto auto;gap:8px;margin-bottom:8px;align-items:center}
+.filters input,.filters select{font-size:13px;padding:6px 10px;border:1px solid #ccc;border-radius:6px;background:#fff;color:#222;height:32px;min-width:0}
+.filters input{width:100%}
+.more-filters-btn{height:32px;white-space:nowrap}
+.advanced-filters{display:none;background:#fff;border:1px solid #d8dfe6;border-radius:8px;padding:10px 12px;margin:0 0 10px 0}
+.advanced-filters.open{display:block}
+.advanced-filter-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;align-items:end}
+.advanced-filter-field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.advanced-filter-field label{font-size:10px;font-weight:700;color:#607080;text-transform:uppercase;letter-spacing:0.04em}
+.advanced-filter-field input,.advanced-filter-field select{font-size:12px;padding:5px 7px;border:1px solid #c8d1da;border-radius:5px;background:#fff;color:#222;width:100%;min-width:0}
+.advanced-filter-field input,.advanced-filter-field select:not(.msf){height:29px}
+.advanced-filter-field select.msf{min-height:86px}
 .tbl-wrap{overflow:auto;border-radius:8px;border:1px solid #ddd;background:#fff;flex:1;min-height:0}
 table{width:100%;border-collapse:collapse;font-size:13px}
 thead th{background:#e8edf2;padding:9px 10px;text-align:left;font-weight:600;border-bottom:1px solid #ccc;white-space:nowrap;position:sticky;top:0;z-index:3}
 thead th.sortable{cursor:pointer;user-select:none}
 thead th.sortable:hover{background:#dde6ee}
-thead tr.filter-row th{background:#f4f7fa;padding:6px 8px;top:38px;z-index:2}
-thead tr.filter-row input, thead tr.filter-row select{width:100%;font-size:12px;padding:5px 6px;border:1px solid #c8d1da;border-radius:5px;background:#fff;color:#222}
+.filter-row{display:none}
 .sort-indicator{font-size:11px;color:#567; margin-left:4px}
 .col-id{width:78px}
 .col-task{width:300px}
@@ -369,6 +377,91 @@ tr.editing{background:#fffceb}
 .delayed-table td{padding:5px 10px;border-bottom:1px solid rgba(255,255,255,0.08);color:#fff}
 .delayed-table tr:last-child td{border-bottom:none}
 .delayed-table tr:hover td{background:rgba(229,57,53,0.15)}
+.progress-brief{background:#102943;border:1px solid rgba(240,192,64,.35);border-radius:8px;padding:14px 16px;margin-bottom:14px}
+.progress-brief-head{display:flex;align-items:flex-end;justify-content:space-between;gap:14px;margin-bottom:12px}
+.progress-brief-title{font-size:18px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:#fff}
+.progress-brief-date{font-size:12px;color:#cde;font-weight:700}
+.progress-kpis{display:grid;grid-template-columns:1.3fr repeat(4,1fr);gap:10px;margin-bottom:12px}
+.progress-kpi{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px}
+.progress-kpi-label{font-size:10px;color:#b8cbe0;text-transform:uppercase;letter-spacing:.08em;font-weight:800;margin-bottom:6px}
+.progress-kpi-value{font-size:30px;line-height:1;font-weight:900;color:#fff}
+.progress-kpi-sub{font-size:12px;color:#f0c040;margin-top:7px;font-weight:700}
+.progress-meter{height:10px;border-radius:999px;background:rgba(255,255,255,.16);overflow:hidden;margin-top:9px}
+.progress-meter span{display:block;height:100%;background:#2e7d32;border-radius:999px}
+.progress-grid{display:grid;grid-template-columns:1.2fr 1fr 1.1fr;gap:10px}
+.progress-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:12px;min-height:130px}
+.progress-panel-title{font-size:11px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.progress-row{display:grid;grid-template-columns:minmax(88px,1fr) 46px minmax(70px,1.2fr) 74px;align-items:center;gap:8px;font-size:12px;color:#fff;padding:5px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.progress-row:last-child{border-bottom:none}
+.progress-row-name{font-weight:800;color:#e8f1fb;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress-row-pct{font-weight:900;text-align:right;color:#f0c040}
+.progress-row-meta{text-align:right;color:#b8cbe0;font-size:11px}
+.progress-mini-meter{height:6px;border-radius:999px;background:rgba(255,255,255,.14);overflow:hidden}
+.progress-mini-meter span{display:block;height:100%;background:#4a90d9;border-radius:999px}
+.progress-list{display:flex;flex-direction:column;gap:6px}
+.progress-item{display:grid;grid-template-columns:54px 1fr auto;gap:8px;align-items:center;color:#fff;font-size:12px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.progress-item:last-child{border-bottom:none}
+.progress-id{font-weight:900;color:#f0c040}
+.progress-task{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.progress-tag{font-size:10px;font-weight:900;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.12);color:#cde;white-space:nowrap}
+.progress-empty{color:#9fb4c8;font-size:12px;font-style:italic;padding:8px 0}
+.vendor-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
+.vendor-progress-row{background:rgba(13,33,55,.55);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:8px 10px}
+.vendor-progress-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.vendor-progress-name{font-size:12px;font-weight:900;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vendor-progress-total{font-size:12px;font-weight:900;color:#f0c040;white-space:nowrap}
+.vendor-stack{height:12px;background:rgba(255,255,255,.14);border-radius:999px;overflow:hidden;display:flex}
+.vendor-seg{height:100%;min-width:3px}
+.vendor-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;font-size:10px;font-weight:800;color:#9fb4c8}
+.vendor-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px}
+.huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
+.huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
+.huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
+.system-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.system-status-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:7px 9px;display:grid;grid-template-columns:108px minmax(120px,1fr) 88px minmax(88px,1fr);gap:8px;align-items:center;min-height:34px}
+.system-status-id{font-size:11px;color:#f0c040;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.system-status-name{font-size:12px;color:#fff;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.system-status-reason{font-size:11px;color:#cde;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.system-pill{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;text-align:center;white-space:nowrap}
+.system-pill.normal{background:#1f6b42;color:#d7ffe5}
+.system-pill.oos{background:#7a1a1a;color:#ffb4ac}
+.system-pill.cond{background:#80520e;color:#ffe6ae}
+.system-pill.full{background:#174a7a;color:#cce6ff}
+.system-pill.down{background:#3b2f55;color:#ddd7ff}
+.system-pill.breakdown{background:#3b2f55;color:#ddd7ff}
+.system-pill.complete{background:#1f6b42;color:#d7ffe5}
+.system-pill.progress{background:#80520e;color:#ffe6ae}
+.system-pill.planned{background:#174a7a;color:#cce6ff}
+.system-pill.delayed{background:#7a1a1a;color:#ffb4ac}
+.system-pill.na{background:rgba(255,255,255,.12);color:#cde}
+.huddle-rollup-table{width:100%;border-collapse:collapse;font-size:12px}
+.huddle-rollup-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
+.huddle-rollup-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff}
+.gowning-list{display:flex;flex-direction:column;gap:7px}
+.gowning-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 9px;display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}
+.gowning-area{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}
+.gowning-select{width:100%;min-width:0;background:#173653;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:800}
+.gowning-select.suspend{background:#80520e;color:#ffe6ae}
+.gowning-select.full{background:#1f6b42;color:#d7ffe5}
+.huddle-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-bottom:14px}
+.huddle-table{width:100%;border-collapse:collapse;font-size:12px}
+.huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
+.huddle-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;vertical-align:top}
+.huddle-status{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;display:inline-block;white-space:nowrap}
+.huddle-status.normal{background:#1f6b42;color:#d7ffe5}
+.huddle-status.oos{background:#7a1a1a;color:#ffb4ac}
+.huddle-status.cond{background:#80520e;color:#ffe6ae}
+.huddle-status.full{background:#174a7a;color:#cce6ff}
+.huddle-status.down{background:#3b2f55;color:#ddd7ff}
+.huddle-status.breakdown{background:#3b2f55;color:#ddd7ff}
+.huddle-status.complete{background:#1f6b42;color:#d7ffe5}
+.huddle-status.progress{background:#80520e;color:#ffe6ae}
+.huddle-status.planned{background:#174a7a;color:#cce6ff}
+.huddle-status.delayed{background:#7a1a1a;color:#ffb4ac}
+.huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
+.dash-mode-huddle .kpi-section{display:none!important}
+.dash-mode-huddle .progress-grid{display:none!important}
+.dash-mode-kpi .huddle-section{display:none!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
 select.msf:focus{border-color:#1565c0;outline:2px solid #aac4e8}
@@ -404,6 +497,45 @@ select.msf option:checked{background:#ddeeff}
 .rc-empty{padding:22px;text-align:center;color:#999;font-size:13px}
 .rc-legend{font-size:11px;color:#555;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rc-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.rc-dot.pm{background:RoyalBlue}.rc-dot.cal{background:SeaGreen}.rc-dot.cm{background:DarkKhaki}.rc-dot.em{background:#9b7dd4}.rc-dot.proj{background:Sienna}
 @media(max-width:1000px){.rc-main{grid-template-columns:1fr}.rc-panel.side{min-height:260px}}
+@media (max-width:1100px){
+  header{padding:12px 16px}
+  .tab-nav{padding:0 16px;overflow-x:auto}
+  .tab-btn{padding:9px 14px;white-space:nowrap}
+  .container{padding:10px 12px 0 12px}
+  .top-panel{padding-bottom:6px}
+  .filters{grid-template-columns:minmax(150px,1.2fr) repeat(4,minmax(105px,.8fr));gap:6px;margin-bottom:6px}
+  .filters input,.filters select,.more-filters-btn{height:30px;font-size:12px;padding:5px 8px}
+  .actions{grid-column:1/-1;justify-content:flex-end;gap:6px}
+  .actions .btn,.actions button{padding:5px 9px!important;font-size:12px!important}
+  .advanced-filters{padding:8px;margin-bottom:8px}
+  .advanced-filter-grid{grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:6px}
+  .advanced-filter-field label{font-size:9px}
+  .advanced-filter-field input,.advanced-filter-field select:not(.msf){height:28px;font-size:11px;padding:4px 6px}
+  .advanced-filter-field select.msf{min-height:58px;font-size:11px;padding:3px 5px}
+  .progress-kpis{grid-template-columns:1fr 1fr}
+  .progress-grid{grid-template-columns:1fr}
+  .huddle-grid{grid-template-columns:1fr}
+  .huddle-wide{grid-template-columns:1fr}
+  .system-status-grid{grid-template-columns:1fr}
+}
+@media (max-width:720px){
+  header{align-items:flex-start;gap:6px;flex-direction:column}
+  .filters{grid-template-columns:1fr 1fr;gap:6px}
+  .filters input{grid-column:1/-1}
+  .more-filters-btn{width:100%}
+  .actions{justify-content:flex-start;overflow-x:auto;padding-bottom:2px}
+  .project-date-field input{padding:6px 8px;font-size:12px}
+  .project-box{min-width:120px;padding:8px 10px}
+  .project-value{font-size:18px}
+  .progress-brief{padding:10px}
+  .progress-brief-head{align-items:flex-start;flex-direction:column}
+  .progress-kpis{grid-template-columns:1fr}
+  .progress-kpi-value{font-size:26px}
+  .progress-row{grid-template-columns:1fr 44px;gap:6px}
+  .progress-row .progress-mini-meter,.progress-row .progress-row-meta{grid-column:1/-1}
+  .system-status-row{grid-template-columns:92px 1fr;gap:6px}
+  .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
+}
 
 </style>
 </head>
@@ -420,7 +552,8 @@ select.msf option:checked{background:#ddeeff}
   <button class="tab-btn" onclick="showTab('workorders',this)">🔧 Work Orders</button>
   <button class="tab-btn" onclick="showTab('resource',this)">📆 Resource Calendar</button>
   <button class="tab-btn" onclick="showTab('printschedule',this)">🖨️ Print Schedule</button>
-  <button class="tab-btn" onclick="showTab('dashboard',this)">📊 Dashboard</button>
+  <button class="tab-btn" onclick="setDashboardMode('huddle');showTab('dashboard',this)">📊 Dashboard</button>
+  <button class="tab-btn" onclick="setDashboardMode('kpi');showTab('dashboard',this)">📈 KPI</button>
 </div>
 </div>
 
@@ -513,12 +646,28 @@ select.msf option:checked{background:#ddeeff}
       <option value="N/A">N/A</option>
     </select>
     <select id="filterAssigned" onchange="render()"><option value="">All assignees</option><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select>
+    <button class="btn secondary more-filters-btn" id="moreFiltersBtn" onclick="toggleAdvancedFilters()">More Filters</button>
     <div class="actions">
       <button class="btn secondary" onclick="expandAll()">Expand All</button>
       <button class="btn secondary" onclick="collapseAll()">Collapse All</button>
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
     <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
+    </div>
+  </div>
+  <div class="advanced-filters" id="advancedFilters">
+    <div class="advanced-filter-grid">
+      <div class="advanced-filter-field"><label for="headerFilterId">ID</label><input type="text" id="headerFilterId" placeholder="Filter" oninput="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterTask">Task</label><input type="text" id="headerFilterTask" placeholder="Filter" oninput="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterCategory">Category</label><select id="headerFilterCategory" class="msf" multiple="" size="5" onchange="render()"><option value="PM">PM</option><option value="CAL">CAL</option><option value="CM">CM</option><option value="EM">EM</option><option value="PROJ">PROJ</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterAssigned">Assigned</label><select id="headerFilterAssigned" class="msf" multiple="" size="5" onchange="render()"><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterVendor">Vendor</label><input type="text" id="headerFilterVendor" placeholder="Filter" oninput="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterStart">Start</label><input type="date" id="headerFilterStart" onchange="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterEnd">End</label><input type="date" id="headerFilterEnd" onchange="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterDays">Days</label><input type="number" id="headerFilterDays" placeholder="Days" oninput="render()"></div>
+      <div class="advanced-filter-field"><label for="headerFilterWk">WK</label><select id="headerFilterWk" class="msf" multiple="" size="5" onchange="render()"><option value="W1">W1</option><option value="W2">W2</option><option value="W3">W3</option><option value="W4">W4</option><option value="W5">W5</option><option value="W6">W6</option><option value="W7">W7</option><option value="W8">W8</option><option value="W9">W9</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterStatus">Status</label><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="N/A">N/A</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterNotes">Notes</label><input type="text" id="headerFilterNotes" placeholder="Filter" oninput="render()"></div>
     </div>
   </div>
   </div>
@@ -544,22 +693,6 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('status'," event)\"="">Status <span class="sort-indicator" id="sort-status" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('notes'," event)\"="">Notes <span class="sort-indicator" id="sort-notes" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th>Action</th>
-        </tr>
-        <tr class="filter-row">
-          <th><input type="text" id="headerFilterId" placeholder="Filter" oninput="render()"></th>
-          <th><input type="text" id="headerFilterTask" placeholder="Filter" oninput="render()"></th>
-          <th><select id="headerFilterCategory" class="msf" multiple="" size="5" onchange="render()"><option value="PM">PM</option><option value="CAL">CAL</option><option value="CM">CM</option><option value="EM">EM</option><option value="PROJ">PROJ</option></select></th>
-          <th><select id="headerFilterAssigned" class="msf" multiple="" size="5" onchange="render()"><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select></th>
-          <th></th>
-          <th><input type="text" id="headerFilterVendor" placeholder="Filter" oninput="render()"></th>
-          <th><input type="date" id="headerFilterStart" onchange="render()"></th>
-          <th><input type="date" id="headerFilterEnd" onchange="render()"></th>
-          <th></th>
-          <th><input type="number" id="headerFilterDays" placeholder="Days" oninput="render()"></th>
-          <th><select id="headerFilterWk" class="msf" multiple="" size="5" onchange="render()"><option value="W1">W1</option><option value="W2">W2</option><option value="W3">W3</option><option value="W4">W4</option><option value="W5">W5</option><option value="W6">W6</option><option value="W7">W7</option><option value="W8">W8</option><option value="W9">W9</option></select></th>
-          <th><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="N/A">N/A</option></select></th>
-          <th><input type="text" id="headerFilterNotes" placeholder="Filter" oninput="render()"></th>
-          <th></th>
         </tr>
       </thead>
       <tbody id="tbody"><tr class="section-row"><td colspan="14">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
@@ -3488,15 +3621,120 @@ APPENDIX 6.5B)</div>
 </div>
 
 <div id="page-dashboard" class="page">
-<div style="background:#0d2137;overflow-y:auto;flex:1;padding:18px 22px;color:#fff;min-height:0">
+<div id="dashboardPanel" class="dash-mode-huddle" style="background:#0d2137;overflow-y:auto;flex:1;padding:18px 22px;color:#fff;min-height:0">
 
   <!-- Title -->
-  <div style="text-align:center;background:#1a3a5c;padding:13px;border-radius:8px;margin-bottom:14px;border-bottom:3px solid #f0c040">
-    <span style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Shutdown 2026 — KPI Dashboard</span>
+  <div style="background:#1a3a5c;padding:13px 18px;border-radius:8px;margin-bottom:14px;border-bottom:3px solid #f0c040;display:flex;align-items:center;justify-content:space-between;gap:14px">
+    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">2026 Shutdown Daily Huddle</span>
+    <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
+  </div>
+
+  <!-- Daily Progress Brief -->
+  <div class="progress-brief huddle-section">
+    <div class="progress-brief-head">
+      <div>
+        <div class="progress-brief-title">Shutdown Project Progress</div>
+        <div class="progress-brief-date" id="d-progress-asof">As of —</div>
+      </div>
+      <div class="progress-brief-date" id="d-progress-summary">—</div>
+    </div>
+    <div class="progress-kpis">
+      <div class="progress-kpi">
+        <div class="progress-kpi-label">Overall Complete</div>
+        <div class="progress-kpi-value" id="d-progress-pct">—</div>
+        <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
+        <div class="progress-kpi-sub" id="d-progress-done">—</div>
+      </div>
+      <div class="progress-kpi">
+        <div class="progress-kpi-label">In Progress</div>
+        <div class="progress-kpi-value" id="d-progress-inprogress">—</div>
+        <div class="progress-kpi-sub">Active tasks</div>
+      </div>
+      <div class="progress-kpi">
+        <div class="progress-kpi-label">Pending</div>
+        <div class="progress-kpi-value" id="d-progress-pending">—</div>
+        <div class="progress-kpi-sub">Not started</div>
+      </div>
+      <div class="progress-kpi">
+        <div class="progress-kpi-label">Delayed</div>
+        <div class="progress-kpi-value" id="d-progress-delayed">—</div>
+        <div class="progress-kpi-sub">Needs attention</div>
+      </div>
+      <div class="progress-kpi">
+        <div class="progress-kpi-label">Lookahead</div>
+        <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
+        <div class="progress-kpi-sub">Next 7 days</div>
+      </div>
+    </div>
+    <div class="progress-grid">
+      <div class="progress-panel">
+        <div class="progress-panel-title">Progress by System</div>
+        <div id="d-progress-system"></div>
+      </div>
+      <div class="progress-panel">
+        <div class="progress-panel-title">Progress by Category</div>
+        <div id="d-progress-category"></div>
+      </div>
+      <div class="progress-panel">
+        <div class="progress-panel-title">Meeting Focus</div>
+        <div id="d-progress-focus"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Daily Huddle System Status -->
+  <div class="huddle-grid huddle-section">
+    <div class="huddle-panel">
+      <div class="huddle-panel-title">Systems / Utilities Status</div>
+      <div id="d-system-status" class="system-status-grid"></div>
+    </div>
+    <div class="huddle-panel">
+      <div class="huddle-panel-title">Status Rollup</div>
+      <table class="huddle-rollup-table">
+        <thead><tr><th>Status</th><th>Count</th><th>Meeting Meaning</th></tr></thead>
+        <tbody id="d-system-rollup"></tbody>
+      </table>
+      <div class="huddle-panel-title" style="margin-top:16px">Top System Attention</div>
+      <div id="d-system-attention" class="progress-list"></div>
+      <div class="huddle-panel-title" style="margin-top:16px">Gowning Status</div>
+      <div id="d-gowning-status" class="gowning-list">
+        <div class="gowning-row">
+          <div class="gowning-area">DP MFG Area</div>
+          <select id="gowningDp" class="gowning-select" onchange="setGowningStatus('dp',this.value)">
+            <option value="Suspending - Blue scrub only">Suspending - Blue scrub only</option>
+            <option value="Full Gowning">Full Gowning</option>
+          </select>
+        </div>
+        <div class="gowning-row">
+          <div class="gowning-area">DS MFG Area</div>
+          <select id="gowningDs" class="gowning-select" onchange="setGowningStatus('ds',this.value)">
+            <option value="Suspending - Blue scrub only">Suspending - Blue scrub only</option>
+            <option value="Full Gowning">Full Gowning</option>
+          </select>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="huddle-wide huddle-section">
+    <div class="huddle-panel">
+      <div class="huddle-panel-title">Maintenance Activities</div>
+      <table class="huddle-table">
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <tbody id="d-maint-activities"></tbody>
+      </table>
+    </div>
+    <div class="huddle-panel">
+      <div class="huddle-panel-title">Return to Service / Delay Description</div>
+      <table class="huddle-table">
+        <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>New</th><th>Delay Description</th></tr></thead>
+        <tbody id="d-rts-rows"></tbody>
+      </table>
+    </div>
   </div>
 
   <!-- Delayed Alert -->
-  <div id="d-delayed-alert" class="dash-delayed-alert" style="margin-bottom:14px">
+  <div id="d-delayed-alert" class="dash-delayed-alert kpi-section" style="margin-bottom:14px">
     <div class="dash-delayed-alert-header">
       <span style="font-size:20px">⚠</span>
       <span class="dash-delayed-alert-title">Delayed Tasks</span>
@@ -3509,7 +3747,7 @@ APPENDIX 6.5B)</div>
   </div>
 
   <!-- Row 1: Total | By Area | By Resource -->
-  <div style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
+  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
 
     <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center">
       <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;margin-bottom:10px">TOTAL WORK ORDERS</div>
@@ -3554,7 +3792,7 @@ APPENDIX 6.5B)</div>
   </div>
 
   <!-- Row 2: By Type | Timeline -->
-  <div style="display:grid;grid-template-columns:1fr 1.8fr;gap:12px;margin-bottom:12px">
+  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 1.8fr;gap:12px;margin-bottom:12px">
 
     <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
       <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY TYPE</div>
@@ -3581,14 +3819,14 @@ APPENDIX 6.5B)</div>
   </div>
 
   <!-- Row 3: By Vendor (full width) -->
-  <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
+  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
     <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">WORK ORDER BY TYPE BY VENDOR</div>
     <div style="display:flex;justify-content:center;gap:18px;margin-bottom:8px">
       <span style="font-size:11px;color:#f0c040">● CAL</span>
       <span style="font-size:11px;color:#5db3e8">● CM</span>
       <span style="font-size:11px;color:#e07840">● PM</span>
     </div>
-    <div id="d-by-vendor" style="display:flex;align-items:flex-end;gap:6px;min-height:180px;overflow-x:auto;padding-bottom:4px"></div>
+    <div id="d-by-vendor" class="vendor-progress"></div>
   </div>
 
 </div>
@@ -4798,6 +5036,13 @@ function deleteRow(id){
   refreshFilters();
   render();
 }
+function toggleAdvancedFilters(){
+  const panel = document.getElementById('advancedFilters');
+  const btn = document.getElementById('moreFiltersBtn');
+  if(!panel || !btn) return;
+  const open = panel.classList.toggle('open');
+  btn.textContent = open ? 'Less Filters' : 'More Filters';
+}
 
 render();
 document.getElementById('todayInput').value = new Date().toISOString().slice(0,10);
@@ -5343,6 +5588,44 @@ function deleteScopeRow(tblId,idx){ if(!sowEditMode) return;
 // ========== END SCOPE VISUAL ==========
 
 // ========== SCOPE OF WORK ==========
+function setDashboardMode(mode){
+  const panel = document.getElementById('dashboardPanel');
+  if(!panel) return;
+  panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
+  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi');
+  const title = document.getElementById('dashboardTitle');
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : '2026 Shutdown Daily Huddle';
+}
+
+function getGowningStatus(){
+  const defaults = {dp:'Full Gowning', ds:'Full Gowning'};
+  try{
+    const saved = localStorage.getItem('sd26_gowning_status_v1');
+    return saved ? Object.assign(defaults, JSON.parse(saved)) : defaults;
+  }catch(e){ return defaults; }
+}
+
+function applyGowningSelectStyle(sel){
+  if(!sel) return;
+  sel.classList.toggle('suspend', sel.value === 'Suspending - Blue scrub only');
+  sel.classList.toggle('full', sel.value === 'Full Gowning');
+}
+
+function renderGowningStatus(){
+  const status = getGowningStatus();
+  const dp = document.getElementById('gowningDp');
+  const ds = document.getElementById('gowningDs');
+  if(dp){ dp.value = status.dp; applyGowningSelectStyle(dp); }
+  if(ds){ ds.value = status.ds; applyGowningSelectStyle(ds); }
+}
+
+function setGowningStatus(area, value){
+  const status = getGowningStatus();
+  status[area] = value;
+  try{ localStorage.setItem('sd26_gowning_status_v1', JSON.stringify(status)); }catch(e){}
+  renderGowningStatus();
+}
+
 function showTab(tab, btn){
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -5375,6 +5658,245 @@ function renderDashboard(){
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
   const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
+  const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
+  const todayDate = new Date(todayIso + 'T00:00:00');
+  const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
+  const statusCounts = activeLeaf.reduce((acc,t)=>{
+    const s = statusMap[t.id] || t.status || 'Pending';
+    acc[s] = (acc[s]||0) + 1;
+    return acc;
+  }, {Pending:0,'In Progress':0,Complete:0,Delayed:0});
+  const progressTotal = activeLeaf.length;
+  const progressDone = statusCounts.Complete || 0;
+  const progressPct = progressTotal ? Math.round(progressDone / progressTotal * 100) : 0;
+  const overdueTasks = activeLeaf.filter(t=>{
+    const endIso = normalizeDateValue(t.end);
+    return endIso && new Date(endIso+'T00:00:00') < todayDate && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+  });
+  const lookaheadTasks = activeLeaf.filter(t=>{
+    const startIso = normalizeDateValue(t.start);
+    if(!startIso) return false;
+    const startDate = new Date(startIso+'T00:00:00');
+    const delta = Math.floor((startDate - todayDate) / 86400000);
+    return delta >= 0 && delta <= 7 && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+  }).sort((a,b)=>(normalizeDateValue(a.start)||'').localeCompare(normalizeDateValue(b.start)||''));
+
+  function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
+  function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
+  function pctRowHtml(name, done, total, meta, color){
+    const pct = total ? Math.round(done/total*100) : 0;
+    return `<div class="progress-row">
+      <div class="progress-row-name" title="${name}">${name}</div>
+      <div class="progress-row-pct">${pct}%</div>
+      <div class="progress-mini-meter"><span style="width:${pct}%;background:${color||'#4a90d9'}"></span></div>
+      <div class="progress-row-meta">${meta||done+'/'+total}</div>
+    </div>`;
+  }
+  function shortTask(t){
+    const st = statusMap[t.id] || t.status || 'Pending';
+    return `<div class="progress-item">
+      <div class="progress-id">${t.id}</div>
+      <div class="progress-task" title="${t.task}">${t.task}</div>
+      <div class="progress-tag">${st}</div>
+    </div>`;
+  }
+
+  setText('d-progress-asof', 'As of ' + displayDate(todayIso));
+  setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
+  setText('d-progress-pct', progressPct + '%');
+  setWidth('d-progress-meter', progressPct + '%');
+  setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
+  setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
+  setText('d-progress-pending', statusCounts.Pending || 0);
+  setText('d-progress-delayed', statusCounts.Delayed || 0);
+  setText('d-progress-lookahead-count', lookaheadTasks.length);
+  setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+  renderGowningStatus();
+
+  const huddleSystemDefs = [
+    {system:'01-PURW-001', name:'Purified Water', parents:['1']},
+    {system:'01-WFIS-001', name:'WFI', parents:['2']},
+    {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|cstg|cond rel|full rel/i.test(t.task||'')},
+    {system:'01-PMES-001', name:'MES System', parents:['3']},
+    {system:'01-HPPS-001', name:'High Pressure Steam', parents:['4']},
+    {system:'01-AHUN-001-005', name:'Air Handler Units', parents:['5']},
+    {system:'01-CCDA-001', name:'Clean Dry Air', parents:['6']},
+    {system:'01-N2GS-001', name:'Liquid Nitrogen', parents:['7']},
+    {system:'01-EMGN-001/002', name:'Emergency Generators', parents:['8']},
+    {system:'01-VACU-001', name:'Vacuum System', parents:['9']},
+    {system:'01-SMRT-001', name:'Smart Filler', match:t=>/smart/i.test(t.task||'')},
+    {system:'01-LYOP-001', name:'Lyophilizer', match:t=>/lyo|lyophilizer/i.test(t.task||'')},
+    {system:'01-DPOV-001', name:'DP Oven', match:t=>/oven/i.test(t.task||'')},
+    {system:'01-FERM-002', name:'Fermenter', match:t=>/ferment/i.test(t.task||'')},
+    {system:'01-TFFS-001/002', name:'TFFS Skids', match:t=>/tffs/i.test(t.task||'')},
+    {system:'01-ACLE/CWAS/DECA', name:'Autoclaves / Parts Washers', match:t=>/acle|cwas|deca|autoclave|parts washer|vial washer/i.test(t.task||'')},
+    {system:'AREA RELEASE', name:'DP / DS Area Release', parents:['13']},
+    {system:'PROJECTS', name:'Shutdown Projects', parents:['14']}
+  ];
+  function huddleTasksFor(def){
+    return activeLeaf.filter(t=>{
+      const id = String(t.id);
+      const byParent = (def.parents||[]).some(p=>id.startsWith(p+'.'));
+      const byMatch = typeof def.match === 'function' && def.match(t);
+      return byParent || byMatch;
+    });
+  }
+  function hasStarted(t){
+    const st = statusMap[t.id] || t.status || 'Pending';
+    return st !== 'Pending' && st !== 'N/A';
+  }
+  function isFullRelTask(t){ return /full\s*rel|ful\s*rel|full release/i.test(t.task||''); }
+  function isCondRelTask(t){ return /cond\s*rel|conditional release/i.test(t.task||''); }
+  function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
+  function huddleStatus(items){
+    if(!items.length) return 'Normal';
+    const fullRel = items.find(t=>isFullRelTask(t) && hasStarted(t));
+    const condRel = items.find(t=>isCondRelTask(t) && hasStarted(t));
+    const down = items.find(t=>isBreakdownTask(t) && hasStarted(t));
+    const oos = items.find(t=>hasStarted(t));
+    if(fullRel) return 'FUL REL';
+    if(condRel) return 'Cond. REL';
+    if(down) return 'Breakdown';
+    if(oos) return 'OOS';
+    return 'Normal';
+  }
+  function huddleReason(items, status){
+    if(!items.length) return 'No active outage scope';
+    if(status==='FUL REL'){
+      const t = items.find(x=>isFullRelTask(x) && hasStarted(x));
+      return t ? 'Full release: '+t.id : 'Full release';
+    }
+    if(status==='Cond. REL'){
+      const t = items.find(x=>isCondRelTask(x) && hasStarted(x));
+      return t ? 'Conditional release: '+t.id : 'Conditional release';
+    }
+    if(status==='Breakdown'){
+      const t = items.find(x=>isBreakdownTask(x) && hasStarted(x));
+      return t ? 'Breakdown: '+t.id : 'Breakdown';
+    }
+    if(status==='OOS'){
+      const active = items.filter(hasStarted);
+      const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
+      return active.length+' active' + (cats.length ? ' / '+cats.join('+') : '');
+    }
+    return 'Normal operation';
+  }
+  function pillClass(status){
+    return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
+  }
+  const huddleSystems = huddleSystemDefs.map(def=>{
+    const items = huddleTasksFor(def);
+    const status = huddleStatus(items);
+    const complete = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
+    const pct = items.length ? Math.round(complete/items.length*100) : 0;
+    return {def, items, status, pct, reason:huddleReason(items,status)};
+  });
+  const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
+  const systemStatusEl = document.getElementById('d-system-status');
+  if(systemStatusEl){
+    systemStatusEl.innerHTML = huddleSystems.map(s=>`<div class="system-status-row">
+      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
+      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
+      <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
+      <div class="system-status-reason" title="${s.reason}">${s.reason}</div>
+    </div>`).join('');
+  }
+  const rollupEl = document.getElementById('d-system-rollup');
+  if(rollupEl){
+    const meaning = {'Normal':'No active outage','OOS':'Task started / out of service','Cond. REL':'Conditional release','FUL REL':'Full release','Breakdown':'Unplanned failure'};
+    rollupEl.innerHTML = statusOrder.map(st=>{
+      const n = huddleSystems.filter(s=>s.status===st).length;
+      return `<tr><td><span class="system-pill ${pillClass(st)}">${st}</span></td><td>${n}</td><td>${meaning[st]}</td></tr>`;
+    }).join('');
+  }
+  const attentionEl = document.getElementById('d-system-attention');
+  if(attentionEl){
+    const attention = huddleSystems.filter(s=>s.status==='OOS'||s.status==='Breakdown'||s.status==='Cond. REL').slice(0,5);
+    attentionEl.innerHTML = attention.length ? attention.map(s=>`<div class="progress-item">
+      <div class="progress-id">${s.def.system.split('/')[0]}</div>
+      <div class="progress-task" title="${s.def.name}">${s.def.name}</div>
+      <div class="progress-tag">${s.reason}</div>
+    </div>`).join('') : '<div class="progress-empty">No delayed or active systems.</div>';
+  }
+  function huddleSystemForTask(t){
+    const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
+    return found ? found.def.system : (t.section||'—');
+  }
+  function taskProgressPct(t){
+    const st = statusMap[t.id] || t.status || 'Pending';
+    if(st==='Complete') return 100;
+    if(st==='In Progress') return 50;
+    return 0;
+  }
+  function huddleStatusHtml(st){
+    return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
+  }
+  const maintEl = document.getElementById('d-maint-activities');
+  if(maintEl){
+    const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending'));
+    const maintItems = (primary.length ? primary : lookaheadTasks).slice(0,6);
+    maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      return `<tr>
+        <td>${taskProgressPct(t)}%</td>
+        <td>${huddleSystemForTask(t)}</td>
+        <td>${t.task}</td>
+        <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+        <td>—</td>
+        <td>${huddleStatusHtml(st)}</td>
+      </tr>`;
+    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 7-day lookahead tasks.</td></tr>';
+  }
+  const rtsEl = document.getElementById('d-rts-rows');
+  if(rtsEl){
+    const rtsCandidates = delayedTasks
+      .concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)))
+      .concat(activeLeaf.filter(t=>/cond|full rel|release|return/i.test(t.task||'') && (statusMap[t.id]||t.status||'Pending')!=='Complete'))
+      .filter((t,i,arr)=>arr.findIndex(x=>x.id===t.id)===i)
+      .slice(0,6);
+    rtsEl.innerHTML = rtsCandidates.length ? rtsCandidates.map(t=>`<tr>
+      <td>${taskProgressPct(t)}%</td>
+      <td>${huddleSystemForTask(t)}</td>
+      <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+      <td>—</td>
+      <td>${t.actionComment||t.notes||'Review schedule impact / owner update'}</td>
+    </tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No return-to-service delays or release impacts.</td></tr>';
+  }
+
+  const systemEl = document.getElementById('d-progress-system');
+  if(systemEl){
+    const systemOrder = ['UTILITIES SYSTEM','PROCESS EQUIPMENT','AREA RELEASE','PROJECTS'];
+    systemEl.innerHTML = systemOrder.map(sec=>{
+      const items = activeLeaf.filter(t=>t.section===sec);
+      const done = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
+      const delayed = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
+      const label = sec.replace(' SYSTEM','').replace('PROCESS EQUIPMENT','PROCESS EQ');
+      return pctRowHtml(label, done, items.length, delayed ? delayed+' delayed' : done+'/'+items.length, delayed ? '#c62828' : '#4a90d9');
+    }).join('');
+  }
+
+  const categoryEl = document.getElementById('d-progress-category');
+  if(categoryEl){
+    const catColors = {PM:'RoyalBlue',CAL:'SeaGreen',CM:'DarkKhaki',EM:'#9b27af',PROJ:'Sienna'};
+    const cats = ['PM','CAL','CM','EM','PROJ'];
+    categoryEl.innerHTML = cats.map(cat=>{
+      const items = activeLeaf.filter(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()===cat);
+      const done = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
+      return pctRowHtml(cat, done, items.length, done+'/'+items.length, catColors[cat]||'#4a90d9');
+    }).join('');
+  }
+
+  const focusEl = document.getElementById('d-progress-focus');
+  if(focusEl){
+    const focusItems = delayedTasks.concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))).slice(0,5);
+    if(focusItems.length){
+      focusEl.innerHTML = `<div class="progress-list">${focusItems.map(shortTask).join('')}</div>`;
+    }else if(lookaheadTasks.length){
+      focusEl.innerHTML = `<div class="progress-list">${lookaheadTasks.slice(0,5).map(shortTask).join('')}</div>`;
+    }else{
+      focusEl.innerHTML = '<div class="progress-empty">No delayed, overdue, or 7-day lookahead items.</div>';
+    }
+  }
 
   // ── Total card ────────────────────────────────────────────────────────────
   const tn = document.getElementById('d-total-num');
@@ -5523,31 +6045,25 @@ function renderDashboard(){
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
-  const maxV2 = Math.max(...topVendors.map(([,v])=>v.total),1);
-  const BAR_MAX = 160;
   const vEl = document.getElementById('d-by-vendor');
   if(vEl) vEl.innerHTML = topVendors.map(([name,d])=>{
-    const h = v => Math.max(3, Math.round(v/maxV2*BAR_MAX));
-    const shortName = name.length>10 ? name.slice(0,9)+'…' : name;
-    return `<div style="display:flex;flex-direction:column;align-items:center;gap:0;min-width:52px">
-      <div style="display:flex;align-items:flex-end;gap:2px;height:${BAR_MAX}px;position:relative">
-        ${d.CAL>0?`<div style="display:flex;flex-direction:column;align-items:center">
-          <span style="font-size:11px;font-weight:700;color:#fff">${d.CAL}</span>
-          <div style="width:18px;height:${h(d.CAL)}px;background:#f0c040;border-radius:3px 3px 0 0"></div>
-        </div>`:''}
-        ${d.CM>0?`<div style="display:flex;flex-direction:column;align-items:center">
-          <span style="font-size:11px;font-weight:700;color:#fff">${d.CM}</span>
-          <div style="width:18px;height:${h(d.CM)}px;background:#5db3e8;border-radius:3px 3px 0 0"></div>
-        </div>`:''}
-        ${d.PM>0?`<div style="display:flex;flex-direction:column;align-items:center">
-          <span style="font-size:11px;font-weight:700;color:#fff">${d.PM}</span>
-          <div style="width:18px;height:${h(d.PM)}px;background:#e07840;border-radius:3px 3px 0 0"></div>
-        </div>`:''}
+    const calPct = d.total ? Math.max(3, Math.round(d.CAL/d.total*100)) : 0;
+    const cmPct = d.total ? Math.max(3, Math.round(d.CM/d.total*100)) : 0;
+    const pmPct = d.total ? Math.max(3, Math.round(d.PM/d.total*100)) : 0;
+    return `<div class="vendor-progress-row">
+      <div class="vendor-progress-top">
+        <div class="vendor-progress-name" title="${name}">${name}</div>
+        <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div style="width:100%;height:1px;background:rgba(255,255,255,0.2);margin:3px 0"></div>
-      <div style="font-size:9px;color:#acd;text-align:center;font-weight:600;white-space:nowrap">${shortName}</div>
-      <div style="font-size:8px;color:#778;text-align:center">
-        ${d.CAL>0?'<span style="color:#f0c040">●CAL</span> ':''}${d.CM>0?'<span style="color:#5db3e8">●CM</span> ':''}${d.PM>0?'<span style="color:#e07840">●PM</span>':''}
+      <div class="vendor-stack">
+        ${d.CAL>0?`<span class="vendor-seg" style="width:${calPct}%;background:#f0c040"></span>`:''}
+        ${d.CM>0?`<span class="vendor-seg" style="width:${cmPct}%;background:#5db3e8"></span>`:''}
+        ${d.PM>0?`<span class="vendor-seg" style="width:${pmPct}%;background:#e07840"></span>`:''}
+      </div>
+      <div class="vendor-meta">
+        ${d.CAL>0?`<span><i class="vendor-dot" style="background:#f0c040"></i>CAL ${d.CAL}</span>`:''}
+        ${d.CM>0?`<span><i class="vendor-dot" style="background:#5db3e8"></i>CM ${d.CM}</span>`:''}
+        ${d.PM>0?`<span><i class="vendor-dot" style="background:#e07840"></i>PM ${d.PM}</span>`:''}
       </div>
     </div>`;
   }).join('');
@@ -7066,11 +7582,11 @@ function rcExpandedBarRows(items,start,end){
 
 /* ========== Print Schedule Executive Weekly Gantt ========== */
 .ps-page{padding:12px 16px;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#f5f5f5}
-.ps-toolbar{display:flex;align-items:flex-end;gap:10px;flex-wrap:wrap;background:#fff;border:1px solid #ddd;border-radius:10px;padding:10px 12px;margin-bottom:10px;flex-shrink:0}
-.ps-titlebox{margin-right:auto}.ps-title{font-size:16px;font-weight:800;color:#1a3a5c}.ps-subtitle{font-size:11px;color:#666;margin-top:2px}
+.ps-toolbar{display:grid;grid-template-columns:repeat(3,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}
+.ps-titlebox{display:none}.ps-title{font-size:16px;font-weight:800;color:#1a3a5c}.ps-subtitle{font-size:11px;color:#666;margin-top:2px}
 .ps-toolbar label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.04em;display:flex;flex-direction:column;gap:3px}
-.ps-toolbar select,.ps-toolbar input{font-size:12px;padding:6px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;min-height:30px}.ps-toolbar input{min-width:180px}
-.ps-btn{background:#1a3a5c;color:#fff;border:1px solid #1a3a5c;border-radius:7px;padding:8px 14px;font-size:13px;font-weight:800;cursor:pointer}.ps-btn:hover{filter:brightness(.96)}
+.ps-toolbar select,.ps-toolbar input{font-size:12px;padding:5px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;min-height:29px;width:100%;min-width:0}.ps-toolbar input{min-width:0}
+.ps-btn{background:#1a3a5c;color:#fff;border:1px solid #1a3a5c;border-radius:7px;padding:7px 13px;font-size:12px;font-weight:800;cursor:pointer;white-space:nowrap}.ps-btn:hover{filter:brightness(.96)}
 .ps-print-area{background:#fff;border:1px solid #ddd;border-radius:10px;overflow:auto;flex:1;min-height:0;padding:14px}
 .ps-print-header{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px;border-bottom:2px solid #1a3a5c;padding-bottom:8px}
 .ps-print-header h2{font-size:18px;color:#1a3a5c;margin:0 0 4px 0}.ps-print-meta{font-size:11px;color:#555;line-height:1.4}
@@ -7080,6 +7596,7 @@ function rcExpandedBarRows(items,start,end){
 .ps-group-row{display:grid;grid-template-columns:340px repeat(var(--ps-weeks), 120px)}.ps-group-title{grid-column:1 / -1;background:#1a3a5c;color:#fff;font-size:13px;font-weight:900;letter-spacing:.04em;padding:7px 10px;border-top:4px solid #fff;break-after:avoid}.ps-group-title span{float:right;font-size:11px;font-weight:700;opacity:.85}.ps-task-row{min-height:42px;border-bottom:1px solid #e1e5ea;position:relative;break-inside:avoid}.ps-task-row:nth-child(even) .ps-grid-cell,.ps-task-row:nth-child(even) .ps-task-label{background:#fbfcfd}.ps-task-label{position:sticky;left:0;z-index:2;background:#fff;border-right:1px solid #d7dde4;padding:6px 9px;font-size:11px;line-height:1.25;overflow:hidden}.ps-task-label b{color:#1a3a5c;font-size:11.5px}.ps-task-label .ps-small{display:block;color:#666;font-size:9.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.ps-task-label .ps-small strong{font-weight:900;color:#333}.ps-grid-cell{border-right:1px solid #e8edf2;min-height:42px}.ps-grid-cell:nth-child(odd){background:rgba(26,58,92,.018)}
 .ps-bar{height:24px;border-radius:7px;align-self:center;margin:9px 5px;z-index:1;color:#fff;font-size:10px;font-weight:900;line-height:24px;padding:0 9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 1px 2px rgba(0,0,0,.18)}.ps-bar small{font-size:9px;font-weight:800;opacity:.9;margin-left:6px}.ps-bar.PM,.ps-milestone.PM span{background:RoyalBlue}.ps-bar.CAL,.ps-milestone.CAL span{background:SeaGreen}.ps-bar.CM,.ps-milestone.CM span{background:DarkKhaki;color:#2b2600}.ps-bar.EM,.ps-milestone.EM span{background:#9b7dd4}.ps-bar.PROJ,.ps-milestone.PROJ span{background:Sienna}
 .ps-milestone{align-self:center;z-index:2;height:28px;margin:7px 4px;display:flex;align-items:center;gap:4px;white-space:nowrap;overflow:visible}.ps-milestone span{width:22px;height:22px;border-radius:5px;transform:rotate(45deg);display:inline-flex;align-items:center;justify-content:center;color:transparent;box-shadow:0 1px 2px rgba(0,0,0,.2);flex-shrink:0}.ps-milestone em{font-style:normal;font-size:9px;font-weight:800;color:#1a3a5c;background:rgba(255,255,255,.9);border:1px solid #d6dde5;border-radius:10px;padding:2px 6px}.ps-empty{padding:28px;text-align:center;color:#999;font-size:13px;background:#fff;border:1px dashed #ccc;border-radius:8px}
+@media(max-width:900px){.ps-page{padding:8px}.ps-toolbar{grid-template-columns:1fr 1fr}.ps-btn{width:100%}}
 @media print{
   @page{size:landscape;margin:0.22in}
   html,body{height:auto!important;overflow:visible!important;background:#fff!important}
