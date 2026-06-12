@@ -538,6 +538,8 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
+
+.system-status-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
 </style>
 </head>
 <body>
@@ -3686,7 +3688,7 @@ APPENDIX 6.5B)</div>
   <!-- Daily Huddle System Status -->
   <div class="huddle-grid huddle-section">
     <div class="huddle-panel">
-      <div class="huddle-panel-title">Systems / Utilities Status</div>
+      <div class="huddle-panel-title">Systems / Utilities Status (3 Column)</div>
       <div id="d-system-status" class="system-status-grid"></div>
     </div>
     <div class="huddle-panel">
@@ -3721,7 +3723,7 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel">
       <div class="huddle-panel-title">Maintenance Activities</div>
       <table class="huddle-table">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
     </div>
@@ -5803,7 +5805,9 @@ function renderDashboard(){
   function pillClass(status){
     return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
   }
-  const huddleSystems = huddleSystemDefs.map(def=>{
+  const huddleSystems = huddleSystemDefs
+    .filter(def=>!/PROJECTS/i.test(def.system))
+    .map(def=>{
     const items = huddleTasksFor(def);
     const status = huddleStatus(items);
     const complete = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
@@ -5813,12 +5817,17 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    systemStatusEl.innerHTML = huddleSystems.map(s=>`<div class="system-status-row">
+    systemStatusEl.innerHTML = (function(){
+      const rows=huddleSystems.slice();
+      rows.push({def:{system:'AREA RELEASE - DP MFG',name:'DP Manufacturing Area'},status:'Normal',reason:'Area status'});
+      rows.push({def:{system:'AREA RELEASE - DS MFG',name:'DS Manufacturing Area'},status:'Normal',reason:'Area status'});
+      return rows.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
       <div class="system-status-reason" title="${s.reason}">${s.reason}</div>
     </div>`).join('');
+    })();
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -5853,26 +5862,18 @@ function renderDashboard(){
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
     const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending') && taskTouchesUpcomingTwoWeeks(t));
-    const maintItems = (primary.length ? primary : lookaheadTasks)
-      .slice()
-      .sort((a,b)=>{
-        const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
-        const bs = normalizeDateValue(b.start) || normalizeDateValue(b.end) || '';
-        return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
-      })
-      .slice(0,6);
+    const maintItems = (primary.length ? primary : lookaheadTasks).slice(0,6);
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
       return `<tr>
         <td>${taskProgressPct(t)}%</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
-        <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>—</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
+    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
