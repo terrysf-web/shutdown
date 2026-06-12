@@ -433,6 +433,7 @@ tr.editing{background:#fffceb}
 .system-pill.complete{background:#1f6b42;color:#d7ffe5}
 .system-pill.progress{background:#80520e;color:#ffe6ae}
 .system-pill.planned{background:#174a7a;color:#cce6ff}
+.system-pill.scheduled{background:#174a7a;color:#cce6ff}
 .system-pill.delayed{background:#7a1a1a;color:#ffb4ac}
 .system-pill.na{background:rgba(255,255,255,.12);color:#cde}
 .huddle-rollup-table{width:100%;border-collapse:collapse;font-size:12px}
@@ -458,6 +459,7 @@ tr.editing{background:#fffceb}
 .huddle-status.complete{background:#1f6b42;color:#d7ffe5}
 .huddle-status.progress{background:#80520e;color:#ffe6ae}
 .huddle-status.planned{background:#174a7a;color:#cce6ff}
+.huddle-status.scheduled{background:#174a7a;color:#cce6ff}
 .huddle-status.delayed{background:#7a1a1a;color:#ffb4ac}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
 .dash-mode-huddle .kpi-section{display:none!important}
@@ -642,6 +644,7 @@ select.msf option:checked{background:#ddeeff}
     <select id="filterStatus" onchange="render()">
       <option value="">All statuses</option>
       <option value="Pending">Pending</option>
+      <option value="Scheduled">Scheduled</option>
       <option value="In Progress">In Progress</option>
       <option value="Complete">Complete</option>
       <option value="Delayed">Delayed</option>
@@ -722,7 +725,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="1.02">
@@ -739,7 +742,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.03">
@@ -756,7 +759,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">7</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.04">
@@ -773,7 +776,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.05">
@@ -790,7 +793,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.06">
@@ -807,7 +810,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">480V, DI Bottle and need to provide city water</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.07">
@@ -824,7 +827,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.08">
@@ -841,7 +844,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.09">
@@ -858,7 +861,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="1.10">
@@ -875,7 +878,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.11">
@@ -892,7 +895,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.12">
@@ -909,7 +912,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -937,7 +940,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="2.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="2.02">
@@ -954,7 +957,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="2.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.03">
@@ -971,7 +974,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="2.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">Plant steam</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.04">
@@ -988,7 +991,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="2.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.05">
@@ -1005,7 +1008,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.06">
@@ -1022,7 +1025,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.07">
@@ -1039,7 +1042,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.08">
@@ -1056,7 +1059,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.09">
@@ -1073,7 +1076,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="2.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.10">
@@ -1090,7 +1093,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="2.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1118,7 +1121,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.02">
@@ -1135,7 +1138,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.03">
@@ -1152,7 +1155,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.04">
@@ -1169,7 +1172,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="3.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.05">
@@ -1186,7 +1189,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.06">
@@ -1203,7 +1206,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="3.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1231,7 +1234,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.02">
@@ -1248,7 +1251,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.03">
@@ -1265,7 +1268,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.04">
@@ -1282,7 +1285,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">9:30AM Van Folloso Ref 3498760</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.05">
@@ -1299,7 +1302,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1327,7 +1330,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.02">
@@ -1344,7 +1347,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.03">
@@ -1361,7 +1364,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.04">
@@ -1378,7 +1381,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.05">
@@ -1395,7 +1398,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.06">
@@ -1412,7 +1415,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.07">
@@ -1429,7 +1432,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.08">
@@ -1446,7 +1449,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.09">
@@ -1463,7 +1466,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.10">
@@ -1480,7 +1483,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.11">
@@ -1497,7 +1500,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.12">
@@ -1514,7 +1517,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.13">
@@ -1531,7 +1534,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.13" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.13" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.14">
@@ -1548,7 +1551,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.14" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.14" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.20.01">
@@ -1565,7 +1568,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="5.20.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.20.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.20.02">
@@ -1582,7 +1585,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.20.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.20.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.01">
@@ -1599,7 +1602,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.21.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.02">
@@ -1616,7 +1619,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="5.21.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.03">
@@ -1633,7 +1636,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="5.21.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1661,7 +1664,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.02">
@@ -1678,7 +1681,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="6.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="6.03">
@@ -1695,7 +1698,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.04">
@@ -1712,7 +1715,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.05">
@@ -1729,7 +1732,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="6.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1757,7 +1760,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.02">
@@ -1774,7 +1777,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.03">
@@ -1791,7 +1794,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.04">
@@ -1808,7 +1811,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.05">
@@ -1825,7 +1828,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">—</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="7.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.06">
@@ -1842,7 +1845,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.07">
@@ -1859,7 +1862,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.08">
@@ -1876,7 +1879,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1904,7 +1907,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="8.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="8.02">
@@ -1921,7 +1924,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="8.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="8.03">
@@ -1938,7 +1941,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W5</td>
-      <td><select class="status-sel" data-id="8.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1966,7 +1969,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W5</td>
-      <td><select class="status-sel" data-id="9.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="9.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="9.02">
@@ -1983,7 +1986,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="14">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
@@ -2011,7 +2014,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02a">
@@ -2028,7 +2031,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02a" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02a" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02b">
@@ -2045,7 +2048,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02b" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02b" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02c">
@@ -2062,7 +2065,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02c" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02c" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02d">
@@ -2079,7 +2082,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="10.02d" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02d" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="10.02e">
@@ -2096,7 +2099,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02e" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02e" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="10.02f">
@@ -2113,7 +2116,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="10.02f" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02f" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02g">
@@ -2130,7 +2133,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">16</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02g" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02g" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02h">
@@ -2147,7 +2150,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">14</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02h" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02h" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02i">
@@ -2164,7 +2167,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02i" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02i" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02j">
@@ -2181,7 +2184,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02j" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02j" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2209,7 +2212,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="11.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.02">
@@ -2226,7 +2229,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="11.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.03">
@@ -2243,7 +2246,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="11.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="11.04">
@@ -2260,7 +2263,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W6</td>
-      <td><select class="status-sel" data-id="11.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.05">
@@ -2277,7 +2280,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">13</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="11.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.06">
@@ -2294,7 +2297,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">12</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="11.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.07">
@@ -2311,7 +2314,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">8</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="11.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.08">
@@ -2328,7 +2331,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="11.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2356,7 +2359,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="14">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
@@ -2384,7 +2387,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.01.02">
@@ -2401,7 +2404,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="13.01.03">
@@ -2418,7 +2421,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="13.01.04">
@@ -2435,7 +2438,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">8</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.01">
@@ -2452,7 +2455,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W7</td>
-      <td><select class="status-sel" data-id="13.02.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.02">
@@ -2469,7 +2472,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W7</td>
-      <td><select class="status-sel" data-id="13.02.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.03">
@@ -2486,7 +2489,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W8</td>
-      <td><select class="status-sel" data-id="13.02.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.04">
@@ -2503,7 +2506,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W9</td>
-      <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="14">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
@@ -2531,7 +2534,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">7</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.02">
@@ -2548,7 +2551,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.03">
@@ -2565,7 +2568,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.04">
@@ -2582,7 +2585,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr></tbody>
@@ -4024,7 +4027,7 @@ const rawTasks = [
   {id:'14.01',task:'New Task',assigned:'',vendor:'',start:null,end:null,days:null,section:'PROJECTS'},
 ];
 
-const STATUSES = ['Pending','In Progress','Complete','Delayed','N/A'];
+const STATUSES = ['Pending','Scheduled','In Progress','Complete','Delayed','N/A'];
 const CATEGORIES = ['PM','CAL','CM','EM','PROJ'];
 let projectStartDate = null;
 let projectEndDate = null;
