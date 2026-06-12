@@ -545,7 +545,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.05.3</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.12 System Names</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -5738,25 +5738,25 @@ function renderDashboard(){
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
     {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
     {system:'01-PMES-001', name:'PMES System', parents:['3']},
-    {system:'01-HPPS-001', name:'High Pressure Steam', parents:['4']},
+    {system:'01-HPPS-001', name:'Steam', parents:['4']},
     {system:'01-AHUN-001', name:'AHU-001', match:t=>/AHUN[-\s]*001|AHU[-\s]*001/i.test(t.task||'')},
     {system:'01-AHUN-002', name:'AHU-002', match:t=>/AHUN[-\s]*002|AHU[-\s]*002/i.test(t.task||'')},
     {system:'01-AHUN-003', name:'AHU-003', match:t=>/AHUN[-\s]*003|AHU[-\s]*003/i.test(t.task||'')},
     {system:'01-AHUN-004', name:'AHU-004', match:t=>/AHUN[-\s]*004|AHU[-\s]*004/i.test(t.task||'')},
     {system:'01-AHUN-005', name:'AHU-005', match:t=>/AHUN[-\s]*005|AHU[-\s]*005/i.test(t.task||'')},
     {system:'01-CCDA-001', name:'Clean Dry Air', parents:['6']},
-    {system:'01-N2GS-001', name:'Liquid Nitrogen', parents:['7']},
-    {system:'01-EMGN-001/002', name:'Emergency Generators', parents:['8']},
+    {system:'01-N2GS-001', name:'Nitrogen', parents:['7']},
+    {system:'01-EMGN-001/002', name:'Generators', parents:['8']},
     {system:'01-VACU-001', name:'Vacuum System', parents:['9']},
     {system:'01-SMRT-001', name:'Smart Filler', match:t=>/smart/i.test(t.task||'')},
     {system:'01-LYOP-001', name:'Lyophilizer', match:t=>/lyo|lyophilizer/i.test(t.task||'')},
     {system:'01-DPOV-001', name:'DP Oven', match:t=>/oven|DPOV/i.test(t.task||'')},
     {system:'01-FERM-002', name:'Fermenter', match:t=>/ferment|FERM/i.test(t.task||'')},
-    {system:'01-TFFS-001/002', name:'TFFS Skids', match:t=>/tffs/i.test(t.task||'')},
-    {system:'01-ACLE-001', name:'Autoclave Fill', match:t=>/ACLE[-\s]*001|01-ACLE-001/i.test(t.task||'')},
-    {system:'01-CWAS-001', name:'Reliance 680 Washer', match:t=>/CWAS[-\s]*001|01-CWAS-001/i.test(t.task||'')},
-    {system:'01-ACLE-002', name:'Autoclave API', match:t=>/ACLE[-\s]*002|01-ACLE-002/i.test(t.task||'')},
-    {system:'01-CWAS-002', name:'Glassware Washer', match:t=>/CWAS[-\s]*002|01-CWAS-002/i.test(t.task||'')},
+    {system:'01-TFFS-001/002', name:'TFFS', match:t=>/tffs/i.test(t.task||'')},
+    {system:'01-ACLE-001', name:'DS Autoclave', match:t=>/ACLE[-\s]*001|01-ACLE-001/i.test(t.task||'')},
+    {system:'01-CWAS-001', name:'DP Washer', match:t=>/CWAS[-\s]*001|01-CWAS-001/i.test(t.task||'')},
+    {system:'01-ACLE-002', name:'DS Autoclave', match:t=>/ACLE[-\s]*002|01-ACLE-002/i.test(t.task||'')},
+    {system:'01-CWAS-002', name:'DS Washer', match:t=>/CWAS[-\s]*002|01-CWAS-002/i.test(t.task||'')},
     {system:'01-DECA-001', name:'Decon Autoclave', match:t=>/DECA[-\s]*001|01-DECA-001/i.test(t.task||'')},
     {system:'01-ACLE-003', name:'QC Autoclave', match:t=>/ACLE[-\s]*003|01-ACLE-003/i.test(t.task||'')},
     {system:'DP Area Release', name:'DP Area Release', match:t=>/DP\s*MFG|DP Area/i.test(t.task||'') && String(t.id).startsWith('13.')},
