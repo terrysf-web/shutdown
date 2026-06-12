@@ -406,6 +406,13 @@ tr.editing{background:#fffceb}
 .progress-task{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .progress-tag{font-size:10px;font-weight:900;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.12);color:#cde;white-space:nowrap}
 .progress-empty{color:#9fb4c8;font-size:12px;font-style:italic;padding:8px 0}
+
+.system-attention-item{display:grid;grid-template-columns:minmax(150px,1.05fr) minmax(140px,1fr) auto;gap:10px;align-items:center;color:#fff;font-size:12px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,.07)}
+.system-attention-item:last-child{border-bottom:none}
+.system-attention-id{font-weight:900;color:#f0c040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.system-attention-name{font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.system-attention-reason{font-size:10px;font-weight:900;border-radius:999px;padding:2px 8px;background:rgba(255,255,255,.12);color:#cde;white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+@media(max-width:1300px){.system-attention-item{grid-template-columns:1fr}.system-attention-reason{max-width:none}}
 .vendor-progress{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:8px}
 .vendor-progress-row{background:rgba(13,33,55,.55);border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:8px 10px}
 .vendor-progress-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
@@ -671,7 +678,7 @@ select.msf option:checked{background:#ddeeff}
       <div class="advanced-filter-field"><label for="headerFilterEnd">End</label><input type="date" id="headerFilterEnd" onchange="render()"></div>
       <div class="advanced-filter-field"><label for="headerFilterDays">Days</label><input type="number" id="headerFilterDays" placeholder="Days" oninput="render()"></div>
       <div class="advanced-filter-field"><label for="headerFilterWk">WK</label><select id="headerFilterWk" class="msf" multiple="" size="5" onchange="render()"><option value="W1">W1</option><option value="W2">W2</option><option value="W3">W3</option><option value="W4">W4</option><option value="W5">W5</option><option value="W6">W6</option><option value="W7">W7</option><option value="W8">W8</option><option value="W9">W9</option></select></div>
-      <div class="advanced-filter-field"><label for="headerFilterStatus">Status</label><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="N/A">N/A</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterStatus">Status</label><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="Scheduled">Scheduled</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="N/A">N/A</option></select></div>
       <div class="advanced-filter-field"><label for="headerFilterNotes">Notes</label><input type="text" id="headerFilterNotes" placeholder="Filter" oninput="render()"></div>
     </div>
   </div>
@@ -5773,45 +5780,53 @@ function renderDashboard(){
       return byParent || byMatch;
     });
   }
-  function hasStarted(t){
-    const st = statusMap[t.id] || t.status || 'Pending';
-    return st !== 'Pending' && st !== 'N/A';
+  function taskStatus(t){
+    return statusMap[t.id] || t.status || 'Pending';
+  }
+  function isInProgress(t){
+    return taskStatus(t) === 'In Progress';
+  }
+  function isComplete(t){
+    return taskStatus(t) === 'Complete';
+  }
+  function isDelayed(t){
+    return taskStatus(t) === 'Delayed';
   }
   function isFullRelTask(t){ return /full\s*rel|ful\s*rel|full release/i.test(t.task||''); }
   function isCondRelTask(t){ return /cond\s*rel|conditional release/i.test(t.task||''); }
   function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
   function huddleStatus(items){
     if(!items.length) return 'Normal';
-    const fullRel = items.find(t=>isFullRelTask(t) && hasStarted(t));
-    const condRel = items.find(t=>isCondRelTask(t) && hasStarted(t));
-    const down = items.find(t=>isBreakdownTask(t) && hasStarted(t));
-    const oos = items.find(t=>hasStarted(t));
-    if(fullRel) return 'FUL REL';
-    if(condRel) return 'Cond. REL';
-    if(down) return 'Breakdown';
-    if(oos) return 'OOS';
+    const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
+    const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
+    const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
+    const oosActive = items.find(t=>isInProgress(t));
+    if(fullRelComplete) return 'FUL REL';
+    if(condRelComplete) return 'Cond. REL';
+    if(breakdownActive) return 'Breakdown';
+    if(oosActive) return 'OOS';
     return 'Normal';
   }
   function huddleReason(items, status){
     if(!items.length) return 'No active outage scope';
     if(status==='FUL REL'){
-      const t = items.find(x=>isFullRelTask(x) && hasStarted(x));
+      const t = items.find(x=>isFullRelTask(x) && isComplete(x));
       return t ? 'Full release: '+t.id : 'Full release';
     }
     if(status==='Cond. REL'){
-      const t = items.find(x=>isCondRelTask(x) && hasStarted(x));
+      const t = items.find(x=>isCondRelTask(x) && isComplete(x));
       return t ? 'Conditional release: '+t.id : 'Conditional release';
     }
     if(status==='Breakdown'){
-      const t = items.find(x=>isBreakdownTask(x) && hasStarted(x));
+      const t = items.find(x=>isBreakdownTask(x) && (isInProgress(x) || isDelayed(x)));
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const active = items.filter(hasStarted);
+      const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
-      return active.length+' active' + (cats.length ? ' / '+cats.join('+') : '');
+      return active.length+' in progress' + (cats.length ? ' / '+cats.join('+') : '');
     }
-    return 'Normal operation';
+    return 'Pending / scheduled / normal';
   }
   function pillClass(status){
     return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
@@ -5848,7 +5863,7 @@ function renderDashboard(){
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
-    const meaning = {'Normal':'No active outage','OOS':'Task started / out of service','Cond. REL':'Conditional release','FUL REL':'Full release','Breakdown':'Unplanned failure'};
+    const meaning = {'Normal':'No active outage','OOS':'In Progress / out of service','Cond. REL':'Conditional release','FUL REL':'Full release','Breakdown':'Unplanned failure'};
     rollupEl.innerHTML = statusOrder.map(st=>{
       const n = huddleSystems.filter(s=>s.status===st).length;
       return `<tr><td><span class="system-pill ${pillClass(st)}">${st}</span></td><td>${n}</td><td>${meaning[st]}</td></tr>`;
@@ -5856,12 +5871,12 @@ function renderDashboard(){
   }
   const attentionEl = document.getElementById('d-system-attention');
   if(attentionEl){
-    const attention = huddleSystems.filter(s=>s.status==='OOS'||s.status==='Breakdown'||s.status==='Cond. REL').slice(0,5);
-    attentionEl.innerHTML = attention.length ? attention.map(s=>`<div class="progress-item">
-      <div class="progress-id">${s.def.system.split('/')[0]}</div>
-      <div class="progress-task" title="${s.def.name}">${s.def.name}</div>
-      <div class="progress-tag">${s.reason}</div>
-    </div>`).join('') : '<div class="progress-empty">No delayed or active systems.</div>';
+    const attention = huddleSystems.filter(s=>s.status!=='Normal').slice(0,5);
+    attentionEl.innerHTML = attention.length ? attention.map(s=>`<div class="system-attention-item">
+      <div class="system-attention-id" title="${s.def.system}">${s.def.system}</div>
+      <div class="system-attention-name" title="${s.def.name}">${s.def.name}</div>
+      <div class="system-attention-reason" title="${s.reason}">${s.reason}</div>
+    </div>`).join('') : '<div class="progress-empty">No active OOS or release systems.</div>';
   }
   function huddleSystemForTask(t){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
