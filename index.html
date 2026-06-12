@@ -5826,7 +5826,7 @@ function renderDashboard(){
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
       return active.length+' in progress' + (cats.length ? ' / '+cats.join('+') : '');
     }
-    return 'Pending / scheduled / normal';
+    return status==='Normal' ? 'No active outage' : status==='OOS' ? 'In Progress / out of service' : status==='Cond. REL' ? 'Conditional release' : status==='FUL REL' ? 'Full release' : status==='Breakdown' ? 'Unplanned failure' : 'No active outage';
   }
   function pillClass(status){
     return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
