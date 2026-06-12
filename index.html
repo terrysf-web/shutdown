@@ -418,7 +418,7 @@ tr.editing{background:#fffceb}
 .huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
 .huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
 .huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
-.system-status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.system-status-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
 .system-status-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:7px 9px;display:grid;grid-template-columns:108px minmax(120px,1fr) 88px minmax(88px,1fr);gap:8px;align-items:center;min-height:34px}
 .system-status-id{font-size:11px;color:#f0c040;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .system-status-name{font-size:12px;color:#fff;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -497,6 +497,7 @@ select.msf option:checked{background:#ddeeff}
 .rc-side-list{font-size:12px}.rc-side-row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:7px 9px;border-bottom:1px solid #eee}.rc-side-row.over{background:#ffebee}.rc-side-row.high{background:#fff3e0}.rc-side-row .name{font-weight:800;color:#1a3a5c}.rc-side-row .count{font-weight:800;border-radius:12px;background:#e8edf2;padding:2px 8px}.rc-side-row.over .count{background:#ffcdd2;color:#b71c1c}.rc-side-row.high .count{background:#ffe0b2;color:#e65100}
 .rc-empty{padding:22px;text-align:center;color:#999;font-size:13px}
 .rc-legend{font-size:11px;color:#555;display:flex;gap:10px;align-items:center;flex-wrap:wrap}.rc-dot{width:10px;height:10px;border-radius:50%;display:inline-block}.rc-dot.pm{background:RoyalBlue}.rc-dot.cal{background:SeaGreen}.rc-dot.cm{background:DarkKhaki}.rc-dot.em{background:#9b7dd4}.rc-dot.proj{background:Sienna}
+@media (max-width:1300px) and (min-width:1101px){.system-status-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:1000px){.rc-main{grid-template-columns:1fr}.rc-panel.side{min-height:260px}}
 @media (max-width:1100px){
   header{padding:12px 16px}
@@ -538,8 +539,6 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
-
-.system-status-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important}
 </style>
 </head>
 <body>
@@ -3688,7 +3687,7 @@ APPENDIX 6.5B)</div>
   <!-- Daily Huddle System Status -->
   <div class="huddle-grid huddle-section">
     <div class="huddle-panel">
-      <div class="huddle-panel-title">Systems / Utilities Status (3 Column)</div>
+      <div class="huddle-panel-title">Systems / Utilities Status</div>
       <div id="d-system-status" class="system-status-grid"></div>
     </div>
     <div class="huddle-panel">
@@ -3723,7 +3722,7 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel">
       <div class="huddle-panel-title">Maintenance Activities</div>
       <table class="huddle-table">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
     </div>
@@ -5736,23 +5735,32 @@ function renderDashboard(){
 
   const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
-    {system:'01-WFIS-001', name:'WFI', parents:['2']},
-    {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|cstg|cond rel|full rel/i.test(t.task||'')},
-    {system:'01-PMES-001', name:'MES System', parents:['3']},
+    {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
+    {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
+    {system:'01-PMES-001', name:'PMES System', parents:['3']},
     {system:'01-HPPS-001', name:'High Pressure Steam', parents:['4']},
-    {system:'01-AHUN-001-005', name:'Air Handler Units', parents:['5']},
+    {system:'01-AHUN-001', name:'AHU-001', match:t=>/AHUN[-\s]*001|AHU[-\s]*001/i.test(t.task||'')},
+    {system:'01-AHUN-002', name:'AHU-002', match:t=>/AHUN[-\s]*002|AHU[-\s]*002/i.test(t.task||'')},
+    {system:'01-AHUN-003', name:'AHU-003', match:t=>/AHUN[-\s]*003|AHU[-\s]*003/i.test(t.task||'')},
+    {system:'01-AHUN-004', name:'AHU-004', match:t=>/AHUN[-\s]*004|AHU[-\s]*004/i.test(t.task||'')},
+    {system:'01-AHUN-005', name:'AHU-005', match:t=>/AHUN[-\s]*005|AHU[-\s]*005/i.test(t.task||'')},
     {system:'01-CCDA-001', name:'Clean Dry Air', parents:['6']},
     {system:'01-N2GS-001', name:'Liquid Nitrogen', parents:['7']},
     {system:'01-EMGN-001/002', name:'Emergency Generators', parents:['8']},
     {system:'01-VACU-001', name:'Vacuum System', parents:['9']},
     {system:'01-SMRT-001', name:'Smart Filler', match:t=>/smart/i.test(t.task||'')},
     {system:'01-LYOP-001', name:'Lyophilizer', match:t=>/lyo|lyophilizer/i.test(t.task||'')},
-    {system:'01-DPOV-001', name:'DP Oven', match:t=>/oven/i.test(t.task||'')},
-    {system:'01-FERM-002', name:'Fermenter', match:t=>/ferment/i.test(t.task||'')},
+    {system:'01-DPOV-001', name:'DP Oven', match:t=>/oven|DPOV/i.test(t.task||'')},
+    {system:'01-FERM-002', name:'Fermenter', match:t=>/ferment|FERM/i.test(t.task||'')},
     {system:'01-TFFS-001/002', name:'TFFS Skids', match:t=>/tffs/i.test(t.task||'')},
-    {system:'01-ACLE/CWAS/DECA', name:'Autoclaves / Parts Washers', match:t=>/acle|cwas|deca|autoclave|parts washer|vial washer/i.test(t.task||'')},
-    {system:'AREA RELEASE', name:'DP / DS Area Release', parents:['13']},
-    {system:'PROJECTS', name:'Shutdown Projects', parents:['14']}
+    {system:'01-ACLE-001', name:'Autoclave Fill', match:t=>/ACLE[-\s]*001|01-ACLE-001/i.test(t.task||'')},
+    {system:'01-CWAS-001', name:'Reliance 680 Washer', match:t=>/CWAS[-\s]*001|01-CWAS-001/i.test(t.task||'')},
+    {system:'01-ACLE-002', name:'Autoclave API', match:t=>/ACLE[-\s]*002|01-ACLE-002/i.test(t.task||'')},
+    {system:'01-CWAS-002', name:'Glassware Washer', match:t=>/CWAS[-\s]*002|01-CWAS-002/i.test(t.task||'')},
+    {system:'01-DECA-001', name:'Decon Autoclave', match:t=>/DECA[-\s]*001|01-DECA-001/i.test(t.task||'')},
+    {system:'01-ACLE-003', name:'QC Autoclave', match:t=>/ACLE[-\s]*003|01-ACLE-003/i.test(t.task||'')},
+    {system:'DP Area Release', name:'DP Area Release', match:t=>/DP\s*MFG|DP Area/i.test(t.task||'') && String(t.id).startsWith('13.')},
+    {system:'DS Area Release', name:'DS Area Release', match:t=>/DS\s*MFG|DS Area/i.test(t.task||'') && String(t.id).startsWith('13.')}
   ];
   function huddleTasksFor(def){
     return activeLeaf.filter(t=>{
@@ -5805,29 +5813,35 @@ function renderDashboard(){
   function pillClass(status){
     return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
   }
-  const huddleSystems = huddleSystemDefs
-    .filter(def=>!/PROJECTS/i.test(def.system))
-    .map(def=>{
+  function huddleStartISO(v){
+    if(!v) return null;
+    if(typeof normalizeDateValue === 'function') return normalizeDateValue(v);
+    if(typeof v === 'number'){
+      const d = new Date(Math.round((v - 25569) * 86400 * 1000));
+      return d.toISOString().slice(0,10);
+    }
+    const d = new Date(String(v));
+    return isNaN(d) ? null : d.toISOString().slice(0,10);
+  }
+  function huddleEarliestStart(items){
+    return items.map(t=>huddleStartISO(t.start)).filter(Boolean).sort()[0] || '9999-12-31';
+  }
+  const huddleSystems = huddleSystemDefs.map(def=>{
     const items = huddleTasksFor(def);
     const status = huddleStatus(items);
     const complete = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
     const pct = items.length ? Math.round(complete/items.length*100) : 0;
-    return {def, items, status, pct, reason:huddleReason(items,status)};
-  });
+    return {def, items, status, pct, reason:huddleReason(items,status), sortStart:huddleEarliestStart(items)};
+  }).sort((a,b)=>a.sortStart.localeCompare(b.sortStart) || a.def.system.localeCompare(b.def.system, undefined, {numeric:true}));
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    systemStatusEl.innerHTML = (function(){
-      const rows=huddleSystems.slice();
-      rows.push({def:{system:'AREA RELEASE - DP MFG',name:'DP Manufacturing Area'},status:'Normal',reason:'Area status'});
-      rows.push({def:{system:'AREA RELEASE - DS MFG',name:'DS Manufacturing Area'},status:'Normal',reason:'Area status'});
-      return rows.map(s=>`<div class="system-status-row">
+    systemStatusEl.innerHTML = huddleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
       <div class="system-status-reason" title="${s.reason}">${s.reason}</div>
     </div>`).join('');
-    })();
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -5862,18 +5876,26 @@ function renderDashboard(){
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
     const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending') && taskTouchesUpcomingTwoWeeks(t));
-    const maintItems = (primary.length ? primary : lookaheadTasks).slice(0,6);
+    const maintItems = (primary.length ? primary : lookaheadTasks)
+      .slice()
+      .sort((a,b)=>{
+        const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
+        const bs = normalizeDateValue(b.start) || normalizeDateValue(b.end) || '';
+        return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+      })
+      .slice(0,6);
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
       return `<tr>
         <td>${taskProgressPct(t)}%</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>—</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
