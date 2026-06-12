@@ -3721,7 +3721,7 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel">
       <div class="huddle-panel-title">Maintenance Activities</div>
       <table class="huddle-table">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
     </div>
@@ -5853,18 +5853,26 @@ function renderDashboard(){
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
     const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending') && taskTouchesUpcomingTwoWeeks(t));
-    const maintItems = (primary.length ? primary : lookaheadTasks).slice(0,6);
+    const maintItems = (primary.length ? primary : lookaheadTasks)
+      .slice()
+      .sort((a,b)=>{
+        const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
+        const bs = normalizeDateValue(b.start) || normalizeDateValue(b.end) || '';
+        return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+      })
+      .slice(0,6);
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
       return `<tr>
         <td>${taskProgressPct(t)}%</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>—</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
