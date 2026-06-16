@@ -548,13 +548,31 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
+
+/* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
+.huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
+.huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpi{padding:10px}
+.huddle-top-layout .progress-kpi-value{font-size:28px}
+.huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-panel.tight{padding:12px}
+.system-status-grid.compact{grid-template-columns:1fr;gap:7px}
+.system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 88px minmax(110px,1fr)}
+.huddle-table.small td{padding:7px 8px}
+.huddle-table.small th{padding:6px 8px}
+.gowning-list.dashboard{gap:10px}
+.gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}}
+
 </style>
 </head>
 <body>
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.12 System Names</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.16 Huddle Layout</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3641,75 +3659,54 @@ APPENDIX 6.5B)</div>
     <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
   </div>
 
-  <!-- Daily Progress Brief -->
-  <div class="progress-brief huddle-section">
-    <div class="progress-brief-head">
-      <div>
-        <div class="progress-brief-title">Shutdown Project Progress</div>
-        <div class="progress-brief-date" id="d-progress-asof">As of —</div>
+  <!-- Daily Huddle Top: Project Progress + Gowning Status -->
+  <div class="huddle-top-layout huddle-section">
+    <div class="progress-brief">
+      <div class="progress-brief-head">
+        <div>
+          <div class="progress-brief-title">Shutdown Project Progress</div>
+          <div class="progress-brief-date" id="d-progress-asof">As of —</div>
+        </div>
+        <div class="progress-brief-date" id="d-progress-summary">—</div>
       </div>
-      <div class="progress-brief-date" id="d-progress-summary">—</div>
-    </div>
-    <div class="progress-kpis">
-      <div class="progress-kpi">
-        <div class="progress-kpi-label">Overall Complete</div>
-        <div class="progress-kpi-value" id="d-progress-pct">—</div>
-        <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
-        <div class="progress-kpi-sub" id="d-progress-done">—</div>
+      <div class="progress-kpis">
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Overall Complete</div>
+          <div class="progress-kpi-value" id="d-progress-pct">—</div>
+          <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
+          <div class="progress-kpi-sub" id="d-progress-done">—</div>
+        </div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">In Progress</div>
+          <div class="progress-kpi-value" id="d-progress-inprogress">—</div>
+          <div class="progress-kpi-sub">Active tasks</div>
+        </div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Pending</div>
+          <div class="progress-kpi-value" id="d-progress-pending">—</div>
+          <div class="progress-kpi-sub">Not started</div>
+        </div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Delayed</div>
+          <div class="progress-kpi-value" id="d-progress-delayed">—</div>
+          <div class="progress-kpi-sub">Needs attention</div>
+        </div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Lookahead</div>
+          <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
+          <div class="progress-kpi-sub">Next 14 days</div>
+        </div>
       </div>
-      <div class="progress-kpi">
-        <div class="progress-kpi-label">In Progress</div>
-        <div class="progress-kpi-value" id="d-progress-inprogress">—</div>
-        <div class="progress-kpi-sub">Active tasks</div>
-      </div>
-      <div class="progress-kpi">
-        <div class="progress-kpi-label">Pending</div>
-        <div class="progress-kpi-value" id="d-progress-pending">—</div>
-        <div class="progress-kpi-sub">Not started</div>
-      </div>
-      <div class="progress-kpi">
-        <div class="progress-kpi-label">Delayed</div>
-        <div class="progress-kpi-value" id="d-progress-delayed">—</div>
-        <div class="progress-kpi-sub">Needs attention</div>
-      </div>
-      <div class="progress-kpi">
-        <div class="progress-kpi-label">Lookahead</div>
-        <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
-        <div class="progress-kpi-sub">Next 14 days</div>
-      </div>
-    </div>
-    <div class="progress-grid">
-      <div class="progress-panel">
-        <div class="progress-panel-title">Progress by System</div>
-        <div id="d-progress-system"></div>
-      </div>
-      <div class="progress-panel">
-        <div class="progress-panel-title">Progress by Category</div>
-        <div id="d-progress-category"></div>
-      </div>
-      <div class="progress-panel">
-        <div class="progress-panel-title">Meeting Focus</div>
-        <div id="d-progress-focus"></div>
+      <div class="progress-grid">
+        <div class="progress-panel"><div class="progress-panel-title">Progress by System</div><div id="d-progress-system"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Progress by Category</div><div id="d-progress-category"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Meeting Focus</div><div id="d-progress-focus"></div></div>
       </div>
     </div>
-  </div>
 
-  <!-- Daily Huddle System Status -->
-  <div class="huddle-grid huddle-section">
-    <div class="huddle-panel">
-      <div class="huddle-panel-title">Systems / Utilities Status</div>
-      <div id="d-system-status" class="system-status-grid"></div>
-    </div>
-    <div class="huddle-panel">
-      <div class="huddle-panel-title">Status Rollup</div>
-      <table class="huddle-rollup-table">
-        <thead><tr><th>Status</th><th>Count</th><th>Meeting Meaning</th></tr></thead>
-        <tbody id="d-system-rollup"></tbody>
-      </table>
-      <div class="huddle-panel-title" style="margin-top:16px">Top System Attention</div>
-      <div id="d-system-attention" class="progress-list"></div>
-      <div class="huddle-panel-title" style="margin-top:16px">Gowning Status</div>
-      <div id="d-gowning-status" class="gowning-list">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Gowning Status</div>
+      <div id="d-gowning-status" class="gowning-list dashboard">
         <div class="gowning-row">
           <div class="gowning-area">DP MFG Area</div>
           <select id="gowningDp" class="gowning-select" onchange="setGowningStatus('dp',this.value)">
@@ -3728,27 +3725,33 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <div class="huddle-wide huddle-section">
-    <div class="huddle-panel">
-      <div class="huddle-panel-title">Maintenance Activities</div>
-      <table class="huddle-table">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
-        <tbody id="d-maint-activities"></tbody>
-      </table>
+  <!-- Daily Huddle Middle: Abnormal Systems + Return to Service -->
+  <div class="huddle-middle-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Systems / Utilities Status</div>
+      <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
-    <div class="huddle-panel">
+    <div class="huddle-panel tight">
       <div class="huddle-panel-title">Return to Service / Delay Description</div>
-      <table class="huddle-table">
+      <table class="huddle-table small">
         <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead>
         <tbody id="d-rts-rows"></tbody>
       </table>
     </div>
   </div>
 
-  <div class="huddle-section">
-    <div class="huddle-panel">
+  <!-- Daily Huddle Bottom: Active Work + Next 7 Days -->
+  <div class="huddle-bottom-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Maintenance Activities</div>
+      <table class="huddle-table small">
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <tbody id="d-maint-activities"></tbody>
+      </table>
+    </div>
+    <div class="huddle-panel tight">
       <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
-      <table class="huddle-table">
+      <table class="huddle-table small">
         <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Owner / Resource</th><th>Status</th></tr></thead>
         <tbody id="d-upcoming-schedule"></tbody>
       </table>
@@ -5755,7 +5758,9 @@ function renderDashboard(){
     if(!startIso) return false;
     const startDate = new Date(startIso+'T00:00:00');
     const st = statusMap[t.id] || t.status || 'Pending';
-    return startDate >= todayDate && startDate <= sevenDayEndDate && st !== 'Complete';
+    // Upcoming Schedule is for future work only.
+    // In Progress work belongs only in Maintenance Activities, not Upcoming.
+    return startDate > todayDate && startDate <= sevenDayEndDate && (st === 'Pending' || st === 'Scheduled');
   }
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
@@ -5901,12 +5906,13 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    systemStatusEl.innerHTML = huddleSystems.map(s=>`<div class="system-status-row">
+    const abnormalSystems = huddleSystems.filter(s=>s.status!=='Normal');
+    systemStatusEl.innerHTML = abnormalSystems.length ? abnormalSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
       <div class="system-status-reason" title="${s.reason}">${s.reason}</div>
-    </div>`).join('');
+    </div>`).join('') : '<div class="progress-empty">All systems are Normal.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -5934,8 +5940,10 @@ function renderDashboard(){
   }
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
-    const primary = activeLeaf.filter(t=>['Delayed','In Progress'].includes(statusMap[t.id]||t.status||'Pending') && taskTouchesUpcomingTwoWeeks(t));
-    const maintItems = (primary.length ? primary : lookaheadTasks)
+    // Maintenance Activities shows active work only.
+    // Upcoming Schedule shows Pending/Scheduled future starts only, so no duplicates.
+    const maintItems = activeLeaf
+      .filter(t=>['In Progress','Delayed'].includes(statusMap[t.id]||t.status||'Pending'))
       .slice()
       .sort((a,b)=>{
         const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
@@ -5954,7 +5962,7 @@ function renderDashboard(){
         <td>—</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active, delayed, or 14-day lookahead tasks.</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
@@ -7366,6 +7374,24 @@ function renderRcVendor(items,start,end){
   .rc-cal-more{font-size:10px;font-weight:800;color:#1a3a5c;background:#e8edf2;border-radius:6px;padding:3px 5px;text-align:center;margin-top:auto}
   .rc-controls-hint{font-size:11px;color:#666;margin-left:6px}
   @media print{#sticky-top,.rc-toolbar,.rc-summary,.rc-panel.side,.rc-edit-btn{display:none!important}.resource-page{padding:0;background:#fff}.rc-main{display:block}.rc-panel{border:none}.rc-panel-title{background:#fff!important;color:#111!important;border-bottom:2px solid #111}.rc-scroll{overflow:visible}.rc-calendar-grid{min-width:0;font-size:9px}.rc-cal-day{min-height:120px;page-break-inside:avoid}.rc-cal-activity{font-size:8px}.rc-cal-activity b{font-size:8px}}
+
+/* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
+.huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
+.huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpi{padding:10px}
+.huddle-top-layout .progress-kpi-value{font-size:28px}
+.huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-panel.tight{padding:12px}
+.system-status-grid.compact{grid-template-columns:1fr;gap:7px}
+.system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 88px minmax(110px,1fr)}
+.huddle-table.small td{padding:7px 8px}
+.huddle-table.small th{padding:6px 8px}
+.gowning-list.dashboard{gap:10px}
+.gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}}
+
 </style>
 <script id="rcPhase3Script">
 (function(){
@@ -7471,6 +7497,24 @@ function renderRcMonthlyCalendar(items,start,end){
 .rc-bar-legend{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 10px;background:#f8fafc;border-bottom:1px solid #d8e0ea;font-size:11px}.rc-legend-item{display:inline-flex;align-items:center;gap:5px;font-weight:700;color:#333}.rc-legend-dot{width:12px;height:12px;border-radius:3px;display:inline-block}.rc-legend-dot.PM{background:RoyalBlue}.rc-legend-dot.CAL{background:SeaGreen}.rc-legend-dot.CM{background:DarkKhaki}.rc-legend-dot.EM{background:#9b7dd4}.rc-legend-dot.PROJ{background:Sienna}.rc-legend-dot.OTHER{background:#607d8b}
 .rc-bar-status{font-size:10px;font-weight:700;opacity:.9;margin-left:auto}.rc-bar-note{font-size:11px;color:#666;padding:6px 10px;background:#fffbe6;border-bottom:1px solid #eee}
 @media print{.rc-bar-wrap{max-height:none;overflow:visible}.rc-bar-table th{position:static}.rc-bar-left,.rc-bar-table .rc-left-head{position:static}.rc-day-cell{width:26px;min-width:26px}.rc-bar-left{min-width:90px;max-width:90px}.rc-bar-left.cat{min-width:48px;max-width:48px}.rc-bar-left.task{min-width:170px;max-width:170px}.rc-bar-seg{font-size:8px;padding:0 5px}}
+
+/* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
+.huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
+.huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpi{padding:10px}
+.huddle-top-layout .progress-kpi-value{font-size:28px}
+.huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-panel.tight{padding:12px}
+.system-status-grid.compact{grid-template-columns:1fr;gap:7px}
+.system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 88px minmax(110px,1fr)}
+.huddle-table.small td{padding:7px 8px}
+.huddle-table.small th{padding:6px 8px}
+.gowning-list.dashboard{gap:10px}
+.gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}}
+
 </style>
 <script id="rcPhase4BarScript">
 (function(){
@@ -7746,6 +7790,24 @@ function rcExpandedBarRows(items,start,end){
   .ps-print-header{break-after:avoid;margin-bottom:6px;padding-bottom:5px}.ps-print-header h2{font-size:14px}.ps-print-meta,.ps-legend{font-size:8.5px}.ps-legend{gap:6px}
   .ps-chart{min-width:0!important;width:100%!important}.ps-week-row,.ps-task-row,.ps-group-row{grid-template-columns:235px repeat(var(--ps-weeks), minmax(68px,1fr))!important}.ps-left-head,.ps-task-label{left:0!important}.ps-left-head{font-size:8.5px;padding:5px 6px}.ps-week-cell{height:28px;font-size:8px;padding-top:4px}.ps-week-cell span{font-size:7px}.ps-task-label{font-size:7.6px;padding:3px 5px}.ps-task-label b{font-size:8px}.ps-task-label .ps-small{font-size:6.8px}.ps-task-row{min-height:28px;break-inside:avoid}.ps-grid-cell{min-height:28px}.ps-bar{height:16px;line-height:16px;font-size:7px;margin:6px 2px;padding:0 4px;border-radius:4px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.ps-bar small{font-size:6.2px;margin-left:3px}.ps-milestone{height:20px;margin:4px 1px}.ps-milestone span{width:14px;height:14px;border-radius:3px;print-color-adjust:exact;-webkit-print-color-adjust:exact}.ps-milestone em{font-size:6.2px;padding:1px 3px}.ps-group-title{font-size:8.2px;padding:4px 6px;color:#fff!important;background:#1a3a5c!important;break-after:avoid;print-color-adjust:exact;-webkit-print-color-adjust:exact}.ps-dot,.ps-bar.PM,.ps-bar.CAL,.ps-bar.CM,.ps-bar.EM,.ps-bar.PROJ{print-color-adjust:exact;-webkit-print-color-adjust:exact}
 }
+
+
+/* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
+.huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
+.huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpi{padding:10px}
+.huddle-top-layout .progress-kpi-value{font-size:28px}
+.huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-panel.tight{padding:12px}
+.system-status-grid.compact{grid-template-columns:1fr;gap:7px}
+.system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 88px minmax(110px,1fr)}
+.huddle-table.small td{padding:7px 8px}
+.huddle-table.small th{padding:6px 8px}
+.gowning-list.dashboard{gap:10px}
+.gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}}
 
 </style>
 
