@@ -5885,7 +5885,19 @@ function renderDashboard(){
   function taskProgressPct(t){
     const st = statusMap[t.id] || t.status || 'Pending';
     if(st==='Complete') return 100;
-    if(st==='In Progress') return 50;
+    if(st==='In Progress'){
+      const start = normalizeDateValue(t.start);
+      const end = normalizeDateValue(t.end);
+      if(start && end){
+        const today = new Date();
+        const s = new Date(start+'T00:00:00');
+        const e = new Date(end+'T00:00:00');
+        const total = Math.max(1, Math.round((e-s)/86400000)+1);
+        const elapsed = Math.max(1, Math.min(total, Math.round((today-s)/86400000)+1));
+        return Math.max(5, Math.min(95, Math.round((elapsed/total)*100)));
+      }
+      return 5;
+    }
     return 0;
   }
   function huddleStatusHtml(st){
