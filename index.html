@@ -5852,10 +5852,17 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
+    const downStarted = items.find(t=>downMap[t.id]!=null);
+    const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
     const oosActive = items.find(t=>isInProgress(t));
+
+    // OOS rule: once a Down Start is checked, the system stays OOS
+    // until a Start-Up checked task is actually marked Complete.
+    // A Start-Up checkbox alone does NOT return the system to Normal.
+    if(breakdownActive) return 'Breakdown';
+    if(downStarted && !startupCompleted) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
     if(condRelComplete) return 'Cond. REL';
-    if(breakdownActive) return 'Breakdown';
     if(oosActive) return 'OOS';
     return 'Normal';
   }
@@ -5874,6 +5881,11 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
+      const downStarted = items.find(t=>downMap[t.id]!=null);
+      const startupChecked = items.find(t=>startupMap[t.id]!=null && !isComplete(t));
+      if(downStarted){
+        return 'OOS since Down Start: '+downStarted.id + (startupChecked ? ' / waiting Start-Up Complete: '+startupChecked.id : '');
+      }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
       return active.length+' in progress' + (cats.length ? ' / '+cats.join('+') : '');
