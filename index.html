@@ -5918,13 +5918,8 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    const abnormalSystems = huddleSystems.filter(s=>s.status!=='Normal');
-    systemStatusEl.innerHTML = abnormalSystems.length ? abnormalSystems.map(s=>`<div class="system-status-row">
-      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
-      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
-      <div class="system-status-reason" title="${s.reason}">${s.reason}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems are Normal.</div>';
+    const abnormalSystems = huddleSystems.filter(s=>s.status==='OOS');
+    systemStatusEl.innerHTML = abnormalSystems.length ? abnormalSystems.map(s=>`<div class="system-status-row"><div class="system-status-id" title="${s.def.system}">${s.def.system}</div><div class="system-status-name" title="${s.def.name}">${s.def.name}</div><div class="system-pill ${pillClass(s.status)}">OOS</div></div>`).join('') : '<div class="progress-empty">No systems currently OOS.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -5978,24 +5973,14 @@ function renderDashboard(){
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
-    const rtsItems = activeLeaf
-      .filter(t=>startupMap[t.id]!=null)
+    const rtsItems = huddleSystems.filter(s=>s.status==='Cond. REL' || s.status==='FUL REL')
       .filter(t=>dateInUpcomingTwoWeeks(startupMap[t.id]))
       .sort((a,b)=>{
         const ad = normalizeDateValue(startupMap[a.id]) || normalizeDateValue(a.end) || '';
         const bd = normalizeDateValue(startupMap[b.id]) || normalizeDateValue(b.end) || '';
         return ad.localeCompare(bd);
       });
-    rtsEl.innerHTML = rtsItems.length ? rtsItems.map(t=>{
-      const startUpDate = startupMap[t.id] || t.end;
-      return `<tr>
-        <td>${taskProgressPct(t)}%</td>
-        <td>${huddleSystemForTask(t)}</td>
-        <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
-        <td>${displayDate(startUpDate)||'TBD'}</td>
-        <td>${t.actionComment||t.notes||'Start-Up checked in End column'}</td>
-      </tr>`;
-    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No Start-Up checked items in the next 14 days.</td></tr>';
+    rtsEl.innerHTML = rtsItems.length ? rtsItems.map(s=>`<tr><td>${s.status}</td><td>${s.def.system}</td><td>—</td><td>${displayDate(s.sortStart)||'TBD'}</td><td>${s.def.name}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
   }
 
   const upcomingEl = document.getElementById('d-upcoming-schedule');
