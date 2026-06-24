@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting</title>
+</head>
+<body style="font-family:Arial,sans-serif;padding:32px;">
+  <p>Redirecting to Shutdown Tracker...</p>
+  <script>
+    var p = window.location.pathname;
+    var s = window.location.search;
+    var h = window.location.hash;
+    var base = '/shutdown/';
+    var bad = '/shutdown/&';
+    if (p.indexOf(bad) === 0) {
+      var q = p.substring(bad.length);
+      if (s.length > 1) q = q + '&' + s.substring(1);
+      window.location.href = base + '?' + q + h;
+    } else {
+      window.location.href = base + s + h;
+    }
+  </script>
+</body>
+</html>
