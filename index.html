@@ -615,7 +615,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Power Automate v4 Compact Print</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Email Dashboard v8</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3702,7 +3702,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download a text summary of the current Daily Huddle dashboard">⬇ Summary</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v8</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -8297,51 +8297,156 @@ function handleDailyHuddleUrlParams(){
     if(ev && ev.preventDefault) ev.preventDefault();
     window.ensureDailyHuddleView();
     var today=isoToday();
-    var lines=[];
-    lines.push('2026 Shutdown Daily Huddle - '+today);
-    lines.push('Generated: '+new Date().toLocaleString());
-    lines.push('');
-    lines.push('Overall Complete: '+safeText('d-progress-pct'));
-    lines.push('In Progress: '+safeText('d-progress-inprogress'));
-    lines.push('Pending: '+safeText('d-progress-pending'));
-    lines.push('Delayed: '+safeText('d-progress-delayed'));
-    lines.push('Lookahead: '+safeText('d-progress-lookahead-count'));
-    lines.push('');
-    lines.push('Systems / Utilities Status');
-    lines.push(rowsText('d-system-status') || 'No systems currently OOS');
-    lines.push('');
-    lines.push('Return to Service');
-    lines.push(rowsText('d-rts-rows') || 'No systems returned to service');
-    lines.push('');
-    lines.push('Maintenance Activities');
-    lines.push(rowsText('d-maint-activities') || 'No active maintenance activities');
-    lines.push('');
-    lines.push('Upcoming Schedule - Next 7 Days');
-    lines.push(rowsText('d-upcoming-schedule') || 'No upcoming activities');
-    var content=lines.join('\r\n');
-    var filename='Shutdown_Daily_Huddle_'+today+'.txt';
-    try{
-      var blob=new Blob([content], {type:'text/plain;charset=utf-8'});
-      if(window.navigator && window.navigator.msSaveOrOpenBlob){
-        window.navigator.msSaveOrOpenBlob(blob, filename);
-      }else{
-        var url=URL.createObjectURL(blob);
-        var a=document.createElement('a');
-        a.href=url;
-        a.download=filename;
-        a.style.display='none';
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function(){ URL.revokeObjectURL(url); a.remove(); }, 1500);
+    var generated=new Date().toLocaleString();
+    function esc(v){
+      return String(v==null?'':v).replace(/[&<>\"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});
+    }
+    function safe(id, fallback){
+      var el=document.getElementById(id);
+      var t=el ? String(el.innerText||'').replace(/\s+/g,' ').trim() : '';
+      return t || fallback || '';
+    }
+    function tableRows(tbodyId){
+      var tb=document.getElementById(tbodyId);
+      if(!tb) return [];
+      return Array.from(tb.querySelectorAll('tr')).map(function(tr){
+        return Array.from(tr.children).map(function(td){return String(td.innerText||'').replace(/\s+/g,' ').trim();});
+      }).filter(function(cells){
+        var joined=cells.join(' ').toLowerCase();
+        return joined && !/no active maintenance|no upcoming|no systems returned|no systems currently/.test(joined);
+      });
+    }
+    function statusBadge(status){
+      var s=String(status||'').trim();
+      var bg='#6b7280', fg='#ffffff';
+      if(/OOS/i.test(s)){ bg='#7a1a1a'; }
+      else if(/FULL/i.test(s)){ bg='#174a7a'; }
+      else if(/COND/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
+      else if(/In Progress/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
+      else if(/Scheduled|Pending/i.test(s)){ bg='#174a7a'; }
+      else if(/Delayed/i.test(s)){ bg='#7a1a1a'; }
+      else if(/Complete/i.test(s)){ bg='#1f6b42'; }
+      return '<span style="display:inline-block;background:'+bg+';color:'+fg+';border-radius:999px;padding:3px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(s)+'</span>';
+    }
+    function kpiCard(label, value, sub, primary){
+      var bg=primary?'#1a3a5c':'#f3f7fb';
+      var fg=primary?'#ffffff':'#1a3a5c';
+      var val=primary?'#f0c040':'#1a3a5c';
+      var subc=primary?'#d8e8f8':'#526b83';
+      return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
+        '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
+        '<div style="font-size:11px;margin-top:6px;color:'+subc+';white-space:nowrap;">'+esc(sub||'')+'</div>'+ '</td>';
+    }
+    function panel(title, innerHtml){
+      return '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#ffffff;border:1px solid #d9e2ec;">'+
+        '<tr><td style="background:#1a3a5c;color:#f0c040;font-size:12px;font-weight:bold;letter-spacing:.07em;text-transform:uppercase;padding:9px 12px;">'+esc(title)+'</td></tr>'+
+        '<tr><td style="padding:0;">'+innerHtml+'</td></tr></table>';
+    }
+    function dataTable(headers, rows, emptyText, statusCols){
+      statusCols=statusCols||[];
+      if(!rows || !rows.length){
+        return '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">'+esc(emptyText||'None')+'</div>';
       }
-      setExportStatus('Summary downloaded');
+      var html='<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:fixed;">';
+      html+='<tr>' + headers.map(function(h){return '<th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">'+esc(h)+'</th>';}).join('') + '</tr>';
+      rows.forEach(function(cells){
+        html+='<tr>' + headers.map(function(h,i){
+          var value=cells[i]||'';
+          var isStatus=statusCols.indexOf(i)>=0;
+          return '<td style="padding:7px 8px;border-bottom:1px solid #edf2f7;color:#222;font-size:11px;line-height:1.2;vertical-align:top;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(isStatus?statusBadge(value):esc(value))+'</td>';
+        }).join('') + '</tr>';
+      });
+      html+='</table>';
+      return html;
+    }
+    function simpleRows(rows, emptyText){
+      if(!rows || !rows.length) return '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">'+esc(emptyText)+'</div>';
+      return '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+rows.map(function(r){
+        return '<tr><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;font-size:12px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r[0]||'')+'</td><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;text-align:right;">'+statusBadge(r[1]||'')+'</td></tr>';
+      }).join('')+'</table>';
+    }
+
+    var overall=safe('d-progress-pct','0%');
+    var done=safe('d-progress-done','');
+    var inProgress=safe('d-progress-inprogress','0');
+    var pending=safe('d-progress-pending','0');
+    var delayed=safe('d-progress-delayed','0');
+    var lookahead=safe('d-progress-lookahead-count','0');
+
+    var systemRows=[];
+    var sysEl=document.getElementById('d-system-status');
+    if(sysEl){
+      Array.from(sysEl.querySelectorAll('.system-status-row')).forEach(function(row){
+        var id=(row.querySelector('.system-status-id')||{}).innerText||'';
+        var name=(row.querySelector('.system-status-name')||{}).innerText||'';
+        var st=(row.querySelector('.system-pill')||{}).innerText||'OOS';
+        systemRows.push([(id+' '+name).replace(/\s+/g,' ').trim(), st]);
+      });
+    }
+    var gowning=getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
+    var gowningRows=[['DP MFG Area', gowning.dp||'Full Gowning'], ['DS MFG Area', gowning.ds||'Full Gowning']];
+
+    var rawRts=tableRows('d-rts-rows');
+    var rtsRows=rawRts.map(function(c){
+      // Dashboard row: Progress/Status, System ID, Target, Start-Up, Note
+      return [c[1]||'—', c[2]||'TBD', c[0]||'—', c[4]||c[3]||'—'];
+    });
+    var rawMaint=tableRows('d-maint-activities');
+    var maintRows=rawMaint.map(function(c){
+      // Dashboard row: Progress, System ID, Event, Start, Target, New, Status
+      return [c[0]||'—', c[1]||'—', c[2]||'—', c[3]||'TBD', c[4]||'TBD', c[6]||c[5]||'—'];
+    });
+    var rawUpcoming=tableRows('d-upcoming-schedule');
+    var upcomingRows=rawUpcoming.map(function(c){
+      // Dashboard row: Start, Target, System ID, Event, Owner / Resource, Status
+      return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
+    });
+
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Shutdown Daily Huddle</title></head>'+ 
+      '<body style="margin:0;padding:0;background:#eef2f6;font-family:Arial,Helvetica,sans-serif;color:#222;text-align:left;">'+
+      '<div style="width:100%;max-width:1120px;margin:0;padding:14px;background:#0d2137;text-align:left;">'+
+      '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#0d2137;text-align:left;">'+
+      '<tr><td style="background:#1a3a5c;border-bottom:4px solid #f0c040;padding:14px 16px;color:#fff;text-align:left;">'+
+      '<div style="font-size:21px;font-weight:bold;letter-spacing:.10em;text-transform:uppercase;white-space:nowrap;">2026 Shutdown Daily Huddle</div>'+ 
+      '<div style="font-size:12px;color:#cde;margin-top:5px;">Date: '+esc(today)+' &nbsp;|&nbsp; Generated: '+esc(generated)+'</div>'+ 
+      '</td></tr>'+ 
+      '<tr><td style="padding:12px 0 0 0;">'+
+      '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
+      kpiCard('Overall Complete', overall, done, true)+
+      kpiCard('In Progress', inProgress, 'Active tasks', false)+
+      kpiCard('Pending', pending, 'Not started', false)+
+      kpiCard('Delayed', delayed, 'Needs attention', false)+
+      kpiCard('Lookahead', lookahead, 'Next 14 days', false)+
+      '</tr></table></td></tr>'+ 
+      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
+      '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
+      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+ 
+      '</tr></table></td></tr>'+ 
+      '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+ 
+      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
+      '<td style="width:50%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+ 
+      '<td style="width:50%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+ 
+      '</tr></table></td></tr>'+ 
+      '</table></div></body></html>';
+    var filename='Shutdown_Daily_Huddle_Email_Body.html';
+    try{
+      var blob=new Blob([html], {type:'text/html;charset=utf-8'});
+      var url=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=url; a.download=filename; a.style.display='none';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){URL.revokeObjectURL(url); a.remove();}, 1500);
+      setExportStatus('Email Body Dashboard downloaded');
+      setTimeout(function(){setExportStatus('');}, 2200);
     }catch(e){
       var w=window.open('', '_blank');
-      if(w){ w.document.write('<pre style="white-space:pre-wrap;font-family:Arial,sans-serif">'+content.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</pre>'); w.document.title=filename; }
-      else{ alert(content); }
+      if(w){ w.document.open(); w.document.write(html); w.document.close(); w.document.title=filename; }
+      else alert('Could not download email body dashboard.');
     }
     return false;
   };
+
   window.handleDailyHuddleUrlParams=function(){
     try{
       var params=new URLSearchParams(window.location.search||'');
@@ -8463,51 +8568,6 @@ function handleDailyHuddleUrlParams(){
         if(document.body.classList.contains('huddle-print-mode')) cleanup();
       }, 3000);
     }, 500);
-    return false;
-  };
-  window.downloadDailyHuddleSummary=function(ev){
-    if(ev && ev.preventDefault) ev.preventDefault();
-    window.ensureDailyHuddleView();
-    var today=isoToday();
-    var lines=[];
-    lines.push('2026 Shutdown Daily Huddle - '+today);
-    lines.push('Generated: '+new Date().toLocaleString());
-    lines.push('');
-    lines.push('Overall Complete: '+safeText('d-progress-pct'));
-    lines.push('In Progress: '+safeText('d-progress-inprogress'));
-    lines.push('Pending: '+safeText('d-progress-pending'));
-    lines.push('Delayed: '+safeText('d-progress-delayed'));
-    lines.push('Lookahead: '+safeText('d-progress-lookahead-count'));
-    lines.push('');
-    lines.push('Systems / Utilities Status');
-    lines.push(rowsText('d-system-status') || 'No systems currently OOS');
-    lines.push('');
-    lines.push('Return to Service');
-    lines.push(rowsText('d-rts-rows') || 'No systems returned to service');
-    lines.push('');
-    lines.push('Maintenance Activities');
-    lines.push(rowsText('d-maint-activities') || 'No active maintenance activities');
-    lines.push('');
-    lines.push('Upcoming Schedule - Next 7 Days');
-    lines.push(rowsText('d-upcoming-schedule') || 'No upcoming activities');
-    var content=lines.join('\r\n');
-    var filename='Shutdown_Daily_Huddle_'+today+'.txt';
-    try{
-      var blob=new Blob([content], {type:'text/plain;charset=utf-8'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=url; a.download=filename; a.style.display='none';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){URL.revokeObjectURL(url); a.remove();}, 1500);
-      setExportStatus('Summary downloaded');
-      setTimeout(function(){setExportStatus('');}, 1800);
-    }catch(e){
-      var w=window.open('', '_blank');
-      if(w){
-        w.document.write('<pre style="white-space:pre-wrap;font-family:Arial,sans-serif">'+content.replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c];})+'</pre>');
-        w.document.title=filename;
-      }else alert(content);
-    }
     return false;
   };
   window.handleDailyHuddleUrlParams=function(){
