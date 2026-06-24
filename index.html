@@ -615,7 +615,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Email Dashboard v8</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Shared Data v11</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -726,6 +726,9 @@ select.msf option:checked{background:#ddeeff}
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
     <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
+    <button onclick="saveSharedDataFile()" style="background:#1565c0;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Save current tracker data to shared JSON file">💾 Save Shared Data</button>
+    <button onclick="document.getElementById('sharedDataFileInput').click()" style="background:#fff;color:#1a3a5c;border:1px solid #1a3a5c;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Load shared JSON data from SharePoint/OneDrive">📂 Load Shared Data</button>
+    <input id="sharedDataFileInput" type="file" accept=".json,application/json" style="display:none" onchange="loadSharedDataFromInput(this)">
     </div>
   </div>
   <div class="advanced-filters" id="advancedFilters">
@@ -6856,6 +6859,122 @@ function woUpdateBadges(){
 // ========== END WORK ORDERS (CAL + PM) ==========
 
 
+
+
+// ── Shared Data JSON Sync (v11) ─────────────────────────────────────────────
+// Purpose: allow multiple users to share the same tracker state through a single
+// SharePoint/OneDrive JSON file instead of browser-only localStorage.
+// Recommended shared filename: shutdown-tracker-data.json
+const SHARED_DATA_FILENAME = 'shutdown-tracker-data.json';
+
+function getSd26Snapshot(){
+  try{ if(typeof collectEditedRows === 'function') collectEditedRows(); }catch(e){}
+  try{
+    const ps=document.getElementById('projectStartInput');
+    const pe=document.getElementById('projectEndInput');
+    if(ps && ps.value) projectStartDate = ps.value;
+    if(pe && pe.value) projectEndDate = pe.value;
+  }catch(e){}
+  try{ if(typeof updateDerivedFields === 'function') updateDerivedFields(); }catch(e){}
+  try{ if(typeof saveLocal === 'function') saveLocal(); }catch(e){}
+  try{ if(typeof saveEndImpact === 'function') saveEndImpact(); }catch(e){}
+  try{ if(typeof saveDownMaps === 'function') saveDownMaps(); }catch(e){}
+  try{ if(typeof saveGowningStatus === 'function') saveGowningStatus(); }catch(e){}
+  try{ if(typeof saveTlData === 'function') saveTlData(); }catch(e){}
+
+  const data = {};
+  Object.keys(localStorage).filter(k => k.indexOf('sd26_') === 0).sort().forEach(k => {
+    data[k] = localStorage.getItem(k);
+  });
+  return {
+    app: '2026 Shutdown Tracker',
+    schema: 'sd26-shared-data-v1',
+    generatedAt: new Date().toISOString(),
+    generatedBy: (typeof navigator !== 'undefined' ? navigator.userAgent : ''),
+    data
+  };
+}
+
+function saveSharedDataFile(){
+  try{
+    const payload = getSd26Snapshot();
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = SHARED_DATA_FILENAME;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(a.href); document.body.removeChild(a); }, 0);
+    alert('Shared data file downloaded. Save/replace this file in the shared SharePoint/OneDrive folder as: ' + SHARED_DATA_FILENAME);
+  }catch(e){
+    console.error(e);
+    alert('Could not save shared data JSON. See console for details.');
+  }
+}
+
+function applySd26SharedData(payload, opts){
+  opts = opts || {};
+  try{
+    if(!payload) throw new Error('Empty shared data file');
+    if(typeof payload === 'string') payload = JSON.parse(payload);
+    const data = payload.data || payload;
+    if(!data || typeof data !== 'object') throw new Error('Invalid shared data format');
+    Object.keys(data).forEach(k => {
+      if(k.indexOf('sd26_') === 0 && data[k] != null) localStorage.setItem(k, String(data[k]));
+    });
+    if(!opts.silent){
+      alert('Shared data loaded. The tracker will refresh now.');
+    }
+    location.reload();
+  }catch(e){
+    console.error(e);
+    alert('Could not load shared data JSON. Please confirm you selected ' + SHARED_DATA_FILENAME);
+  }
+}
+
+function loadSharedDataFromInput(input){
+  const file = input && input.files && input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = function(){ applySd26SharedData(reader.result); };
+  reader.onerror = function(){ alert('Could not read selected shared data file.'); };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+async function tryAutoLoadSharedData(){
+  // Works when index.html is served from SharePoint/OneDrive web/HTTP location
+  // and shutdown-tracker-data.json is saved in the same folder.
+  try{
+    if(location.protocol === 'file:') return;
+    const params = new URLSearchParams(location.search || '');
+    if(params.get('shared') === '0') return;
+    const res = await fetch(SHARED_DATA_FILENAME + '?v=' + Date.now(), {cache:'no-store'});
+    if(!res.ok) return;
+    const payload = await res.json();
+    const incoming = payload.generatedAt || '';
+    const lastLoaded = localStorage.getItem('sd26_shared_last_loaded') || '';
+    if(incoming && incoming === lastLoaded) return;
+    if(payload && payload.data){
+      Object.keys(payload.data).forEach(k => {
+        if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
+      });
+      if(incoming) localStorage.setItem('sd26_shared_last_loaded', incoming);
+      // Avoid loops: render with loaded data once.
+      location.replace(location.pathname + location.search.replace(/[?&]autoloaded=1/, '') + (location.search ? '&' : '?') + 'autoloaded=1');
+    }
+  }catch(e){
+    // Silent because shared file may not exist yet.
+    console.warn('Shared data autoload skipped:', e.message || e);
+  }
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', tryAutoLoadSharedData);
+}else{
+  tryAutoLoadSharedData();
+}
+// ── End Shared Data JSON Sync ───────────────────────────────────────────────
 
 function exportSnapshot(){
   // Save current edits first, then export a portable HTML snapshot.
