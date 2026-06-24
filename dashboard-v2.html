@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shutdown Dashboard v2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0d2137;color:white;font-family:Arial,Helvetica,sans-serif}.wrap{padding:24px}.top{display:flex;justify-content:space-between;gap:16px;align-items:center;margin-bottom:18px}h1{margin:0;font-size:26px;letter-spacing:.1em;text-transform:uppercase}.meta{color:#bfd4e8;font-size:13px;margin-top:6px}.btn{background:#f0c040;color:#10243a;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:800}.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:12px}.card{background:#1f4b78;border-radius:14px;padding:16px;min-height:130px}.label{font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:#d7e9f8}.big{font-size:42px;font-weight:900;line-height:1;margin-top:14px}.sub{font-size:15px;color:#f0c040;font-weight:800;margin-top:8px}.grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-top:14px}.panel{background:#17365a;border-radius:14px;overflow:hidden}.panel h2{margin:0;padding:13px 16px;background:#1f4b78;color:#f0c040;font-size:13px;letter-spacing:.08em;text-transform:uppercase}.row{display:grid;grid-template-columns:85px 1fr 85px 90px;gap:10px;padding:9px 16px;border-top:1px solid rgba(255,255,255,.1);font-size:12px}.head{color:#bcd3e8;text-transform:uppercase;font-weight:800;font-size:10px}.pill{display:inline-block;border-radius:999px;background:#274d76;padding:4px 8px;font-weight:800}.ok{color:#70e0a0}.warn{color:#ffd36a}.bad{color:#ff8f8f}.bar{height:10px;background:rgba(255,255,255,.15);border-radius:999px;margin-top:10px;overflow:hidden}.fill{height:100%;background:#f0c040}.load{padding:40px;text-align:center;color:#c9d9e8}iframe{display:none}@media(max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.grid{grid-template-columns:1fr}.row{grid-template-columns:70px 1fr 70px 80px}}
+</style>
+</head>
+<body>
+<iframe id="source" src="index.html"></iframe>
+<div class="wrap">
+<div class="top"><div><h1>2026 Shutdown Executive Dashboard</h1><div id="meta" class="meta">Loading tracker data...</div></div><a class="btn" href="index.html">Open Full Tracker</a></div>
+<div id="loading" class="load">Loading Dashboard v2...</div>
+<div id="app" style="display:none"><div id="kpis" class="kpis"></div><div class="grid"><div class="panel"><h2>Today / Next 7 Days</h2><div id="todayRows"></div></div><div class="panel"><h2>Systems / Utilities Status</h2><div id="systemRows"></div></div></div></div>
+</div>
+<script>
+(function(){
+function esc(s){return String(s==null?'':s).replace(/[&<>]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]})}
+function iso(v){if(!v)return null;if(typeof v==='number'){var d=new Date(Math.round((v-25569)*86400*1000));return d.toISOString().slice(0,10)}var d=new Date(String(v));return isNaN(d)?null:d.toISOString().slice(0,10)}
+function md(v){var d=new Date(v+'T00:00:00');return (d.getMonth()+1)+'/'+d.getDate()}
+function diff(a,b){return Math.round((new Date(b+'T00:00:00')-new Date(a+'T00:00:00'))/86400000)}
+function done(t){return /complete|done|closed/i.test(String(t.status||''))}
+function prog(t){return /progress|active|ongoing/i.test(String(t.status||''))}
+function cat(t){return t.category||(/calib/i.test(t.task||'')?'CAL':/pm|prevent/i.test(t.task||'')?'PM':/repair|corrective/i.test(t.task||'')?'CM':'PROJ')}
+function row(t){return '<div class="row"><div>'+esc(md(iso(t.start)))+'</div><div><b>'+esc(t.id)+'</b> '+esc(t.task)+'</div><div><span class="pill">'+esc(cat(t))+'</span></div><div>'+esc(t.status||'Pending')+'</div></div>'}
+function render(){
+ var frame=document.getElementById('source');
+ var w=frame.contentWindow;
+ var all=Array.isArray(w.tasks)?w.tasks:[];
+ if(!all.length){document.getElementById('loading').textContent='Tracker data was not ready. Please refresh once.';return}
+ var items=all.filter(function(t){return t&&!t.isParent&&iso(t.start)&&iso(t.end)});
+ var today=new Date().toISOString().slice(0,10);
+ var starts=items.map(function(t){return iso(t.start)}).sort();
+ var ends=items.map(function(t){return iso(t.end)}).sort();
+ var start=starts[0]||'2026-07-06'; var end=ends[ends.length-1]||'2026-08-28';
+ var total=items.length, complete=items.filter(done).length, pct=total?Math.round(complete/total*100):0;
+ var inprog=items.filter(prog).length;
+ var pending=items.filter(function(t){return !done(t)&&!prog(t)}).length;
+ var late=items.filter(function(t){return !done(t)&&iso(t.end)<today}).length;
+ var todays=items.filter(function(t){return iso(t.start)<=today&&iso(t.end)>=today});
+ var look=items.filter(function(t){var s=iso(t.start);return s>=today&&diff(today,s)<=7&&!done(t)}).sort(function(a,b){return iso(a.start).localeCompare(iso(b.start))}).slice(0,12);
+ var dleft=diff(today,start); var status=dleft>0?'Starts in '+dleft+' Days':(today<=end?'In Progress':'Completed');
+ var parents=all.filter(function(t){return t.isParent}); var down=w.downMap||{}; var up=w.startupMap||{}; var systems=[];
+ parents.forEach(function(p){var kids=all.filter(function(k){return !k.isParent&&String(k.id).indexOf(String(p.id)+'.')===0});var any=kids.some(function(k){return down[k.id]!=null});var allup=kids.length&&kids.every(function(k){return !down[k.id]||up[k.id]!=null});if(any&&!allup)systems.push(p)});
+ var normal=Math.max(parents.length-systems.length,0);
+ var k=[['Shutdown Status',status,md(start)+' to '+md(end),''],['Overall Progress',pct+'%',complete+' / '+total+' complete','bar'],['Today Work',todays.length+' Due',todays.filter(done).length+' complete',''],['Schedule Risk',late,String(inprog)+' in progress','risk'],['Systems',normal+' Normal',systems.length+' OOS',''],['Readiness',pending+' Pending','Next 7 days '+look.length,'']];
+ document.getElementById('kpis').innerHTML=k.map(function(x){var c=(x[0]==='Schedule Risk'&&Number(x[1])>0)?'bad':(x[0]==='Systems'&&systems.length?'warn':'');return '<div class="card"><div class="label">'+esc(x[0])+'</div><div class="big '+c+'">'+esc(x[1])+'</div><div class="sub">'+esc(x[2])+'</div>'+(x[3]==='bar'?'<div class="bar"><div class="fill" style="width:'+pct+'%"></div></div>':'')+'</div>'}).join('');
+ document.getElementById('todayRows').innerHTML='<div class="row head"><div>Start</div><div>Task</div><div>Type</div><div>Status</div></div>'+((todays.length?todays:look).slice(0,12).map(row).join('')||'<div class="row"><div></div><div>No priority tasks found.</div><div></div><div></div></div>');
+ document.getElementById('systemRows').innerHTML='<div class="row head"><div>ID</div><div>System</div><div>Status</div><div></div></div>'+(systems.length?systems.map(function(s){return '<div class="row"><div><b>'+esc(s.id)+'</b></div><div>'+esc(s.task)+'</div><div><span class="pill bad">OOS</span></div><div></div></div>'}).join(''):'<div class="row"><div></div><div>All systems normal based on current Down / Start-Up marks.</div><div><span class="pill ok">Normal</span></div><div></div></div>');
+ document.getElementById('meta').textContent='Generated '+new Date().toLocaleString()+' · Project '+md(start)+'-'+md(end);
+ document.getElementById('loading').style.display='none';document.getElementById('app').style.display='block';
+}
+document.getElementById('source').addEventListener('load',function(){setTimeout(render,1000)});
+})();
+</script>
+</body>
+</html>
