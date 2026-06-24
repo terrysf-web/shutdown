@@ -8073,36 +8073,36 @@ function exportDailyHuddlePDF(){
   const priorTitle = document.title;
   document.title = 'Shutdown_Daily_Huddle_' + todayIso;
   setTimeout(function(){
-    window.print();
-    setTimeout(function(){ document.title = priorTitle; }, 500);
-  }, 250);
+    try { window.print(); }
+    finally { setTimeout(function(){ document.title = priorTitle; }, 500); }
+  }, 300);
 }
 function tableTextFromBody(tbodyId){
   const tbody = document.getElementById(tbodyId);
   if(!tbody) return '';
-  return Array.from(tbody.querySelectorAll('tr')).map(tr=>
-    Array.from(tr.querySelectorAll('td,th')).map(td=>String(td.innerText||'').replace(/\s+/g,' ').trim()).join(' | ')
-  ).filter(Boolean).join('
-');
+  return Array.from(tbody.querySelectorAll('tr')).map(function(tr){
+    return Array.from(tr.querySelectorAll('td,th')).map(function(td){
+      return String(td.innerText || '').replace(/\s+/g,' ').trim();
+    }).join(' | ');
+  }).filter(Boolean).join('\n');
 }
 function downloadDailyHuddleSummary(){
   ensureDailyHuddleView();
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const lines = [];
+  const textOf = function(id){ return (document.getElementById(id)?.innerText || '').trim(); };
   lines.push('2026 Shutdown Daily Huddle - ' + todayIso);
   lines.push('Generated: ' + new Date().toLocaleString());
   lines.push('');
-  lines.push('Overall Complete: ' + (document.getElementById('d-progress-pct')?.innerText || ''));
-  lines.push('In Progress: ' + (document.getElementById('d-progress-inprogress')?.innerText || ''));
-  lines.push('Pending: ' + (document.getElementById('d-progress-pending')?.innerText || ''));
-  lines.push('Delayed: ' + (document.getElementById('d-progress-delayed')?.innerText || ''));
-  lines.push('Lookahead: ' + (document.getElementById('d-progress-lookahead-count')?.innerText || ''));
+  lines.push('Overall Complete: ' + textOf('d-progress-pct'));
+  lines.push('In Progress: ' + textOf('d-progress-inprogress'));
+  lines.push('Pending: ' + textOf('d-progress-pending'));
+  lines.push('Delayed: ' + textOf('d-progress-delayed'));
+  lines.push('Lookahead: ' + textOf('d-progress-lookahead-count'));
   lines.push('');
   lines.push('Systems / Utilities Status');
   const sys = document.getElementById('d-system-status');
-  lines.push(sys ? String(sys.innerText||'').replace(/
-{2,}/g,'
-').trim() : '');
+  lines.push(sys ? String(sys.innerText || '').replace(/\n{2,}/g,'\n').trim() : '');
   lines.push('');
   lines.push('Return to Service');
   lines.push(tableTextFromBody('d-rts-rows'));
@@ -8112,8 +8112,7 @@ function downloadDailyHuddleSummary(){
   lines.push('');
   lines.push('Upcoming Schedule - Next 7 Days');
   lines.push(tableTextFromBody('d-upcoming-schedule'));
-  const blob = new Blob([lines.join('
-')], {type:'text/plain;charset=utf-8'});
+  const blob = new Blob([lines.join('\n')], {type:'text/plain;charset=utf-8'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'Shutdown_Daily_Huddle_' + todayIso + '.txt';
