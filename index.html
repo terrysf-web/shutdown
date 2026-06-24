@@ -6961,7 +6961,13 @@ async function tryAutoLoadSharedData(){
       });
       if(incoming) localStorage.setItem('sd26_shared_last_loaded', incoming);
       // Avoid loops: render with loaded data once.
-      location.replace(location.pathname + location.search.replace(/[?&]autoloaded=1/, '') + (location.search ? '&' : '?') + 'autoloaded=1');
+      const __p=new URLSearchParams(location.search);
+      if(!__p.has('autoloaded')){
+        __p.set('autoloaded','1');
+        location.replace(location.pathname+'?'+__p.toString());
+      } else {
+        renderAll?.();
+      }
     }
   }catch(e){
     // Silent because shared file may not exist yet.
