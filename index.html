@@ -422,6 +422,18 @@ tr.editing{background:#fffceb}
 .vendor-seg{height:100%;min-width:3px}
 .vendor-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;font-size:10px;font-weight:800;color:#9fb4c8}
 .vendor-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px}
+.executive-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.exec-mini-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
+.exec-mini{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:9px 10px}
+.exec-mini-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#9fb4c8;margin-bottom:5px}
+.exec-mini-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
+.system-pill.returning{background:#174a7a;color:#cce6ff}
+.system-pill.risk{background:#7a1a1a;color:#ffb4ac}
+.system-pill.ready{background:#1f6b42;color:#d7ffe5}
+.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(160px,1fr) repeat(4,78px);align-items:center;gap:8px}
+.vendor-progress-row.exec .vendor-meta{margin-top:0;justify-content:flex-end}
+.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff}
+.vendor-metric span{display:block;font-size:9px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.05em}
 .huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
 .huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
 .huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
@@ -470,7 +482,6 @@ tr.editing{background:#fffceb}
 .huddle-status.delayed{background:#7a1a1a;color:#ffb4ac}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
 .dash-mode-huddle .kpi-section{display:none!important}
-.dash-mode-huddle .progress-grid{display:none!important}
 .dash-mode-kpi .huddle-section{display:none!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
@@ -552,7 +563,7 @@ select.msf option:checked{background:#ddeeff}
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -587,7 +598,7 @@ select.msf option:checked{background:#ddeeff}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -3701,7 +3712,7 @@ APPENDIX 6.5B)</div>
 
   <!-- Title -->
   <div style="background:#1a3a5c;padding:13px 18px;border-radius:8px;margin-bottom:14px;border-bottom:3px solid #f0c040;display:flex;align-items:center;justify-content:space-between;gap:14px">
-    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">2026 Shutdown Daily Huddle</span>
+    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Shutdown Executive Dashboard</span>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
@@ -3710,47 +3721,52 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Daily Huddle Top: Project Progress + Gowning Status -->
+  <!-- Executive Dashboard Top: Operational KPIs + Gowning Status -->
   <div class="huddle-top-layout huddle-section">
     <div class="progress-brief">
       <div class="progress-brief-head">
         <div>
-          <div class="progress-brief-title">Shutdown Project Progress</div>
+          <div class="progress-brief-title">Executive Operations Snapshot</div>
           <div class="progress-brief-date" id="d-progress-asof">As of —</div>
         </div>
         <div class="progress-brief-date" id="d-progress-summary">—</div>
       </div>
-      <div class="progress-kpis">
+      <div class="progress-kpis executive-kpis">
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Overall Complete</div>
+          <div class="progress-kpi-label">Shutdown Status</div>
+          <div class="progress-kpi-value" id="d-shutdown-status">—</div>
+          <div class="progress-kpi-sub" id="d-shutdown-status-sub">—</div>
+        </div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Overall Progress</div>
           <div class="progress-kpi-value" id="d-progress-pct">—</div>
           <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
           <div class="progress-kpi-sub" id="d-progress-done">—</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">In Progress</div>
-          <div class="progress-kpi-value" id="d-progress-inprogress">—</div>
-          <div class="progress-kpi-sub">Active tasks</div>
+          <div class="progress-kpi-label">Today's Work</div>
+          <div class="progress-kpi-value" id="d-today-work">—</div>
+          <div class="progress-kpi-sub" id="d-today-work-sub">Due today</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Pending</div>
-          <div class="progress-kpi-value" id="d-progress-pending">—</div>
-          <div class="progress-kpi-sub">Not started</div>
+          <div class="progress-kpi-label">Schedule Risk</div>
+          <div class="progress-kpi-value" id="d-schedule-risk">—</div>
+          <div class="progress-kpi-sub" id="d-schedule-risk-sub">Late / delayed</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Delayed</div>
-          <div class="progress-kpi-value" id="d-progress-delayed">—</div>
-          <div class="progress-kpi-sub">Needs attention</div>
+          <div class="progress-kpi-label">Systems Status</div>
+          <div class="progress-kpi-value" id="d-systems-summary">—</div>
+          <div class="progress-kpi-sub" id="d-systems-summary-sub">Normal / OOS / RTS</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Lookahead</div>
-          <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
-          <div class="progress-kpi-sub">Next 14 days</div>
+          <div class="progress-kpi-label">Resource Readiness</div>
+          <div class="progress-kpi-value" id="d-resource-readiness">—</div>
+          <div class="progress-kpi-sub" id="d-resource-readiness-sub">Assigned today</div>
         </div>
       </div>
       <div class="progress-grid">
-        <div class="progress-panel"><div class="progress-panel-title">Progress by System</div><div id="d-progress-system"></div></div>
-        <div class="progress-panel"><div class="progress-panel-title">Progress by Category</div><div id="d-progress-category"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Today's Operations</div><div id="d-today-operations" class="exec-mini-grid"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Operational Detail</div><div id="d-progress-system"></div></div>
         <div class="progress-panel"><div class="progress-panel-title">Meeting Focus</div><div id="d-progress-focus"></div></div>
       </div>
     </div>
@@ -3776,10 +3792,10 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Daily Huddle Middle: Abnormal Systems + Return to Service -->
+  <!-- Executive Dashboard Middle: Systems + Return to Service -->
   <div class="huddle-middle-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Systems / Utilities Status</div>
+      <div class="huddle-panel-title">Systems Status</div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
     <div class="huddle-panel tight">
@@ -3894,14 +3910,9 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Row 3: By Vendor (full width) -->
-  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">WORK ORDER BY TYPE BY VENDOR</div>
-    <div style="display:flex;justify-content:center;gap:18px;margin-bottom:8px">
-      <span style="font-size:11px;color:#f0c040">● CAL</span>
-      <span style="font-size:11px;color:#5db3e8">● CM</span>
-      <span style="font-size:11px;color:#e07840">● PM</span>
-    </div>
+  <!-- Row 3: Vendor Readiness (full width) -->
+  <div class="vendor-readiness-section huddle-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">VENDOR READINESS</div>
     <div id="d-by-vendor" class="vendor-progress"></div>
   </div>
 
@@ -5670,7 +5681,7 @@ function setDashboardMode(mode){
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
   panel.classList.toggle('dash-mode-huddle', mode !== 'kpi');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : '2026 Shutdown Daily Huddle';
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : 'Shutdown Executive Dashboard';
 }
 
 function getGowningStatus(){
@@ -5813,6 +5824,24 @@ function renderDashboard(){
     // In Progress work belongs only in Maintenance Activities, not Upcoming.
     return startDate > todayDate && startDate <= sevenDayEndDate && (st === 'Pending' || st === 'Scheduled');
   }
+  function taskTouchesToday(t){
+    const startIso = normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.end) || startIso;
+    if(!startIso && !endIso) return false;
+    const startDate = new Date((startIso || endIso)+'T00:00:00');
+    const endDate = new Date((endIso || startIso)+'T00:00:00');
+    return startDate <= todayDate && endDate >= todayDate;
+  }
+  function hasOwner(t){
+    return !!String(t.assigned || t.assignedTo || t.resource || t.owner || t.vendor || '').trim();
+  }
+  const dueTodayTasks = activeLeaf.filter(t=>taskTouchesToday(t) && taskStatus(t)!=='N/A');
+  const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
+  const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
+  const lateTasks = overdueTasks;
+  const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
+  const assignedToday = dueTodayTasks.filter(hasOwner).length;
+  const resourcePct = dueTodayTasks.length ? Math.round(assignedToday / dueTodayTasks.length * 100) : 100;
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5835,16 +5864,40 @@ function renderDashboard(){
   }
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
+  const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
+  const shutdownStatus = scheduleRiskCount ? 'At Risk' : (progressPct > 0 ? 'Active' : 'Planned');
   setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
+  setText('d-shutdown-status', shutdownStatus);
+  setText('d-shutdown-status-sub', scheduleRiskCount ? scheduleRiskCount + ' schedule risk items' : 'No open schedule risk');
   setText('d-progress-pct', progressPct + '%');
   setWidth('d-progress-meter', progressPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
+  setText('d-today-work', dueTodayTasks.length);
+  setText('d-today-work-sub', completedTodayTasks.length + ' completed / ' + remainingTodayTasks.length + ' remaining');
+  setText('d-schedule-risk', scheduleRiskCount);
+  setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
+  setText('d-resource-readiness', resourcePct + '%');
+  setText('d-resource-readiness-sub', assignedToday + '/' + dueTodayTasks.length + ' assigned today');
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
   setText('d-progress-delayed', statusCounts.Delayed || 0);
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
+  const todayOpsEl = document.getElementById('d-today-operations');
+  if(todayOpsEl){
+    const ops = [
+      ['Due Today', dueTodayTasks.length],
+      ['Completed Today', completedTodayTasks.length],
+      ['Remaining Today', remainingTodayTasks.length],
+      ['Critical Tasks', criticalTasks.length],
+      ['Late Tasks', lateTasks.length]
+    ];
+    todayOpsEl.innerHTML = ops.map(([label,value])=>`<div class="exec-mini">
+      <div class="exec-mini-label">${label}</div>
+      <div class="exec-mini-value">${value}</div>
+    </div>`).join('');
+  }
 
   const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
@@ -5969,8 +6022,26 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    const abnormalSystems = huddleSystems.filter(s=>s.status==='OOS');
-    systemStatusEl.innerHTML = abnormalSystems.length ? abnormalSystems.map(s=>`<div class="system-status-row"><div class="system-status-id" title="${s.def.system}">${s.def.system}</div><div class="system-status-name" title="${s.def.name}">${s.def.name}</div><div class="system-pill ${pillClass(s.status)}">OOS</div></div>`).join('') : '<div class="progress-empty">No systems currently OOS.</div>';
+    function executiveSystemStatus(status){
+      if(status === 'OOS' || status === 'Breakdown') return 'OOS';
+      if(status === 'Cond. REL' || status === 'FUL REL') return 'Returning to Service';
+      return 'Normal';
+    }
+    function executiveSystemClass(status){
+      const st = executiveSystemStatus(status);
+      return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
+    }
+    const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
+    const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
+    const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
+    const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
+    setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
+    setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
+    systemStatusEl.innerHTML = executiveSystems.map(s=>`<div class="system-status-row">
+      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
+      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
+      <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
+    </div>`).join('');
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -6097,7 +6168,7 @@ function renderDashboard(){
   const tn = document.getElementById('d-total-num');
   const ts = document.getElementById('d-total-sub');
   if(tn) tn.textContent = grandTotal;
-  if(ts) ts.textContent = (daysLeft>0 ? daysLeft+' days left' : 'Shutdown started') + '  •  Done: '+grandDone+' ('+grandPct+'%)';
+  if(ts) ts.textContent = 'Progress '+grandPct+'%  •  Risk '+scheduleRiskCount+'  •  Active '+progressTotal;
 
   const bc = document.getElementById('d-delayed-badge-card');
   const bn = document.getElementById('d-delayed-badge-num');
@@ -6215,51 +6286,42 @@ function renderDashboard(){
       `).join('')}`;
   }
 
-  // ── By Vendor ─────────────────────────────────────────────────────────────
+  // ── Vendor Readiness ──────────────────────────────────────────────────────
   const vendorMap = {};
-  leaf.forEach(t=>{
-    const v=(t.vendor||'').trim()||'Internal';
-    const c=(t.category||inferCategory(t.task)).toUpperCase();
-    if(!vendorMap[v]) vendorMap[v]={CAL:0,PM:0,CM:0,total:0};
-    if(c==='CAL') vendorMap[v].CAL++;
-    else if(c==='PM') vendorMap[v].PM++;
-    else if(c==='CM') vendorMap[v].CM++;
-    vendorMap[v].total++;
-  });
-  // Add CAL WO vendor data (A&P is main vendor)
-  if(!vendorMap['A&P']) vendorMap['A&P']={CAL:0,PM:0,CM:0,total:0};
-  vendorMap['A&P'].CAL += calTotal;
-  vendorMap['A&P'].total += calTotal;
-  // Add PM WO vendors
-  pmData.forEach(r=>{
+  function ensureVendor(name){
+    const key = (name || '').trim() || 'Internal';
+    if(!vendorMap[key]) vendorMap[key] = {scheduled:0,inProgress:0,completed:0,remaining:0,total:0};
+    return vendorMap[key];
+  }
+  function addVendorStatus(name, status){
+    const d = ensureVendor(name);
+    const st = String(status || 'Pending');
+    d.total++;
+    if(st === 'Complete' || st === 'Done') d.completed++;
+    else if(st === 'In Progress') d.inProgress++;
+    else d.scheduled++;
+    d.remaining = d.total - d.completed;
+  }
+  leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
+  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', calSMap[i] || 'Pending'));
+  pmData.forEach((r,i)=>{
     const v=(r.mfr||'').trim()||'Internal';
     const key = v.length>12 ? v.slice(0,11) : v;
-    if(!vendorMap[key]) vendorMap[key]={CAL:0,PM:0,CM:0,total:0};
-    vendorMap[key].PM++;
-    vendorMap[key].total++;
+    addVendorStatus(key, pmSMap[i] || 'Pending');
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
   const vEl = document.getElementById('d-by-vendor');
   if(vEl) vEl.innerHTML = topVendors.map(([name,d])=>{
-    const calPct = d.total ? Math.max(3, Math.round(d.CAL/d.total*100)) : 0;
-    const cmPct = d.total ? Math.max(3, Math.round(d.CM/d.total*100)) : 0;
-    const pmPct = d.total ? Math.max(3, Math.round(d.PM/d.total*100)) : 0;
-    return `<div class="vendor-progress-row">
+    return `<div class="vendor-progress-row exec">
       <div class="vendor-progress-top">
         <div class="vendor-progress-name" title="${name}">${name}</div>
         <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div class="vendor-stack">
-        ${d.CAL>0?`<span class="vendor-seg" style="width:${calPct}%;background:#f0c040"></span>`:''}
-        ${d.CM>0?`<span class="vendor-seg" style="width:${cmPct}%;background:#5db3e8"></span>`:''}
-        ${d.PM>0?`<span class="vendor-seg" style="width:${pmPct}%;background:#e07840"></span>`:''}
-      </div>
-      <div class="vendor-meta">
-        ${d.CAL>0?`<span><i class="vendor-dot" style="background:#f0c040"></i>CAL ${d.CAL}</span>`:''}
-        ${d.CM>0?`<span><i class="vendor-dot" style="background:#5db3e8"></i>CM ${d.CM}</span>`:''}
-        ${d.PM>0?`<span><i class="vendor-dot" style="background:#e07840"></i>PM ${d.PM}</span>`:''}
-      </div>
+      <div class="vendor-metric">${d.scheduled}<span>Scheduled</span></div>
+      <div class="vendor-metric">${d.inProgress}<span>In Progress</span></div>
+      <div class="vendor-metric">${d.completed}<span>Completed</span></div>
+      <div class="vendor-metric">${d.remaining}<span>Remaining</span></div>
     </div>`;
   }).join('');
 }
@@ -6960,14 +7022,13 @@ async function tryAutoLoadSharedData(){
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
       });
       if(incoming) localStorage.setItem('sd26_shared_last_loaded', incoming);
-      // Avoid loops: render with loaded data once.
-      const __p=new URLSearchParams(location.search);
-      if(!__p.has('autoloaded')){
+      // Avoid loops: mark the URL once without navigating, then render in place.
+      const __p = new URLSearchParams(location.search || '');
+      if(!__p.has('autoloaded') && window.history && history.replaceState){
         __p.set('autoloaded','1');
-        location.replace(location.pathname+'?'+__p.toString());
-      } else {
-        renderAll?.();
+        history.replaceState(null, '', location.pathname + '?' + __p.toString() + location.hash);
       }
+      renderAll?.();
     }
   }catch(e){
     // Silent because shared file may not exist yet.
