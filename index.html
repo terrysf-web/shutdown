@@ -449,6 +449,12 @@ tr.editing{background:#fffceb}
 .operational-detail-kpi .progress-row-meta{font-size:10px;color:#d6e7f7;text-align:right}
 .operational-detail-kpi .progress-mini-meter{height:5px;background:rgba(255,255,255,.17)}
 .operational-detail-kpi .progress-mini-meter span{background:#4f9be8}
+.wo-add-btn{font-size:11px;font-weight:800;border:none;border-radius:5px;padding:4px 8px;color:#fff;cursor:pointer}
+.wo-add-panel{display:none;padding:8px 10px;border-bottom:1px solid #eee;background:#fbfcfd;gap:6px;flex-wrap:wrap;align-items:center}
+.wo-add-panel.open{display:flex}
+.wo-add-panel input,.wo-add-panel select{font-size:12px;padding:5px 7px;border:1px solid #ccc;border-radius:5px;min-width:90px}
+.wo-add-panel button{font-size:11px;font-weight:800;border:none;border-radius:5px;padding:5px 9px;cursor:pointer}
+.wo-manual-badge{display:inline-block;font-size:9px;font-weight:800;background:#fff3cd;color:#7a5200;border-radius:8px;padding:1px 5px;margin-left:4px}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
 .system-pill.ready{background:#1f6b42;color:#d7ffe5}
@@ -5764,8 +5770,9 @@ function showTab(tab, btn){
 
 function renderDashboard(){
   const leaf = tasks.filter(t=>!t.isParent);
-  const calData = typeof WO_DATA !== 'undefined' ? WO_DATA : [];
-  const pmData  = typeof PM_DATA !== 'undefined' ? PM_DATA : [];
+  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
+  const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
+  const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
   const calSMap = typeof calStatusMap !== 'undefined' ? calStatusMap : {};
   const pmSMap  = typeof pmStatusMap  !== 'undefined' ? pmStatusMap  : {};
 
@@ -5775,8 +5782,8 @@ function renderDashboard(){
   const grandTotal = taskTotal + calTotal + pmTotal;
 
   const taskDone = leaf.filter(t=>statusMap[t.id]==='Complete').length;
-  const calDone  = calData.filter((_,i)=>(calSMap[i]||'Pending')==='Done').length;
-  const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
+  const calDone  = calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, calSMap)==='Done' : (calSMap[i]||'Pending')==='Done').length;
+  const pmDone   = pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap)==='Done' : (pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
   const displayGrandTotal = Math.max(grandTotal, 559);
   const grandPct = displayGrandTotal ? Math.round(grandDone/displayGrandTotal*100) : 0;
@@ -6771,35 +6778,120 @@ var PM_DATA = [{"name":"PM-ACLE-Q, SA & A","tag":"01-ACLE-001","desc":"Autoclave
 var WO_CAL_STATUS_KEY = 'sd26_wo_status_v1';
 var WO_CAL_NOTES_KEY  = 'sd26_wo_notes_v1';
 var WO_PM_STATUS_KEY  = 'sd26_wo_pm_status_v1';
+var WO_MANUAL_KEY     = 'sd26_wo_manual_v1';
 
 var calStatusMap = {};
 var pmStatusMap  = {};
+var woManualData = [];
 var woInitialized = false;
 
 function woLoadStorage(){
   try{ var s=localStorage.getItem(WO_CAL_STATUS_KEY); if(s) calStatusMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_PM_STATUS_KEY);  if(s) pmStatusMap=JSON.parse(s);  }catch(e){}
+  try{ var s=localStorage.getItem(WO_MANUAL_KEY);     woManualData=s?JSON.parse(s):[]; if(!Array.isArray(woManualData)) woManualData=[]; }catch(e){ woManualData=[]; }
 }
 function woSaveCAL(){ try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){} }
 function woSavePM(){  try{ localStorage.setItem(WO_PM_STATUS_KEY,  JSON.stringify(pmStatusMap));  }catch(e){} }
+function woSaveManual(){
+  try{ localStorage.setItem(WO_MANUAL_KEY, JSON.stringify(woManualData)); }catch(e){}
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
+
+function woEsc(v){
+  return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+function woManualRows(category){
+  return woManualData.filter(function(r){ return (r.category||'') === category; }).map(function(r){
+    var copy = Object.assign({}, r);
+    copy._woType = 'manual';
+    copy._woId = r.id;
+    return copy;
+  });
+}
+function woAllCalData(){
+  return WO_DATA.map(function(r,i){
+    var copy = Object.assign({_woType:'base', _woIndex:i}, r);
+    return copy;
+  }).concat(woManualRows('CAL'));
+}
+function woAllPmData(){
+  return PM_DATA.map(function(r,i){
+    var copy = Object.assign({_woType:'base', _woIndex:i}, r);
+    return copy;
+  }).concat(woManualRows('PM'));
+}
+function woRowStatus(row, map){
+  if(row && row._woType === 'manual') return row.status || 'Pending';
+  return map[row._woIndex] || 'Pending';
+}
+function woManualFind(id){
+  return woManualData.find(function(r){ return r.id === id; });
+}
+function woToggleAddPanel(id){
+  var el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+function woAddManual(category){
+  var now = Date.now();
+  if(category === 'CAL'){
+    var system = (document.getElementById('wo-add-cal-system')||{}).value || '';
+    var tag = (document.getElementById('wo-add-cal-tag')||{}).value || '';
+    var interval = (document.getElementById('wo-add-cal-interval')||{}).value || '';
+    if(!tag.trim()){ alert('Please enter a CAL Tag / ID.'); return; }
+    woManualData.push({id:'manual-cal-'+now, category:'CAL', system:system.trim()||'Manual', tag:tag.trim(), interval:interval.trim(), flag:'', status:'Pending'});
+    ['wo-add-cal-system','wo-add-cal-tag','wo-add-cal-interval'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    woSaveManual();
+    woRefreshFilterOptions();
+    calRender();
+  }else{
+    var name = (document.getElementById('wo-add-pm-name')||{}).value || '';
+    var tagPm = (document.getElementById('wo-add-pm-tag')||{}).value || '';
+    var desc = (document.getElementById('wo-add-pm-desc')||{}).value || '';
+    var assigned = (document.getElementById('wo-add-pm-assigned')||{}).value || '';
+    if(!name.trim() && !tagPm.trim()){ alert('Please enter a PM Name or Tag.'); return; }
+    woManualData.push({id:'manual-pm-'+now, category:'PM', name:name.trim()||'Manual PM', tag:tagPm.trim(), desc:desc.trim(), assigned:assigned.trim(), dept:'Manual', mfr:'', location:'', status:'Pending'});
+    ['wo-add-pm-name','wo-add-pm-tag','wo-add-pm-desc','wo-add-pm-assigned'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
+    woSaveManual();
+    woRefreshFilterOptions();
+    pmRender();
+  }
+  try{ renderDashboard(); }catch(e){}
+}
+function woDeleteManual(id){
+  if(!confirm('Delete this manual work order?')) return;
+  woManualData = woManualData.filter(function(r){ return r.id !== id; });
+  woSaveManual();
+  woRefreshFilterOptions();
+  calRender();
+  pmRender();
+  try{ renderDashboard(); }catch(e){}
+}
+function woRefreshFilterOptions(){
+  var calSel = document.getElementById('cal-sys-filter');
+  if(calSel){
+    var calValue = calSel.value;
+    calSel.innerHTML = '<option value="">All Systems</option>';
+    [...new Set(woAllCalData().map(function(r){return r.system;}).filter(Boolean))].sort().forEach(function(s){
+      var o=document.createElement('option'); o.value=s; o.textContent=s; calSel.appendChild(o);
+    });
+    calSel.value = [...calSel.options].some(function(o){return o.value===calValue;}) ? calValue : '';
+  }
+  var pmSel = document.getElementById('pm-dept-filter');
+  if(pmSel){
+    var pmValue = pmSel.value;
+    pmSel.innerHTML = '<option value="">All Depts</option>';
+    [...new Set(woAllPmData().map(function(r){return r.dept;}).filter(Boolean))].sort().forEach(function(d){
+      var o=document.createElement('option'); o.value=d; o.textContent=d; pmSel.appendChild(o);
+    });
+    pmSel.value = [...pmSel.options].some(function(o){return o.value===pmValue;}) ? pmValue : '';
+  }
+}
 
 function woInit(){
   woLoadStorage();
-  // CAL system filter
-  var calSel = document.getElementById('cal-sys-filter');
-  if(calSel && calSel.options.length === 1){
-    WO_SYSTEMS.forEach(function(s){
-      var o=document.createElement('option'); o.value=s; o.textContent=s; calSel.appendChild(o);
-    });
-  }
-  // PM dept filter
-  var pmSel = document.getElementById('pm-dept-filter');
-  if(pmSel && pmSel.options.length === 1){
-    var depts = [...new Set(PM_DATA.map(function(r){return r.dept;}).filter(Boolean))].sort();
-    depts.forEach(function(d){
-      var o=document.createElement('option'); o.value=d; o.textContent=d; pmSel.appendChild(o);
-    });
-  }
+  woRefreshFilterOptions();
   calRender();
   pmRender();
   woUpdateBadges();
@@ -6839,11 +6931,11 @@ function calCurrentData(){
   var search = (document.getElementById('cal-search')||{}).value||'';
   var sys    = (document.getElementById('cal-sys-filter')||{}).value||'';
   var stat   = (document.getElementById('cal-status-filter')||{}).value||'';
-  return WO_DATA.filter(function(r,i){
-    var status = calStatusMap[i]||'Pending';
+  return woAllCalData().filter(function(r){
+    var status = woRowStatus(r, calStatusMap);
     if(sys  && r.system!==sys)  return false;
     if(stat && status!==stat)   return false;
-    if(search && r.tag.toLowerCase().indexOf(search.toLowerCase())<0) return false;
+    if(search && String(r.tag||'').toLowerCase().indexOf(search.toLowerCase())<0) return false;
     return true;
   });
 }
@@ -6853,31 +6945,40 @@ function calRender(){
   var tbody = document.getElementById('cal-tbody');
   if(!tbody) return;
   var html='';
-  rows.forEach(function(r){
-    var idx = WO_DATA.indexOf(r);
-    var status = calStatusMap[idx]||'Pending';
+  rows.forEach(function(r, rowNum){
+    var idx = r._woIndex;
+    var status = woRowStatus(r, calStatusMap);
+    var key = r._woType === 'manual' ? r._woId : idx;
     var bc = status==='Done'?'#c8e6c9;color:#1b5e20':status==='N/A'?'#fff9c4;color:#827717':'#f5f5f5;color:#555;border:1px solid #ccc';
     var flag = r.flag==='?'?' <span style="color:#e65100;font-size:10px">[?]</span>':'';
     html+='<tr style="border-bottom:1px solid #eee">'
-      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(idx+1)+'</td>'
-      +'<td style="padding:5px 8px"><span style="font-size:10px;background:#e8edf2;padding:1px 6px;border-radius:8px;white-space:nowrap;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="'+r.system+'">'+r.system+'</span></td>'
-      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+r.tag+flag+'</td>'
-      +'<td style="padding:5px 8px;text-align:center;color:#666">'+(r.interval?r.interval+'mo':'')+'</td>'
-      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-idx="'+idx+'" onchange="calStatusChange(this)">'
+      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(r._woType==='manual'?'M'+(rowNum+1):(idx+1))+'</td>'
+      +'<td style="padding:5px 8px"><span style="font-size:10px;background:#e8edf2;padding:1px 6px;border-radius:8px;white-space:nowrap;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.system)+'">'+woEsc(r.system)+'</span></td>'
+      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+woEsc(r.tag)+flag+(r._woType==='manual'?'<span class="wo-manual-badge">Manual</span>':'')+'</td>'
+      +'<td style="padding:5px 8px;text-align:center;color:#666">'+(r.interval?woEsc(r.interval)+'mo':'')+'</td>'
+      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="calStatusChange(this)">'
       +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
+      +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
   });
-  tbody.innerHTML = html||'<tr><td colspan="5" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
+  tbody.innerHTML = html||'<tr><td colspan="6" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
   var cnt=document.getElementById('cal-count');
-  if(cnt) cnt.textContent = rows.length+' / '+WO_DATA.length+' items';
+  if(cnt) cnt.textContent = rows.length+' / '+woAllCalData().length+' items';
   woUpdateBadges();
 }
 
 function calStatusChange(sel){
-  calStatusMap[parseInt(sel.dataset.idx)] = sel.value;
-  woSaveCAL();
+  if(sel.dataset.type === 'manual'){
+    var row = woManualFind(sel.dataset.key);
+    if(row){ row.status = sel.value; woSaveManual(); }
+  }else{
+    calStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    woSaveCAL();
+    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  }
   woUpdateBadges();
+  try{ renderDashboard(); }catch(e){}
 }
 
 function calFilter(){ calRender(); }
@@ -6887,11 +6988,11 @@ function pmCurrentData(){
   var search = (document.getElementById('pm-search')||{}).value||'';
   var dept   = (document.getElementById('pm-dept-filter')||{}).value||'';
   var stat   = (document.getElementById('pm-status-filter')||{}).value||'';
-  return PM_DATA.filter(function(r,i){
-    var status = pmStatusMap[i]||'Pending';
+  return woAllPmData().filter(function(r){
+    var status = woRowStatus(r, pmStatusMap);
     if(dept && r.dept!==dept) return false;
     if(stat && status!==stat) return false;
-    if(search && (r.name+r.tag+r.desc).toLowerCase().indexOf(search.toLowerCase())<0) return false;
+    if(search && (String(r.name||'')+String(r.tag||'')+String(r.desc||'')).toLowerCase().indexOf(search.toLowerCase())<0) return false;
     return true;
   });
 }
@@ -6901,41 +7002,52 @@ function pmRender(){
   var tbody = document.getElementById('pm-tbody');
   if(!tbody) return;
   var html='';
-  rows.forEach(function(r){
-    var idx = PM_DATA.indexOf(r);
-    var status = pmStatusMap[idx]||'Pending';
+  rows.forEach(function(r, rowNum){
+    var idx = r._woIndex;
+    var status = woRowStatus(r, pmStatusMap);
+    var key = r._woType === 'manual' ? r._woId : idx;
     var bc = status==='Done'?'#c8e6c9;color:#1b5e20':status==='N/A'?'#fff9c4;color:#827717':'#f5f5f5;color:#555;border:1px solid #ccc';
     html+='<tr style="border-bottom:1px solid #eee">'
-      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(idx+1)+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.name+'">'+r.name+'</td>'
-      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px;color:#1a3a5c">'+r.tag+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;color:#555;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.desc+'">'+r.desc+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.assigned+'">'+r.assigned+'</td>'
-      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-idx="'+idx+'" onchange="pmStatusChange(this)">'
+      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(r._woType==='manual'?'M'+(rowNum+1):(idx+1))+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.name)+'">'+woEsc(r.name)+(r._woType==='manual'?'<span class="wo-manual-badge">Manual</span>':'')+'</td>'
+      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px;color:#1a3a5c">'+woEsc(r.tag)+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;color:#555;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.desc)+'">'+woEsc(r.desc)+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.assigned)+'">'+woEsc(r.assigned)+'</td>'
+      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="pmStatusChange(this)">'
       +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
+      +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
   });
-  tbody.innerHTML = html||'<tr><td colspan="6" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
+  tbody.innerHTML = html||'<tr><td colspan="7" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
   var cnt=document.getElementById('pm-count');
-  if(cnt) cnt.textContent = rows.length+' / '+PM_DATA.length+' items';
+  if(cnt) cnt.textContent = rows.length+' / '+woAllPmData().length+' items';
   woUpdateBadges();
 }
 
 function pmStatusChange(sel){
-  pmStatusMap[parseInt(sel.dataset.idx)] = sel.value;
-  woSavePM();
+  if(sel.dataset.type === 'manual'){
+    var row = woManualFind(sel.dataset.key);
+    if(row){ row.status = sel.value; woSaveManual(); }
+  }else{
+    pmStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    woSavePM();
+    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  }
   woUpdateBadges();
+  try{ renderDashboard(); }catch(e){}
 }
 
 function pmFilter(){ pmRender(); }
 
 // ── Badges & progress ─────────────────────────────────────────────────────────
 function woUpdateBadges(){
-  var calTotal = WO_DATA.length;
-  var calDone  = WO_DATA.filter(function(r,i){return (calStatusMap[i]||'Pending')==='Done';}).length;
-  var pmTotal  = PM_DATA.length;
-  var pmDone   = PM_DATA.filter(function(r,i){return (pmStatusMap[i]||'Pending')==='Done';}).length;
+  var calRows = woAllCalData();
+  var pmRows = woAllPmData();
+  var calTotal = calRows.length;
+  var calDone  = calRows.filter(function(r){return woRowStatus(r, calStatusMap)==='Done';}).length;
+  var pmTotal  = pmRows.length;
+  var pmDone   = pmRows.filter(function(r){return woRowStatus(r, pmStatusMap)==='Done';}).length;
 
   var calBadge = document.getElementById('cal-done-badge');
   if(calBadge) calBadge.textContent = calDone+' / '+calTotal+' Done';
@@ -7125,6 +7237,10 @@ function refreshSd26FromLocalStorage(){
   try{ if(typeof render === 'function') render(); }catch(e){}
   try{ if(typeof renderScope === 'function') renderScope(); }catch(e){}
   try{ if(typeof renderTimeline === 'function') renderTimeline(); }catch(e){}
+  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
+  try{ if(typeof woRefreshFilterOptions === 'function') woRefreshFilterOptions(); }catch(e){}
+  try{ if(typeof calRender === 'function') calRender(); }catch(e){}
+  try{ if(typeof pmRender === 'function') pmRender(); }catch(e){}
   try{ if(typeof renderDashboard === 'function') renderDashboard(); }catch(e){}
   try{ if(typeof renderGowningStatus === 'function') renderGowningStatus(); }catch(e){}
   try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
@@ -7460,6 +7576,13 @@ function msActive(id) {
       <div style="background:#1a3a5c;color:#fff;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center">
         <span style="font-size:13px;font-weight:700">🔬 CAL Work Orders</span>
         <span id="cal-done-badge" style="font-size:11px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;margin-left:4px"></span>
+        <button class="wo-add-btn" onclick="woToggleAddPanel('wo-add-cal-panel')" style="margin-left:auto;background:#3d7fb8">+ Add CAL</button>
+      </div>
+      <div id="wo-add-cal-panel" class="wo-add-panel">
+        <input id="wo-add-cal-system" placeholder="System">
+        <input id="wo-add-cal-tag" placeholder="Tag / ID">
+        <input id="wo-add-cal-interval" placeholder="Interval mo">
+        <button onclick="woAddManual('CAL')" style="background:#1a3a5c;color:#fff">Add</button>
       </div>
       <div style="flex-shrink:0;padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:6px;flex-wrap:wrap">
         <input type="text" id="cal-search" placeholder="🔍 Search tag..." oninput="calFilter()" style="font-size:12px;padding:5px 8px;border:1px solid #ccc;border-radius:5px;flex:1;min-width:120px">
@@ -7485,6 +7608,7 @@ function msActive(id) {
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;color:#555">Tag / ID</th>
               <th style="padding:7px 8px;text-align:center;border-bottom:1px solid #ccc;width:50px;color:#555">Int.</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:95px;color:#555">Status</th>
+              <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:60px;color:#555"></th>
             </tr>
           </thead>
           <tbody id="cal-tbody"></tbody>
@@ -7497,6 +7621,14 @@ function msActive(id) {
       <div style="background:#2e5c1e;color:#fff;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center">
         <span style="font-size:13px;font-weight:700">🔧 PM Work Orders</span>
         <span id="pm-done-badge" style="font-size:11px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;margin-left:4px"></span>
+        <button class="wo-add-btn" onclick="woToggleAddPanel('wo-add-pm-panel')" style="margin-left:auto;background:#4f8c35">+ Add PM</button>
+      </div>
+      <div id="wo-add-pm-panel" class="wo-add-panel">
+        <input id="wo-add-pm-name" placeholder="PM Name">
+        <input id="wo-add-pm-tag" placeholder="Tag">
+        <input id="wo-add-pm-desc" placeholder="Description">
+        <input id="wo-add-pm-assigned" placeholder="Assigned">
+        <button onclick="woAddManual('PM')" style="background:#2e5c1e;color:#fff">Add</button>
       </div>
       <div style="flex-shrink:0;padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:6px;flex-wrap:wrap">
         <input type="text" id="pm-search" placeholder="🔍 Search name/tag..." oninput="pmFilter()" style="font-size:12px;padding:5px 8px;border:1px solid #ccc;border-radius:5px;flex:1;min-width:120px">
@@ -7523,6 +7655,7 @@ function msActive(id) {
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:100px;color:#555">Description</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:80px;color:#555">Assigned</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:95px;color:#555">Status</th>
+              <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:60px;color:#555"></th>
             </tr>
           </thead>
           <tbody id="pm-tbody"></tbody>
