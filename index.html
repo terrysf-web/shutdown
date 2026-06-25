@@ -430,10 +430,11 @@ tr.editing{background:#fffceb}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
 .system-pill.ready{background:#1f6b42;color:#d7ffe5}
-.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(160px,1fr) repeat(4,78px);align-items:center;gap:8px}
+.executive-vendor-list{display:flex;flex-direction:column;gap:6px}
+.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(180px,1fr) repeat(4,minmax(72px,90px));align-items:center;gap:8px;width:100%}
 .vendor-progress-row.exec .vendor-meta{margin-top:0;justify-content:flex-end}
-.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff}
-.vendor-metric span{display:block;font-size:9px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.05em}
+.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff;min-width:0}
+.vendor-metric span{display:block;font-size:8px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
 .huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
 .huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
@@ -3913,7 +3914,7 @@ APPENDIX 6.5B)</div>
   <!-- Row 3: Vendor Readiness (full width) -->
   <div class="vendor-readiness-section huddle-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
     <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress"></div>
+    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
   </div>
 
 </div>
@@ -6037,11 +6038,12 @@ function renderDashboard(){
     const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
     setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
     setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
-    systemStatusEl.innerHTML = executiveSystems.map(s=>`<div class="system-status-row">
+    const visibleSystems = executiveSystems.filter(s=>s.execStatus !== 'Normal');
+    systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('');
+    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
