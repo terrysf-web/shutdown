@@ -567,6 +567,13 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
+.firebase-sync-status{display:inline-flex;align-items:center;gap:5px;margin-left:8px;border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.12);color:#d9e8f7;font-size:11px;font-weight:800;white-space:nowrap}
+.firebase-sync-status.ok{background:#1f6b42;color:#d7ffe5}
+.firebase-sync-status.warn{background:#80520e;color:#ffe6ae;cursor:pointer}
+.firebase-sync-status.error{background:#7a1a1a;color:#ffb4ac}
+.firebase-sync-status.saving{background:#174a7a;color:#cce6ff}
+.firebase-sync-status.off{background:rgba(255,255,255,.12);color:#cde}
+
 
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
@@ -634,7 +641,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Shared Data v11</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Firebase Sync v12</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -5079,7 +5086,11 @@ function collectEditedRows(){
 }
 function saveAll(){
   // Allow save even if edit mode was just toggled or user expects a manual save.
-  if(!editMode && !dirty){ if(typeof saveLocal === 'function') saveLocal(); return; }
+  if(!editMode && !dirty){
+    if(typeof saveLocal === 'function') saveLocal();
+    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+    return;
+  }
   collectEditedRows();
   projectStartDate = document.getElementById('projectStartInput').value || projectStartDate;
   projectEndDate = document.getElementById('projectEndInput').value || projectEndDate;
@@ -5089,6 +5100,7 @@ function saveAll(){
   editMode = false;
   document.getElementById('editToggleBtn').textContent = 'Edit Mode: Off';
   render();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 function insertRow(afterId){
   if(!editMode) return;
@@ -7046,7 +7058,9 @@ async function tryAutoLoadSharedData(){
         __p.set('autoloaded','1');
         history.replaceState(null, '', location.pathname + '?' + __p.toString() + location.hash);
       }
-      renderAll?.();
+      if(typeof renderAll === 'function') renderAll();
+      else if(typeof refreshSd26FromLocalStorage === 'function') refreshSd26FromLocalStorage();
+      else if(typeof render === 'function') render();
     }
   }catch(e){
     // Silent because shared file may not exist yet.
@@ -7060,6 +7074,191 @@ if(document.readyState === 'loading'){
   tryAutoLoadSharedData();
 }
 // ── End Shared Data JSON Sync ───────────────────────────────────────────────
+
+// ── Firebase Firestore Shared Sync ──────────────────────────────────────────
+const FIREBASE_SHARED_CONFIG = {
+  apiKey: "AIzaSyCsNY_jvkOyFm1VlovKu_42PQ441cs5nV8",
+  authDomain: "shutdown-1b5e4.firebaseapp.com",
+  projectId: "shutdown-1b5e4",
+  storageBucket: "shutdown-1b5e4.firebasestorage.app",
+  messagingSenderId: "1026582555298",
+  appId: "1:1026582555298:web:02368892db5fee868f05fb"
+};
+const FIREBASE_SHARED_COLLECTION = 'shutdown_tracker';
+const FIREBASE_SHARED_DOC = 'shared_state';
+const FIREBASE_LAST_LOADED_KEY = 'sd26_firebase_last_loaded';
+let firebaseSharedApi = null;
+let firebaseSharedSavePending = false;
+let firebaseSharedApplyingRemote = false;
+
+function setFirebaseSyncStatus(text, cls, title){
+  const el = document.getElementById('firebaseSyncStatus');
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'firebase-sync-status ' + (cls || 'off');
+  el.title = title || '';
+}
+
+function refreshSd26FromLocalStorage(){
+  try{ if(typeof loadLocal === 'function') loadLocal(); }catch(e){}
+  try{ if(typeof loadDownMaps === 'function') loadDownMaps(); }catch(e){}
+  try{ if(typeof loadEndImpact === 'function') loadEndImpact(); }catch(e){}
+  try{ if(typeof loadVisualScope === 'function') loadVisualScope(); }catch(e){}
+  try{ const s=localStorage.getItem('sd26_tl_v1'); tlData = s ? JSON.parse(s) : {}; }catch(e){}
+  try{ if(typeof updateDerivedFields === 'function') updateDerivedFields(); }catch(e){}
+  try{ if(typeof refreshFilters === 'function') refreshFilters(); }catch(e){}
+  try{ if(typeof render === 'function') render(); }catch(e){}
+  try{ if(typeof renderScope === 'function') renderScope(); }catch(e){}
+  try{ if(typeof renderTimeline === 'function') renderTimeline(); }catch(e){}
+  try{ if(typeof renderDashboard === 'function') renderDashboard(); }catch(e){}
+  try{ if(typeof renderGowningStatus === 'function') renderGowningStatus(); }catch(e){}
+  try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
+  try{ if(typeof renderResourceCalendar === 'function') renderResourceCalendar(); }catch(e){}
+  try{ if(typeof renderPrintSchedule === 'function') renderPrintSchedule(); }catch(e){}
+  try{ if(typeof updateStats === 'function') updateStats(); }catch(e){}
+}
+
+function applyFirebaseSharedPayload(payload, opts){
+  opts = opts || {};
+  if(!payload || !payload.data) return false;
+  firebaseSharedApplyingRemote = true;
+  Object.keys(payload.data).forEach(k => {
+    if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
+  });
+  if(payload.generatedAt) localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
+  refreshSd26FromLocalStorage();
+  firebaseSharedApplyingRemote = false;
+  if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
+  return true;
+}
+
+async function loadFirebaseSharedData(){
+  if(!firebaseSharedApi){
+    setFirebaseSyncStatus('Firebase: not ready', 'warn', 'Firebase is still connecting.');
+    return false;
+  }
+  return firebaseSharedApi.load();
+}
+
+function queueFirebaseSharedSave(){
+  if(firebaseSharedApplyingRemote) return;
+  if(!firebaseSharedApi){
+    firebaseSharedSavePending = true;
+    setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Save will sync after Firebase connects.');
+    return;
+  }
+  firebaseSharedApi.save();
+}
+
+(function initFirebaseSharedSync(){
+  if(location.protocol === 'file:'){
+    setFirebaseSyncStatus('Firebase: local off', 'off', 'Firebase sync runs from the hosted site.');
+    return;
+  }
+  const appUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+  const firestoreUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+  Promise.all([import(appUrl), import(firestoreUrl)]).then(([appMod, fsMod]) => {
+    const app = appMod.initializeApp(FIREBASE_SHARED_CONFIG);
+    const db = fsMod.initializeFirestore(app, {experimentalAutoDetectLongPolling:true});
+    const sharedRef = fsMod.doc(db, FIREBASE_SHARED_COLLECTION, FIREBASE_SHARED_DOC);
+    let lastSeenRemote = '';
+    function firebaseWithTimeout(promise, action){
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error(action + ' timed out. Check Firestore setup and network access.')), 15000))
+      ]);
+    }
+
+    async function save(){
+      try{
+        setFirebaseSyncStatus('Firebase: saving', 'saving', 'Saving shared data to Firestore...');
+        const currentSnap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase save check');
+        const current = currentSnap.exists() ? currentSnap.data() : null;
+        const remoteRev = current && current.generatedAt ? current.generatedAt : '';
+        const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
+        if(remoteRev && localRev && remoteRev !== localRev){
+          setFirebaseSyncStatus('Firebase: newer data', 'warn', 'Another user saved first. Click to load latest.');
+          const el = document.getElementById('firebaseSyncStatus');
+          if(el) el.onclick = loadFirebaseSharedData;
+          alert('Another user saved newer shared data. Your local save was kept, but Firebase was not overwritten. Click the Firebase status badge to load the latest shared data, then save again.');
+          return false;
+        }
+        const payload = getSd26Snapshot();
+        await firebaseWithTimeout(fsMod.setDoc(sharedRef, Object.assign({}, payload, {
+          updatedAt: fsMod.serverTimestamp(),
+          updateId: String(Date.now()) + '-' + Math.random().toString(36).slice(2),
+          updatedBy: (navigator && navigator.userAgent) ? navigator.userAgent : ''
+        })), 'Firebase save');
+        localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
+        lastSeenRemote = payload.generatedAt;
+        setFirebaseSyncStatus('Firebase: saved', 'ok', 'Shared data saved to Firestore.');
+        const el = document.getElementById('firebaseSyncStatus');
+        if(el) el.onclick = loadFirebaseSharedData;
+        return true;
+      }catch(e){
+        console.error('Firebase shared save failed:', e);
+        setFirebaseSyncStatus('Firebase: save failed', 'error', e.message || 'Firebase save failed.');
+        return false;
+      }
+    }
+
+    async function load(){
+      try{
+        setFirebaseSyncStatus('Firebase: loading', 'saving', 'Loading latest shared data...');
+        const snap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase load');
+        if(!snap.exists()){
+          setFirebaseSyncStatus('Firebase: ready', 'ok', 'No shared data exists yet. Save once to create it.');
+          return false;
+        }
+        const payload = snap.data();
+        applyFirebaseSharedPayload(payload, {silent:true});
+        lastSeenRemote = payload.generatedAt || '';
+        setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
+        return true;
+      }catch(e){
+        console.error('Firebase shared load failed:', e);
+        setFirebaseSyncStatus('Firebase: load failed', 'error', e.message || 'Firebase load failed.');
+        return false;
+      }
+    }
+
+    firebaseSharedApi = {save, load};
+    setFirebaseSyncStatus('Firebase: connected', 'ok', 'Realtime shared sync connected.');
+    const el = document.getElementById('firebaseSyncStatus');
+    if(el) el.onclick = loadFirebaseSharedData;
+    if(firebaseSharedSavePending){
+      firebaseSharedSavePending = false;
+      save();
+    }else{
+      load();
+    }
+
+    fsMod.onSnapshot(sharedRef, snap => {
+      if(!snap.exists() || snap.metadata.hasPendingWrites) return;
+      const payload = snap.data();
+      const remoteRev = payload.generatedAt || '';
+      if(!remoteRev || remoteRev === lastSeenRemote) return;
+      lastSeenRemote = remoteRev;
+      const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
+      if(localRev === remoteRev) return;
+      if(editMode || dirty){
+        setFirebaseSyncStatus('Firebase: new update', 'warn', 'Another user saved changes. Click to load latest after saving or canceling edits.');
+        const badge = document.getElementById('firebaseSyncStatus');
+        if(badge) badge.onclick = loadFirebaseSharedData;
+        return;
+      }
+      applyFirebaseSharedPayload(payload, {silent:true});
+      setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded automatically.');
+    }, e => {
+      console.error('Firebase shared listener failed:', e);
+      setFirebaseSyncStatus('Firebase: listener error', 'error', e.message || 'Firebase listener failed.');
+    });
+  }).catch(e => {
+    console.error('Firebase initialization failed:', e);
+    setFirebaseSyncStatus('Firebase: unavailable', 'error', e.message || 'Firebase could not initialize.');
+  });
+})();
+// ── End Firebase Firestore Shared Sync ──────────────────────────────────────
 
 function exportSnapshot(){
   // Save current edits first, then export a portable HTML snapshot.
