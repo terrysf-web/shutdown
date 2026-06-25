@@ -752,9 +752,6 @@ select.msf option:checked{background:#ddeeff}
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
     <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
-    <button onclick="saveSharedDataFile()" style="background:#1565c0;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Save current tracker data to shared JSON file">💾 Save Shared Data</button>
-    <button onclick="document.getElementById('sharedDataFileInput').click()" style="background:#fff;color:#1a3a5c;border:1px solid #1a3a5c;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Load shared JSON data from SharePoint/OneDrive">📂 Load Shared Data</button>
-    <input id="sharedDataFileInput" type="file" accept=".json,application/json" style="display:none" onchange="loadSharedDataFromInput(this)">
     </div>
   </div>
   <div class="advanced-filters" id="advancedFilters">
