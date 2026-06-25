@@ -115,6 +115,16 @@ function renderPrintSchedule(){
   }).join('');
   chart.innerHTML = header + body;
 }
+function printPrintSchedule(){
+  try{ initPrintSchedule(); }catch(e){ try{ renderPrintSchedule(); }catch(err){} }
+  document.body.classList.add('ps-print-mode');
+  const cleanup = function(){ document.body.classList.remove('ps-print-mode'); window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(function(){
+    try { window.print(); }
+    finally { setTimeout(cleanup, 700); }
+  }, 50);
+}
 </script>
 
 <style>
@@ -7361,7 +7371,7 @@ function msActive(id) {
       <label>Search
         <input id="psSearch" oninput="renderPrintSchedule()" placeholder="task / ID / vendor / system">
       </label>
-      <button class="ps-btn" onclick="window.print()">Print / Save PDF</button>
+      <button class="ps-btn" onclick="printPrintSchedule()">Print / Save PDF</button>
     </div>
     <div id="psPrintArea" class="ps-print-area">
       <div class="ps-print-header">
@@ -8993,5 +9003,28 @@ function handleDailyHuddleUrlParams(){
   });
 })();
 </script>
+
+<style id="psPrintModeFinalFix">
+@media print{
+  body.ps-print-mode{background:#fff!important;color:#111!important;height:auto!important;overflow:visible!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body.ps-print-mode *{visibility:hidden!important}
+  body.ps-print-mode #page-printschedule,
+  body.ps-print-mode #page-printschedule *{visibility:visible!important}
+  body.ps-print-mode #sticky-top,
+  body.ps-print-mode header,
+  body.ps-print-mode .tab-nav,
+  body.ps-print-mode .no-print,
+  body.ps-print-mode .page:not(#page-printschedule){display:none!important;visibility:hidden!important}
+  body.ps-print-mode #page-printschedule{display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important}
+  body.ps-print-mode .ps-page{display:block!important;padding:0!important;background:#fff!important;overflow:visible!important}
+  body.ps-print-mode .ps-print-area{display:block!important;border:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;background:#fff!important}
+  body.ps-print-mode .ps-chart{min-width:0!important;width:100%!important}
+  body.ps-print-mode .ps-week-row,
+  body.ps-print-mode .ps-task-row,
+  body.ps-print-mode .ps-group-row{display:grid!important;grid-template-columns:235px repeat(var(--ps-weeks), minmax(68px,1fr))!important}
+  body.ps-print-mode .ps-left-head,
+  body.ps-print-mode .ps-task-label{position:static!important;left:auto!important}
+}
+</style>
 
 </body></html>
