@@ -440,9 +440,6 @@ tr.editing{background:#fffceb}
 .kpi-lines{display:flex;flex-direction:column;gap:3px;margin-top:6px}
 .kpi-line{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;color:#e8f1fb;white-space:nowrap}
 .kpi-line b{font-size:13px;color:#f0c040}
-.operational-detail-kpi .progress-row{grid-template-columns:minmax(70px,1fr) 36px minmax(52px,.9fr) 48px;gap:5px;font-size:10px;padding:3px 0}
-.operational-detail-kpi .progress-row-meta{font-size:9px}
-.operational-detail-kpi .progress-mini-meter{height:5px}
 .progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
@@ -480,8 +477,10 @@ tr.editing{background:#fffceb}
 .gowning-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 9px;display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}
 .gowning-area{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}
 .gowning-select{width:100%;min-width:0;background:#173653;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:800}
-.gowning-select.suspend{background:#80520e;color:#ffe6ae}
+.gowning-select.suspend{background:#8a5a08!important;color:#fff0bd!important;border-color:#d39b2d!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
 .gowning-select.full{background:#1f6b42;color:#d7ffe5}
+.gowning-select option[value="Suspending - Blue scrub only"]{background:#8a5a08;color:#fff0bd;font-weight:800}
+.gowning-select option[value="Full Gowning"]{background:#1f6b42;color:#d7ffe5;font-weight:800}
 .huddle-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-bottom:14px}
 .huddle-table{width:100%;border-collapse:collapse;font-size:12px}
 .huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
@@ -651,7 +650,6 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Firebase Sync v12</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3738,7 +3736,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v8</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v9</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -5772,9 +5770,6 @@ function renderDashboard(){
   const calDone  = calData.filter((_,i)=>(calSMap[i]||'Pending')==='Done').length;
   const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
-  const grandPct  = grandTotal ? Math.round(grandDone/grandTotal*100) : 0;
-  const grandPctText = grandTotal ? (grandDone/grandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
-
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
   const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
@@ -5899,10 +5894,6 @@ function renderDashboard(){
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
   const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
   const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
-  setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
-  setText('d-shutdown-status', shutdownStatus);
-  setText('d-shutdown-status-sub', daysToStart == null ? 'Start date TBD' : daysToStart > 0 ? 'Starts in ' + daysToStart + ' Days' : 'Shutdown in progress');
-  setText('d-progress-count', grandDone + ' / ' + grandTotal);
   setText('d-progress-pct', grandPctText);
   setWidth('d-progress-meter', grandPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
@@ -8594,14 +8585,22 @@ function downloadDailyHuddleSummary(){
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const lines = [];
   const textOf = function(id){ return (document.getElementById(id)?.innerText || '').trim(); };
+  const cardLines = function(childId){
+    const child = document.getElementById(childId);
+    const card = child ? child.closest('.progress-kpi') : null;
+    if(!card) return '';
+    return Array.from(card.querySelectorAll('.kpi-line,.progress-row')).map(function(row){
+      return String(row.innerText || '').replace(/\s+/g,' ').trim();
+    }).filter(Boolean).join(' | ');
+  };
   lines.push('2026 Shutdown Daily Huddle - ' + todayIso);
   lines.push('Generated: ' + new Date().toLocaleString());
   lines.push('');
-  lines.push('Overall Complete: ' + textOf('d-progress-pct'));
-  lines.push('In Progress: ' + textOf('d-progress-inprogress'));
-  lines.push('Pending: ' + textOf('d-progress-pending'));
-  lines.push('Delayed: ' + textOf('d-progress-delayed'));
-  lines.push('Lookahead: ' + textOf('d-progress-lookahead-count'));
+  lines.push('Overall Progress: ' + textOf('d-progress-count') + ' (' + textOf('d-progress-pct') + ')');
+  lines.push("Today's Work: " + cardLines('d-today-due'));
+  lines.push('Schedule Risk: ' + cardLines('d-risk-late'));
+  lines.push('Systems Status: ' + cardLines('d-systems-normal'));
+  lines.push('Operational Detail: ' + cardLines('d-progress-system'));
   lines.push('');
   lines.push('Systems / Utilities Status');
   const sys = document.getElementById('d-system-status');
@@ -8746,7 +8745,7 @@ function handleDailyHuddleUrlParams(){
       return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
         '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
         '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
-        '<div style="font-size:11px;margin-top:6px;color:'+subc+';white-space:nowrap;">'+esc(sub||'')+'</div>'+ '</td>';
+        '<div style="font-size:11px;margin-top:6px;color:'+subc+';line-height:1.25;">'+esc(sub||'')+'</div>'+ '</td>';
     }
     function panel(title, innerHtml){
       return '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#ffffff;border:1px solid #d9e2ec;">'+
@@ -8776,13 +8775,65 @@ function handleDailyHuddleUrlParams(){
         return '<tr><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;font-size:12px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r[0]||'')+'</td><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;text-align:right;">'+statusBadge(r[1]||'')+'</td></tr>';
       }).join('')+'</table>';
     }
+    function kpiLinesFromChild(childId){
+      var child=document.getElementById(childId);
+      var el=child ? child.closest('.progress-kpi') : null;
+      if(!el) return '';
+      return Array.from(el.querySelectorAll('.kpi-line')).map(function(line){
+        return String(line.innerText||'').replace(/\s+/g,' ').trim();
+      }).filter(Boolean).join(' | ');
+    }
+    function progressRows(id){
+      var el=document.getElementById(id);
+      if(!el) return '';
+      return Array.from(el.querySelectorAll('.progress-row')).map(function(row){
+        return String(row.innerText||'').replace(/\s+/g,' ').trim();
+      }).filter(Boolean).join(' | ');
+    }
+    function operationalDetailCard(id){
+      var el=document.getElementById(id);
+      var rows=el ? Array.from(el.querySelectorAll('.progress-row')).map(function(row){
+        var name=(row.querySelector('.progress-row-name')||{}).innerText||'';
+        var pct=(row.querySelector('.progress-row-pct')||{}).innerText||'0%';
+        var meta=(row.querySelector('.progress-row-meta')||{}).innerText||'';
+        var fill=row.querySelector('.progress-mini-fill');
+        var width=fill ? (fill.style.width || '0%') : pct;
+        return {
+          name:String(name).replace(/\s+/g,' ').trim(),
+          pct:String(pct).replace(/\s+/g,' ').trim(),
+          meta:String(meta).replace(/\s+/g,' ').trim(),
+          width:String(width||'0%')
+        };
+      }).filter(function(r){ return r.name; }) : [];
+      var body=rows.map(function(r){
+        return '<tr>'+
+          '<td style="padding:2px 0;color:#ffffff;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(r.name)+'</td>'+
+          '<td style="padding:2px 4px;color:#f0c040;font-size:10px;font-weight:bold;text-align:right;white-space:nowrap;">'+esc(r.pct)+'</td>'+
+          '<td style="padding:2px 0;width:72px;">'+
+            '<div style="height:6px;background:#486783;border-radius:999px;overflow:hidden;">'+
+              '<div style="height:6px;width:'+esc(r.width)+';background:#4f9be8;border-radius:999px;"></div>'+
+            '</div>'+
+          '</td>'+
+          '<td style="padding:2px 0 2px 5px;color:#d8e8f8;font-size:9px;text-align:right;white-space:nowrap;">'+esc(r.meta)+'</td>'+
+        '</tr>';
+      }).join('');
+      if(!body){
+        body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
+      }
+      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">Operational Detail</div>'+
+        '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
+      '</td>';
+    }
 
-    var overall=safe('d-progress-pct','0%');
-    var done=safe('d-progress-done','');
-    var inProgress=safe('d-progress-inprogress','0');
-    var pending=safe('d-progress-pending','0');
-    var delayed=safe('d-progress-delayed','0');
-    var lookahead=safe('d-progress-lookahead-count','0');
+    var overall=safe('d-progress-count','—');
+    var overallSub=safe('d-progress-pct','—');
+    var todayDue=safe('d-today-due','0');
+    var todayCard=kpiLinesFromChild('d-today-due');
+    var riskLate=safe('d-risk-late','0');
+    var riskCard=kpiLinesFromChild('d-risk-late');
+    var systemsOos=safe('d-systems-oos','0');
+    var systemsCard=kpiLinesFromChild('d-systems-normal');
 
     var systemRows=[];
     var sysEl=document.getElementById('d-system-status');
@@ -8823,11 +8874,11 @@ function handleDailyHuddleUrlParams(){
       '</td></tr>'+ 
       '<tr><td style="padding:12px 0 0 0;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      kpiCard('Overall Complete', overall, done, true)+
-      kpiCard('In Progress', inProgress, 'Active tasks', false)+
-      kpiCard('Pending', pending, 'Not started', false)+
-      kpiCard('Delayed', delayed, 'Needs attention', false)+
-      kpiCard('Lookahead', lookahead, 'Next 14 days', false)+
+      kpiCard('Overall Progress', overall, overallSub, true)+
+      kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
+      kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
+      kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
+      operationalDetailCard('d-progress-system')+
       '</tr></table></td></tr>'+ 
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
