@@ -427,6 +427,10 @@ tr.editing{background:#fffceb}
 .exec-mini{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:9px 10px}
 .exec-mini-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#9fb4c8;margin-bottom:5px}
 .exec-mini-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
+.kpi-lines{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.kpi-line{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;color:#e8f1fb;white-space:nowrap}
+.kpi-line b{font-size:13px;color:#f0c040}
+.progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
 .system-pill.ready{background:#1f6b42;color:#d7ffe5}
@@ -3735,34 +3739,53 @@ APPENDIX 6.5B)</div>
       <div class="progress-kpis executive-kpis">
         <div class="progress-kpi">
           <div class="progress-kpi-label">Shutdown Status</div>
-          <div class="progress-kpi-value" id="d-shutdown-status">—</div>
-          <div class="progress-kpi-sub" id="d-shutdown-status-sub">—</div>
+          <div class="progress-kpi-value compact" id="d-shutdown-status">—</div>
+          <div class="progress-kpi-sub" id="d-shutdown-status-sub">Starts in — Days</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Overall Progress</div>
-          <div class="progress-kpi-value" id="d-progress-pct">—</div>
+          <div class="progress-kpi-value compact" id="d-progress-count">—</div>
           <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
-          <div class="progress-kpi-sub" id="d-progress-done">—</div>
+          <div class="progress-kpi-sub" id="d-progress-pct">—</div>
+          <div class="progress-kpi-sub" id="d-progress-done" style="display:none">—</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Today's Work</div>
-          <div class="progress-kpi-value" id="d-today-work">—</div>
-          <div class="progress-kpi-sub" id="d-today-work-sub">Due today</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Due</span><b id="d-today-due">—</b></div>
+            <div class="kpi-line"><span>Complete</span><b id="d-today-complete">—</b></div>
+            <div class="kpi-line"><span>Remaining</span><b id="d-today-remaining">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-today-work" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-today-work-sub" style="display:none">Due today</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Schedule Risk</div>
-          <div class="progress-kpi-value" id="d-schedule-risk">—</div>
-          <div class="progress-kpi-sub" id="d-schedule-risk-sub">Late / delayed</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Late</span><b id="d-risk-late">—</b></div>
+            <div class="kpi-line"><span>Delayed</span><b id="d-risk-delayed">—</b></div>
+            <div class="kpi-line"><span>Critical</span><b id="d-risk-critical">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-schedule-risk" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-schedule-risk-sub" style="display:none">Late / delayed</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Systems Status</div>
-          <div class="progress-kpi-value" id="d-systems-summary">—</div>
-          <div class="progress-kpi-sub" id="d-systems-summary-sub">Normal / OOS / RTS</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
+            <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
+            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Resource Readiness</div>
-          <div class="progress-kpi-value" id="d-resource-readiness">—</div>
-          <div class="progress-kpi-sub" id="d-resource-readiness-sub">Assigned today</div>
+          <div class="progress-kpi-label">Safety</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>LOTO</span><b id="d-safety-loto">—</b></div>
+            <div class="kpi-line"><span>Permits</span><b id="d-safety-permits">—</b></div>
+            <div class="kpi-line"><span>High Risk</span><b id="d-safety-highrisk">—</b></div>
+          </div>
         </div>
       </div>
       <div class="progress-grid">
@@ -5742,6 +5765,7 @@ function renderDashboard(){
   const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
   const grandPct  = grandTotal ? Math.round(grandDone/grandTotal*100) : 0;
+  const grandPctText = grandTotal ? (grandDone/grandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
 
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
@@ -5841,8 +5865,11 @@ function renderDashboard(){
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
   const lateTasks = overdueTasks;
   const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
-  const assignedToday = dueTodayTasks.filter(hasOwner).length;
-  const resourcePct = dueTodayTasks.length ? Math.round(assignedToday / dueTodayTasks.length * 100) : 100;
+  const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
+  const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
+  const lotoTasks = activeLeaf.filter(t=>/loto|lock\s*out|tag\s*out/i.test([t.task,t.notes,t.actionComment].join(' ')));
+  const permitTasks = activeLeaf.filter(t=>/permit|hot work|confined space|energized/i.test([t.task,t.notes,t.actionComment].join(' ')));
+  const highRiskTasks = activeLeaf.filter(t=>/high risk|critical|safety|shutdown critical/i.test([t.task,t.notes,t.actionComment].join(' ')) || taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5866,19 +5893,27 @@ function renderDashboard(){
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
   const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
-  const shutdownStatus = scheduleRiskCount ? 'At Risk' : (progressPct > 0 ? 'Active' : 'Planned');
+  const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
   setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
   setText('d-shutdown-status', shutdownStatus);
-  setText('d-shutdown-status-sub', scheduleRiskCount ? scheduleRiskCount + ' schedule risk items' : 'No open schedule risk');
-  setText('d-progress-pct', progressPct + '%');
-  setWidth('d-progress-meter', progressPct + '%');
+  setText('d-shutdown-status-sub', daysToStart == null ? 'Start date TBD' : daysToStart > 0 ? 'Starts in ' + daysToStart + ' Days' : 'Shutdown in progress');
+  setText('d-progress-count', grandDone + ' / ' + grandTotal);
+  setText('d-progress-pct', grandPctText);
+  setWidth('d-progress-meter', grandPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
   setText('d-today-work', dueTodayTasks.length);
   setText('d-today-work-sub', completedTodayTasks.length + ' completed / ' + remainingTodayTasks.length + ' remaining');
+  setText('d-today-due', dueTodayTasks.length);
+  setText('d-today-complete', completedTodayTasks.length);
+  setText('d-today-remaining', remainingTodayTasks.length);
   setText('d-schedule-risk', scheduleRiskCount);
   setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
-  setText('d-resource-readiness', resourcePct + '%');
-  setText('d-resource-readiness-sub', assignedToday + '/' + dueTodayTasks.length + ' assigned today');
+  setText('d-risk-late', lateTasks.length);
+  setText('d-risk-delayed', delayedTasks.length);
+  setText('d-risk-critical', criticalTasks.length);
+  setText('d-safety-loto', lotoTasks.length);
+  setText('d-safety-permits', permitTasks.length);
+  setText('d-safety-highrisk', highRiskTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
   setText('d-progress-delayed', statusCounts.Delayed || 0);
@@ -6038,6 +6073,9 @@ function renderDashboard(){
     const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
     setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
     setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
+    setText('d-systems-normal', normalCount);
+    setText('d-systems-oos', oosCount);
+    setText('d-systems-returning', rtsCount);
     const visibleSystems = executiveSystems.filter(s=>s.execStatus !== 'Normal');
     systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
