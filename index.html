@@ -115,6 +115,16 @@ function renderPrintSchedule(){
   }).join('');
   chart.innerHTML = header + body;
 }
+function printPrintSchedule(){
+  try{ initPrintSchedule(); }catch(e){ try{ renderPrintSchedule(); }catch(err){} }
+  document.body.classList.add('ps-print-mode');
+  const cleanup = function(){ document.body.classList.remove('ps-print-mode'); window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(function(){
+    try { window.print(); }
+    finally { setTimeout(cleanup, 700); }
+  }, 50);
+}
 </script>
 
 <style>
@@ -422,18 +432,26 @@ tr.editing{background:#fffceb}
 .vendor-seg{height:100%;min-width:3px}
 .vendor-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;font-size:10px;font-weight:800;color:#9fb4c8}
 .vendor-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px}
-.executive-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}
+.executive-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .exec-mini-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
 .exec-mini{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:9px 10px}
 .exec-mini-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#9fb4c8;margin-bottom:5px}
 .exec-mini-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
+.kpi-lines{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.kpi-line{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;color:#e8f1fb;white-space:nowrap}
+.kpi-line b{font-size:13px;color:#f0c040}
+.operational-detail-kpi .progress-row{grid-template-columns:minmax(70px,1fr) 36px minmax(52px,.9fr) 48px;gap:5px;font-size:10px;padding:3px 0}
+.operational-detail-kpi .progress-row-meta{font-size:9px}
+.operational-detail-kpi .progress-mini-meter{height:5px}
+.progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
 .system-pill.ready{background:#1f6b42;color:#d7ffe5}
-.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(160px,1fr) repeat(4,78px);align-items:center;gap:8px}
+.executive-vendor-list{display:flex;flex-direction:column;gap:6px}
+.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(180px,1fr) repeat(4,minmax(72px,90px));align-items:center;gap:8px;width:100%}
 .vendor-progress-row.exec .vendor-meta{margin-top:0;justify-content:flex-end}
-.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff}
-.vendor-metric span{display:block;font-size:9px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.05em}
+.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff;min-width:0}
+.vendor-metric span{display:block;font-size:8px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
 .huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
 .huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
@@ -559,11 +577,18 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
+.firebase-sync-status{display:inline-flex;align-items:center;gap:5px;margin-left:8px;border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.12);color:#d9e8f7;font-size:11px;font-weight:800;white-space:nowrap}
+.firebase-sync-status.ok{background:#1f6b42;color:#d7ffe5}
+.firebase-sync-status.warn{background:#80520e;color:#ffe6ae;cursor:pointer}
+.firebase-sync-status.error{background:#7a1a1a;color:#ffb4ac}
+.firebase-sync-status.saving{background:#174a7a;color:#cce6ff}
+.firebase-sync-status.off{background:rgba(255,255,255,.12);color:#cde}
+
 
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:repeat(6,minmax(0,1fr));gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -598,7 +623,7 @@ select.msf option:checked{background:#ddeeff}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -626,7 +651,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Shared Data v11</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Firebase Sync v12</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -737,9 +762,6 @@ select.msf option:checked{background:#ddeeff}
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
     <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
-    <button onclick="saveSharedDataFile()" style="background:#1565c0;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Save current tracker data to shared JSON file">💾 Save Shared Data</button>
-    <button onclick="document.getElementById('sharedDataFileInput').click()" style="background:#fff;color:#1a3a5c;border:1px solid #1a3a5c;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Load shared JSON data from SharePoint/OneDrive">📂 Load Shared Data</button>
-    <input id="sharedDataFileInput" type="file" accept=".json,application/json" style="display:none" onchange="loadSharedDataFromInput(this)">
     </div>
   </div>
   <div class="advanced-filters" id="advancedFilters">
@@ -3733,41 +3755,46 @@ APPENDIX 6.5B)</div>
       </div>
       <div class="progress-kpis executive-kpis">
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Shutdown Status</div>
-          <div class="progress-kpi-value" id="d-shutdown-status">—</div>
-          <div class="progress-kpi-sub" id="d-shutdown-status-sub">—</div>
-        </div>
-        <div class="progress-kpi">
           <div class="progress-kpi-label">Overall Progress</div>
-          <div class="progress-kpi-value" id="d-progress-pct">—</div>
+          <div class="progress-kpi-value compact" id="d-progress-count">—</div>
           <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
-          <div class="progress-kpi-sub" id="d-progress-done">—</div>
+          <div class="progress-kpi-sub" id="d-progress-pct">—</div>
+          <div class="progress-kpi-sub" id="d-progress-done" style="display:none">—</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Today's Work</div>
-          <div class="progress-kpi-value" id="d-today-work">—</div>
-          <div class="progress-kpi-sub" id="d-today-work-sub">Due today</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Due</span><b id="d-today-due">—</b></div>
+            <div class="kpi-line"><span>Complete</span><b id="d-today-complete">—</b></div>
+            <div class="kpi-line"><span>Remaining</span><b id="d-today-remaining">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-today-work" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-today-work-sub" style="display:none">Due today</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Schedule Risk</div>
-          <div class="progress-kpi-value" id="d-schedule-risk">—</div>
-          <div class="progress-kpi-sub" id="d-schedule-risk-sub">Late / delayed</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Late</span><b id="d-risk-late">—</b></div>
+            <div class="kpi-line"><span>Delayed</span><b id="d-risk-delayed">—</b></div>
+            <div class="kpi-line"><span>Critical</span><b id="d-risk-critical">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-schedule-risk" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-schedule-risk-sub" style="display:none">Late / delayed</div>
         </div>
         <div class="progress-kpi">
           <div class="progress-kpi-label">Systems Status</div>
-          <div class="progress-kpi-value" id="d-systems-summary">—</div>
-          <div class="progress-kpi-sub" id="d-systems-summary-sub">Normal / OOS / RTS</div>
+          <div class="kpi-lines">
+            <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
+            <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
+            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
+          </div>
+          <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
         </div>
-        <div class="progress-kpi">
-          <div class="progress-kpi-label">Resource Readiness</div>
-          <div class="progress-kpi-value" id="d-resource-readiness">—</div>
-          <div class="progress-kpi-sub" id="d-resource-readiness-sub">Assigned today</div>
+        <div class="progress-kpi operational-detail-kpi">
+          <div class="progress-kpi-label">Operational Detail</div>
+          <div id="d-progress-system"></div>
         </div>
-      </div>
-      <div class="progress-grid">
-        <div class="progress-panel"><div class="progress-panel-title">Today's Operations</div><div id="d-today-operations" class="exec-mini-grid"></div></div>
-        <div class="progress-panel"><div class="progress-panel-title">Operational Detail</div><div id="d-progress-system"></div></div>
-        <div class="progress-panel"><div class="progress-panel-title">Meeting Focus</div><div id="d-progress-focus"></div></div>
       </div>
     </div>
 
@@ -3910,10 +3937,10 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Row 3: Vendor Readiness (full width) -->
-  <div class="vendor-readiness-section huddle-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress"></div>
+  <!-- Row 3: Vendor Readiness -->
+  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:10px">VENDOR READINESS</div>
+    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
   </div>
 
 </div>
@@ -5066,7 +5093,11 @@ function collectEditedRows(){
 }
 function saveAll(){
   // Allow save even if edit mode was just toggled or user expects a manual save.
-  if(!editMode && !dirty){ if(typeof saveLocal === 'function') saveLocal(); return; }
+  if(!editMode && !dirty){
+    if(typeof saveLocal === 'function') saveLocal();
+    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+    return;
+  }
   collectEditedRows();
   projectStartDate = document.getElementById('projectStartInput').value || projectStartDate;
   projectEndDate = document.getElementById('projectEndInput').value || projectEndDate;
@@ -5076,6 +5107,7 @@ function saveAll(){
   editMode = false;
   document.getElementById('editToggleBtn').textContent = 'Edit Mode: Off';
   render();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 function insertRow(afterId){
   if(!editMode) return;
@@ -5741,6 +5773,7 @@ function renderDashboard(){
   const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
   const grandPct  = grandTotal ? Math.round(grandDone/grandTotal*100) : 0;
+  const grandPctText = grandTotal ? (grandDone/grandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
 
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
@@ -5840,8 +5873,8 @@ function renderDashboard(){
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
   const lateTasks = overdueTasks;
   const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
-  const assignedToday = dueTodayTasks.filter(hasOwner).length;
-  const resourcePct = dueTodayTasks.length ? Math.round(assignedToday / dueTodayTasks.length * 100) : 100;
+  const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
+  const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5865,40 +5898,30 @@ function renderDashboard(){
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
   const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
-  const shutdownStatus = scheduleRiskCount ? 'At Risk' : (progressPct > 0 ? 'Active' : 'Planned');
+  const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
   setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
   setText('d-shutdown-status', shutdownStatus);
-  setText('d-shutdown-status-sub', scheduleRiskCount ? scheduleRiskCount + ' schedule risk items' : 'No open schedule risk');
-  setText('d-progress-pct', progressPct + '%');
-  setWidth('d-progress-meter', progressPct + '%');
+  setText('d-shutdown-status-sub', daysToStart == null ? 'Start date TBD' : daysToStart > 0 ? 'Starts in ' + daysToStart + ' Days' : 'Shutdown in progress');
+  setText('d-progress-count', grandDone + ' / ' + grandTotal);
+  setText('d-progress-pct', grandPctText);
+  setWidth('d-progress-meter', grandPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
   setText('d-today-work', dueTodayTasks.length);
   setText('d-today-work-sub', completedTodayTasks.length + ' completed / ' + remainingTodayTasks.length + ' remaining');
+  setText('d-today-due', dueTodayTasks.length);
+  setText('d-today-complete', completedTodayTasks.length);
+  setText('d-today-remaining', remainingTodayTasks.length);
   setText('d-schedule-risk', scheduleRiskCount);
   setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
-  setText('d-resource-readiness', resourcePct + '%');
-  setText('d-resource-readiness-sub', assignedToday + '/' + dueTodayTasks.length + ' assigned today');
+  setText('d-risk-late', lateTasks.length);
+  setText('d-risk-delayed', delayedTasks.length);
+  setText('d-risk-critical', criticalTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
   setText('d-progress-delayed', statusCounts.Delayed || 0);
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
-  const todayOpsEl = document.getElementById('d-today-operations');
-  if(todayOpsEl){
-    const ops = [
-      ['Due Today', dueTodayTasks.length],
-      ['Completed Today', completedTodayTasks.length],
-      ['Remaining Today', remainingTodayTasks.length],
-      ['Critical Tasks', criticalTasks.length],
-      ['Late Tasks', lateTasks.length]
-    ];
-    todayOpsEl.innerHTML = ops.map(([label,value])=>`<div class="exec-mini">
-      <div class="exec-mini-label">${label}</div>
-      <div class="exec-mini-value">${value}</div>
-    </div>`).join('');
-  }
-
   const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
@@ -6037,11 +6060,15 @@ function renderDashboard(){
     const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
     setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
     setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
-    systemStatusEl.innerHTML = executiveSystems.map(s=>`<div class="system-status-row">
+    setText('d-systems-normal', normalCount);
+    setText('d-systems-oos', oosCount);
+    setText('d-systems-returning', rtsCount);
+    const visibleSystems = executiveSystems.filter(s=>s.execStatus !== 'Normal');
+    systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('');
+    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -6311,6 +6338,16 @@ function renderDashboard(){
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
+  const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
+    acc.scheduled += d.scheduled;
+    acc.inProgress += d.inProgress;
+    acc.completed += d.completed;
+    acc.remaining += d.remaining;
+    return acc;
+  }, {scheduled:0,inProgress:0,completed:0,remaining:0});
+  setText('d-vendor-scheduled', vendorTotals.scheduled);
+  setText('d-vendor-inprogress', vendorTotals.inProgress);
+  setText('d-vendor-remaining', vendorTotals.remaining);
   const vEl = document.getElementById('d-by-vendor');
   if(vEl) vEl.innerHTML = topVendors.map(([name,d])=>{
     return `<div class="vendor-progress-row exec">
@@ -7028,7 +7065,9 @@ async function tryAutoLoadSharedData(){
         __p.set('autoloaded','1');
         history.replaceState(null, '', location.pathname + '?' + __p.toString() + location.hash);
       }
-      renderAll?.();
+      if(typeof renderAll === 'function') renderAll();
+      else if(typeof refreshSd26FromLocalStorage === 'function') refreshSd26FromLocalStorage();
+      else if(typeof render === 'function') render();
     }
   }catch(e){
     // Silent because shared file may not exist yet.
@@ -7042,6 +7081,191 @@ if(document.readyState === 'loading'){
   tryAutoLoadSharedData();
 }
 // ── End Shared Data JSON Sync ───────────────────────────────────────────────
+
+// ── Firebase Firestore Shared Sync ──────────────────────────────────────────
+const FIREBASE_SHARED_CONFIG = {
+  apiKey: "AIzaSyCsNY_jvkOyFm1VlovKu_42PQ441cs5nV8",
+  authDomain: "shutdown-1b5e4.firebaseapp.com",
+  projectId: "shutdown-1b5e4",
+  storageBucket: "shutdown-1b5e4.firebasestorage.app",
+  messagingSenderId: "1026582555298",
+  appId: "1:1026582555298:web:02368892db5fee868f05fb"
+};
+const FIREBASE_SHARED_COLLECTION = 'shutdown_tracker';
+const FIREBASE_SHARED_DOC = 'shared_state';
+const FIREBASE_LAST_LOADED_KEY = 'sd26_firebase_last_loaded';
+let firebaseSharedApi = null;
+let firebaseSharedSavePending = false;
+let firebaseSharedApplyingRemote = false;
+
+function setFirebaseSyncStatus(text, cls, title){
+  const el = document.getElementById('firebaseSyncStatus');
+  if(!el) return;
+  el.textContent = text;
+  el.className = 'firebase-sync-status ' + (cls || 'off');
+  el.title = title || '';
+}
+
+function refreshSd26FromLocalStorage(){
+  try{ if(typeof loadLocal === 'function') loadLocal(); }catch(e){}
+  try{ if(typeof loadDownMaps === 'function') loadDownMaps(); }catch(e){}
+  try{ if(typeof loadEndImpact === 'function') loadEndImpact(); }catch(e){}
+  try{ if(typeof loadVisualScope === 'function') loadVisualScope(); }catch(e){}
+  try{ const s=localStorage.getItem('sd26_tl_v1'); tlData = s ? JSON.parse(s) : {}; }catch(e){}
+  try{ if(typeof updateDerivedFields === 'function') updateDerivedFields(); }catch(e){}
+  try{ if(typeof refreshFilters === 'function') refreshFilters(); }catch(e){}
+  try{ if(typeof render === 'function') render(); }catch(e){}
+  try{ if(typeof renderScope === 'function') renderScope(); }catch(e){}
+  try{ if(typeof renderTimeline === 'function') renderTimeline(); }catch(e){}
+  try{ if(typeof renderDashboard === 'function') renderDashboard(); }catch(e){}
+  try{ if(typeof renderGowningStatus === 'function') renderGowningStatus(); }catch(e){}
+  try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
+  try{ if(typeof renderResourceCalendar === 'function') renderResourceCalendar(); }catch(e){}
+  try{ if(typeof renderPrintSchedule === 'function') renderPrintSchedule(); }catch(e){}
+  try{ if(typeof updateStats === 'function') updateStats(); }catch(e){}
+}
+
+function applyFirebaseSharedPayload(payload, opts){
+  opts = opts || {};
+  if(!payload || !payload.data) return false;
+  firebaseSharedApplyingRemote = true;
+  Object.keys(payload.data).forEach(k => {
+    if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
+  });
+  if(payload.generatedAt) localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
+  refreshSd26FromLocalStorage();
+  firebaseSharedApplyingRemote = false;
+  if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
+  return true;
+}
+
+async function loadFirebaseSharedData(){
+  if(!firebaseSharedApi){
+    setFirebaseSyncStatus('Firebase: not ready', 'warn', 'Firebase is still connecting.');
+    return false;
+  }
+  return firebaseSharedApi.load();
+}
+
+function queueFirebaseSharedSave(){
+  if(firebaseSharedApplyingRemote) return;
+  if(!firebaseSharedApi){
+    firebaseSharedSavePending = true;
+    setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Save will sync after Firebase connects.');
+    return;
+  }
+  firebaseSharedApi.save();
+}
+
+(function initFirebaseSharedSync(){
+  if(location.protocol === 'file:'){
+    setFirebaseSyncStatus('Firebase: local off', 'off', 'Firebase sync runs from the hosted site.');
+    return;
+  }
+  const appUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+  const firestoreUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+  Promise.all([import(appUrl), import(firestoreUrl)]).then(([appMod, fsMod]) => {
+    const app = appMod.initializeApp(FIREBASE_SHARED_CONFIG);
+    const db = fsMod.initializeFirestore(app, {experimentalAutoDetectLongPolling:true});
+    const sharedRef = fsMod.doc(db, FIREBASE_SHARED_COLLECTION, FIREBASE_SHARED_DOC);
+    let lastSeenRemote = '';
+    function firebaseWithTimeout(promise, action){
+      return Promise.race([
+        promise,
+        new Promise((_, reject) => setTimeout(() => reject(new Error(action + ' timed out. Check Firestore setup and network access.')), 15000))
+      ]);
+    }
+
+    async function save(){
+      try{
+        setFirebaseSyncStatus('Firebase: saving', 'saving', 'Saving shared data to Firestore...');
+        const currentSnap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase save check');
+        const current = currentSnap.exists() ? currentSnap.data() : null;
+        const remoteRev = current && current.generatedAt ? current.generatedAt : '';
+        const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
+        if(remoteRev && localRev && remoteRev !== localRev){
+          setFirebaseSyncStatus('Firebase: newer data', 'warn', 'Another user saved first. Click to load latest.');
+          const el = document.getElementById('firebaseSyncStatus');
+          if(el) el.onclick = loadFirebaseSharedData;
+          alert('Another user saved newer shared data. Your local save was kept, but Firebase was not overwritten. Click the Firebase status badge to load the latest shared data, then save again.');
+          return false;
+        }
+        const payload = getSd26Snapshot();
+        await firebaseWithTimeout(fsMod.setDoc(sharedRef, Object.assign({}, payload, {
+          updatedAt: fsMod.serverTimestamp(),
+          updateId: String(Date.now()) + '-' + Math.random().toString(36).slice(2),
+          updatedBy: (navigator && navigator.userAgent) ? navigator.userAgent : ''
+        })), 'Firebase save');
+        localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
+        lastSeenRemote = payload.generatedAt;
+        setFirebaseSyncStatus('Firebase: saved', 'ok', 'Shared data saved to Firestore.');
+        const el = document.getElementById('firebaseSyncStatus');
+        if(el) el.onclick = loadFirebaseSharedData;
+        return true;
+      }catch(e){
+        console.error('Firebase shared save failed:', e);
+        setFirebaseSyncStatus('Firebase: save failed', 'error', e.message || 'Firebase save failed.');
+        return false;
+      }
+    }
+
+    async function load(){
+      try{
+        setFirebaseSyncStatus('Firebase: loading', 'saving', 'Loading latest shared data...');
+        const snap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase load');
+        if(!snap.exists()){
+          setFirebaseSyncStatus('Firebase: ready', 'ok', 'No shared data exists yet. Save once to create it.');
+          return false;
+        }
+        const payload = snap.data();
+        applyFirebaseSharedPayload(payload, {silent:true});
+        lastSeenRemote = payload.generatedAt || '';
+        setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
+        return true;
+      }catch(e){
+        console.error('Firebase shared load failed:', e);
+        setFirebaseSyncStatus('Firebase: load failed', 'error', e.message || 'Firebase load failed.');
+        return false;
+      }
+    }
+
+    firebaseSharedApi = {save, load};
+    setFirebaseSyncStatus('Firebase: connected', 'ok', 'Realtime shared sync connected.');
+    const el = document.getElementById('firebaseSyncStatus');
+    if(el) el.onclick = loadFirebaseSharedData;
+    if(firebaseSharedSavePending){
+      firebaseSharedSavePending = false;
+      save();
+    }else{
+      load();
+    }
+
+    fsMod.onSnapshot(sharedRef, snap => {
+      if(!snap.exists() || snap.metadata.hasPendingWrites) return;
+      const payload = snap.data();
+      const remoteRev = payload.generatedAt || '';
+      if(!remoteRev || remoteRev === lastSeenRemote) return;
+      lastSeenRemote = remoteRev;
+      const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
+      if(localRev === remoteRev) return;
+      if(editMode || dirty){
+        setFirebaseSyncStatus('Firebase: new update', 'warn', 'Another user saved changes. Click to load latest after saving or canceling edits.');
+        const badge = document.getElementById('firebaseSyncStatus');
+        if(badge) badge.onclick = loadFirebaseSharedData;
+        return;
+      }
+      applyFirebaseSharedPayload(payload, {silent:true});
+      setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded automatically.');
+    }, e => {
+      console.error('Firebase shared listener failed:', e);
+      setFirebaseSyncStatus('Firebase: listener error', 'error', e.message || 'Firebase listener failed.');
+    });
+  }).catch(e => {
+    console.error('Firebase initialization failed:', e);
+    setFirebaseSyncStatus('Firebase: unavailable', 'error', e.message || 'Firebase could not initialize.');
+  });
+})();
+// ── End Firebase Firestore Shared Sync ──────────────────────────────────────
 
 function exportSnapshot(){
   // Save current edits first, then export a portable HTML snapshot.
@@ -7147,7 +7371,7 @@ function msActive(id) {
       <label>Search
         <input id="psSearch" oninput="renderPrintSchedule()" placeholder="task / ID / vendor / system">
       </label>
-      <button class="ps-btn" onclick="window.print()">Print / Save PDF</button>
+      <button class="ps-btn" onclick="printPrintSchedule()">Print / Save PDF</button>
     </div>
     <div id="psPrintArea" class="ps-print-area">
       <div class="ps-print-header">
@@ -7609,7 +7833,7 @@ function renderRcVendor(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -7644,7 +7868,7 @@ function renderRcVendor(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -7775,7 +7999,7 @@ function renderRcMonthlyCalendar(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -7810,7 +8034,7 @@ function renderRcMonthlyCalendar(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -8112,7 +8336,7 @@ function rcExpandedBarRows(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -8147,7 +8371,7 @@ function rcExpandedBarRows(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -8684,7 +8908,7 @@ function handleDailyHuddleUrlParams(){
   body.huddle-print-mode .huddle-top-layout,
   body.huddle-print-mode .huddle-middle-layout,
   body.huddle-print-mode .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:10px!important;}
-  body.huddle-print-mode .progress-kpis{display:grid!important;grid-template-columns:1.4fr repeat(4,.85fr)!important;gap:8px!important;}
+  body.huddle-print-mode .progress-kpis{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;}
   body.huddle-print-mode .progress-grid{display:none!important;}
   body.huddle-print-mode .dash{overflow:visible!important;height:auto!important;}
 }`;
@@ -8779,5 +9003,28 @@ function handleDailyHuddleUrlParams(){
   });
 })();
 </script>
+
+<style id="psPrintModeFinalFix">
+@media print{
+  body.ps-print-mode{background:#fff!important;color:#111!important;height:auto!important;overflow:visible!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+  body.ps-print-mode *{visibility:hidden!important}
+  body.ps-print-mode #page-printschedule,
+  body.ps-print-mode #page-printschedule *{visibility:visible!important}
+  body.ps-print-mode #sticky-top,
+  body.ps-print-mode header,
+  body.ps-print-mode .tab-nav,
+  body.ps-print-mode .no-print,
+  body.ps-print-mode .page:not(#page-printschedule){display:none!important;visibility:hidden!important}
+  body.ps-print-mode #page-printschedule{display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important}
+  body.ps-print-mode .ps-page{display:block!important;padding:0!important;background:#fff!important;overflow:visible!important}
+  body.ps-print-mode .ps-print-area{display:block!important;border:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;background:#fff!important}
+  body.ps-print-mode .ps-chart{min-width:0!important;width:100%!important}
+  body.ps-print-mode .ps-week-row,
+  body.ps-print-mode .ps-task-row,
+  body.ps-print-mode .ps-group-row{display:grid!important;grid-template-columns:235px repeat(var(--ps-weeks), minmax(68px,1fr))!important}
+  body.ps-print-mode .ps-left-head,
+  body.ps-print-mode .ps-task-label{position:static!important;left:auto!important}
+}
+</style>
 
 </body></html>
