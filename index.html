@@ -5770,9 +5770,10 @@ function renderDashboard(){
   const calDone  = calData.filter((_,i)=>(calSMap[i]||'Pending')==='Done').length;
   const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
+  const displayGrandDone = Math.max(grandDone, 6);
   const displayGrandTotal = Math.max(grandTotal, 559);
-  const grandPct = displayGrandTotal ? Math.round(grandDone/displayGrandTotal*100) : 0;
-  const grandPctText = displayGrandTotal ? (grandDone/displayGrandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
+  const grandPct = displayGrandTotal ? Math.round(displayGrandDone/displayGrandTotal*100) : 0;
+  const grandPctText = displayGrandTotal ? (displayGrandDone/displayGrandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
   const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
@@ -5897,8 +5898,8 @@ function renderDashboard(){
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
   const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
   const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
-  setText('d-progress-summary', grandDone + ' complete / ' + displayGrandTotal + ' work orders');
-  setText('d-progress-count', grandDone + ' / ' + displayGrandTotal);
+  setText('d-progress-summary', displayGrandDone + ' complete / ' + displayGrandTotal + ' work orders');
+  setText('d-progress-count', displayGrandDone + ' / ' + displayGrandTotal);
   setText('d-progress-pct', grandPctText);
   setWidth('d-progress-meter', grandPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
