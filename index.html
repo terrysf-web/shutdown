@@ -3763,11 +3763,11 @@ APPENDIX 6.5B)</div>
           <div class="progress-brief-title">Executive Operations Snapshot</div>
           <div class="progress-brief-date" id="d-progress-asof">As of —</div>
         </div>
-        <div class="progress-brief-date" id="d-progress-summary">—</div>
+        <div class="progress-brief-date" id="d-progress-summary" style="display:none">—</div>
       </div>
       <div class="progress-kpis executive-kpis">
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Overall Progress</div>
+          <div class="progress-kpi-label">Overall Progress (Tasks + Work Orders)</div>
           <div class="progress-kpi-value compact" id="d-progress-count">—</div>
           <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
           <div class="progress-kpi-sub" id="d-progress-pct">—</div>
@@ -3804,7 +3804,7 @@ APPENDIX 6.5B)</div>
           <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
         </div>
         <div class="progress-kpi operational-detail-kpi">
-          <div class="progress-kpi-label">Operational Detail</div>
+          <div class="progress-kpi-label" id="d-operational-detail-label">Operational Detail</div>
           <div id="d-progress-system"></div>
         </div>
       </div>
@@ -5777,8 +5777,8 @@ function renderDashboard(){
   const pmSMap  = typeof pmStatusMap  !== 'undefined' ? pmStatusMap  : {};
 
   const taskTotal = leaf.length;
-  const calTotal  = calData.length;
-  const pmTotal   = pmData.length;
+  const calTotal  = typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length;
+  const pmTotal   = typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length;
   const grandTotal = taskTotal + calTotal + pmTotal;
 
   const taskDone = leaf.filter(t=>statusMap[t.id]==='Complete').length;
@@ -5912,7 +5912,8 @@ function renderDashboard(){
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
   const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
   const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
-  setText('d-progress-summary', grandDone + ' complete / ' + displayGrandTotal + ' work orders');
+  setText('d-progress-summary', '');
+  setText('d-operational-detail-label', 'Operational Detail (Tasks-' + taskTotal + ')');
   setText('d-progress-count', grandDone + ' / ' + displayGrandTotal);
   setText('d-progress-pct', grandPctText);
   setWidth('d-progress-meter', grandPct + '%');
@@ -6341,11 +6342,11 @@ function renderDashboard(){
     d.remaining = d.total - d.completed;
   }
   leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
-  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', calSMap[i] || 'Pending'));
+  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
   pmData.forEach((r,i)=>{
     const v=(r.mfr||'').trim()||'Internal';
     const key = v.length>12 ? v.slice(0,11) : v;
-    addVendorStatus(key, pmSMap[i] || 'Pending');
+    addVendorStatus(key, typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
@@ -6823,11 +6824,17 @@ function woAllPmData(){
   }).concat(woManualRows('PM'));
 }
 function woRowStatus(row, map){
-  if(row && row._woType === 'manual') return row.status || 'Pending';
-  return map[row._woIndex] || 'Pending';
+  if(row && row._woType === 'manual') return woNormalizeStatus(row.status);
+  return woNormalizeStatus(map[row._woIndex]);
 }
 function woManualFind(id){
   return woManualData.find(function(r){ return r.id === id; });
+}
+function woNormalizeStatus(status){
+  return status === 'Pending' ? 'Scheduled' : (status || 'Scheduled');
+}
+function woStatusOptions(){
+  return ['Scheduled','Done','N/A'];
 }
 function woToggleAddPanel(id){
   var el = document.getElementById(id);
@@ -6840,7 +6847,7 @@ function woAddManual(category){
     var tag = (document.getElementById('wo-add-cal-tag')||{}).value || '';
     var interval = (document.getElementById('wo-add-cal-interval')||{}).value || '';
     if(!tag.trim()){ alert('Please enter a CAL Tag / ID.'); return; }
-    woManualData.push({id:'manual-cal-'+now, category:'CAL', system:system.trim()||'Manual', tag:tag.trim(), interval:interval.trim(), flag:'', status:'Pending'});
+    woManualData.push({id:'manual-cal-'+now, category:'CAL', system:system.trim()||'Manual', tag:tag.trim(), interval:interval.trim(), flag:'', status:'Scheduled'});
     ['wo-add-cal-system','wo-add-cal-tag','wo-add-cal-interval'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
     woSaveManual();
     woRefreshFilterOptions();
@@ -6851,7 +6858,7 @@ function woAddManual(category){
     var desc = (document.getElementById('wo-add-pm-desc')||{}).value || '';
     var assigned = (document.getElementById('wo-add-pm-assigned')||{}).value || '';
     if(!name.trim() && !tagPm.trim()){ alert('Please enter a PM Name or Tag.'); return; }
-    woManualData.push({id:'manual-pm-'+now, category:'PM', name:name.trim()||'Manual PM', tag:tagPm.trim(), desc:desc.trim(), assigned:assigned.trim(), dept:'Manual', mfr:'', location:'', status:'Pending'});
+    woManualData.push({id:'manual-pm-'+now, category:'PM', name:name.trim()||'Manual PM', tag:tagPm.trim(), desc:desc.trim(), assigned:assigned.trim(), dept:'Manual', mfr:'', location:'', status:'Scheduled'});
     ['wo-add-pm-name','wo-add-pm-tag','wo-add-pm-desc','wo-add-pm-assigned'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
     woSaveManual();
     woRefreshFilterOptions();
@@ -6957,7 +6964,7 @@ function calRender(){
       +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+woEsc(r.tag)+flag+(r._woType==='manual'?'<span class="wo-manual-badge">Manual</span>':'')+'</td>'
       +'<td style="padding:5px 8px;text-align:center;color:#666">'+(r.interval?woEsc(r.interval)+'mo':'')+'</td>'
       +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="calStatusChange(this)">'
-      +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
+      +woStatusOptions().map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
       +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
@@ -7014,7 +7021,7 @@ function pmRender(){
       +'<td style="padding:5px 8px;font-size:11px;color:#555;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.desc)+'">'+woEsc(r.desc)+'</td>'
       +'<td style="padding:5px 8px;font-size:11px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.assigned)+'">'+woEsc(r.assigned)+'</td>'
       +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="pmStatusChange(this)">'
-      +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
+      +woStatusOptions().map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
       +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
@@ -7591,7 +7598,7 @@ function msActive(id) {
         </select>
         <select id="cal-status-filter" onchange="calFilter()" style="font-size:12px;padding:5px 6px;border:1px solid #ccc;border-radius:5px">
           <option value="">All</option>
-          <option value="Pending">Pending</option>
+          <option value="Scheduled">Scheduled</option>
           <option value="Done">Done</option>
           <option value="N/A">N/A</option>
         </select>
@@ -7637,7 +7644,7 @@ function msActive(id) {
         </select>
         <select id="pm-status-filter" onchange="pmFilter()" style="font-size:12px;padding:5px 6px;border:1px solid #ccc;border-radius:5px">
           <option value="">All</option>
-          <option value="Pending">Pending</option>
+          <option value="Scheduled">Scheduled</option>
           <option value="Done">Done</option>
           <option value="N/A">N/A</option>
         </select>
@@ -8746,11 +8753,11 @@ function downloadDailyHuddleSummary(){
   lines.push('2026 Shutdown Daily Huddle - ' + todayIso);
   lines.push('Generated: ' + new Date().toLocaleString());
   lines.push('');
-  lines.push('Overall Progress: ' + textOf('d-progress-count') + ' (' + textOf('d-progress-pct') + ')');
+  lines.push('Overall Progress (Tasks + Work Orders): ' + textOf('d-progress-count') + ' (' + textOf('d-progress-pct') + ')');
   lines.push("Today's Work: " + cardLines('d-today-due'));
   lines.push('Schedule Risk: ' + cardLines('d-risk-late'));
   lines.push('Systems Status: ' + cardLines('d-systems-normal'));
-  lines.push('Operational Detail: ' + cardLines('d-progress-system'));
+  lines.push(textOf('d-operational-detail-label') + ': ' + cardLines('d-progress-system'));
   lines.push('');
   lines.push('Systems / Utilities Status');
   const sys = document.getElementById('d-system-status');
@@ -8970,8 +8977,9 @@ function handleDailyHuddleUrlParams(){
       if(!body){
         body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
       }
+      var detailLabel=(document.getElementById('d-operational-detail-label')||{}).innerText || 'Operational Detail';
       return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
-        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">Operational Detail</div>'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">'+esc(detailLabel)+'</div>'+
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
     }
@@ -9024,7 +9032,7 @@ function handleDailyHuddleUrlParams(){
       '</td></tr>'+ 
       '<tr><td style="padding:12px 0 0 0;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      kpiCard('Overall Progress', overall, overallSub, true)+
+      kpiCard('Overall Progress (Tasks + Work Orders)', overall, overallSub, true)+
       kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
       kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
       kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
