@@ -651,7 +651,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
-  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Firebase Sync v12</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Email Dashboard v13</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -3738,7 +3738,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v8</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v9</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -8594,14 +8594,22 @@ function downloadDailyHuddleSummary(){
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const lines = [];
   const textOf = function(id){ return (document.getElementById(id)?.innerText || '').trim(); };
+  const cardLines = function(childId){
+    const child = document.getElementById(childId);
+    const card = child ? child.closest('.progress-kpi') : null;
+    if(!card) return '';
+    return Array.from(card.querySelectorAll('.kpi-line,.progress-row')).map(function(row){
+      return String(row.innerText || '').replace(/\s+/g,' ').trim();
+    }).filter(Boolean).join(' | ');
+  };
   lines.push('2026 Shutdown Daily Huddle - ' + todayIso);
   lines.push('Generated: ' + new Date().toLocaleString());
   lines.push('');
-  lines.push('Overall Complete: ' + textOf('d-progress-pct'));
-  lines.push('In Progress: ' + textOf('d-progress-inprogress'));
-  lines.push('Pending: ' + textOf('d-progress-pending'));
-  lines.push('Delayed: ' + textOf('d-progress-delayed'));
-  lines.push('Lookahead: ' + textOf('d-progress-lookahead-count'));
+  lines.push('Overall Progress: ' + textOf('d-progress-count') + ' (' + textOf('d-progress-pct') + ')');
+  lines.push("Today's Work: " + cardLines('d-today-due'));
+  lines.push('Schedule Risk: ' + cardLines('d-risk-late'));
+  lines.push('Systems Status: ' + cardLines('d-systems-normal'));
+  lines.push('Operational Detail: ' + cardLines('d-progress-system'));
   lines.push('');
   lines.push('Systems / Utilities Status');
   const sys = document.getElementById('d-system-status');
@@ -8746,7 +8754,7 @@ function handleDailyHuddleUrlParams(){
       return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
         '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
         '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
-        '<div style="font-size:11px;margin-top:6px;color:'+subc+';white-space:nowrap;">'+esc(sub||'')+'</div>'+ '</td>';
+        '<div style="font-size:11px;margin-top:6px;color:'+subc+';line-height:1.25;">'+esc(sub||'')+'</div>'+ '</td>';
     }
     function panel(title, innerHtml){
       return '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#ffffff;border:1px solid #d9e2ec;">'+
@@ -8776,13 +8784,31 @@ function handleDailyHuddleUrlParams(){
         return '<tr><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;font-size:12px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r[0]||'')+'</td><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;text-align:right;">'+statusBadge(r[1]||'')+'</td></tr>';
       }).join('')+'</table>';
     }
+    function kpiLinesFromChild(childId){
+      var child=document.getElementById(childId);
+      var el=child ? child.closest('.progress-kpi') : null;
+      if(!el) return '';
+      return Array.from(el.querySelectorAll('.kpi-line')).map(function(line){
+        return String(line.innerText||'').replace(/\s+/g,' ').trim();
+      }).filter(Boolean).join(' | ');
+    }
+    function progressRows(id){
+      var el=document.getElementById(id);
+      if(!el) return '';
+      return Array.from(el.querySelectorAll('.progress-row')).map(function(row){
+        return String(row.innerText||'').replace(/\s+/g,' ').trim();
+      }).filter(Boolean).join(' | ');
+    }
 
-    var overall=safe('d-progress-pct','0%');
-    var done=safe('d-progress-done','');
-    var inProgress=safe('d-progress-inprogress','0');
-    var pending=safe('d-progress-pending','0');
-    var delayed=safe('d-progress-delayed','0');
-    var lookahead=safe('d-progress-lookahead-count','0');
+    var overall=safe('d-progress-count','—');
+    var overallSub=safe('d-progress-pct','—');
+    var todayDue=safe('d-today-due','0');
+    var todayCard=kpiLinesFromChild('d-today-due');
+    var riskLate=safe('d-risk-late','0');
+    var riskCard=kpiLinesFromChild('d-risk-late');
+    var systemsOos=safe('d-systems-oos','0');
+    var systemsCard=kpiLinesFromChild('d-systems-normal');
+    var operationalRows=progressRows('d-progress-system');
 
     var systemRows=[];
     var sysEl=document.getElementById('d-system-status');
@@ -8823,11 +8849,11 @@ function handleDailyHuddleUrlParams(){
       '</td></tr>'+ 
       '<tr><td style="padding:12px 0 0 0;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      kpiCard('Overall Complete', overall, done, true)+
-      kpiCard('In Progress', inProgress, 'Active tasks', false)+
-      kpiCard('Pending', pending, 'Not started', false)+
-      kpiCard('Delayed', delayed, 'Needs attention', false)+
-      kpiCard('Lookahead', lookahead, 'Next 14 days', false)+
+      kpiCard('Overall Progress', overall, overallSub, true)+
+      kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
+      kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
+      kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
+      kpiCard('Operational Detail', 'By Area', operationalRows, false)+
       '</tr></table></td></tr>'+ 
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
