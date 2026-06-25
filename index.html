@@ -3780,18 +3780,16 @@ APPENDIX 6.5B)</div>
           <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Safety</div>
+          <div class="progress-kpi-label">Vendor Readiness</div>
           <div class="kpi-lines">
-            <div class="kpi-line"><span>LOTO</span><b id="d-safety-loto">—</b></div>
-            <div class="kpi-line"><span>Permits</span><b id="d-safety-permits">—</b></div>
-            <div class="kpi-line"><span>High Risk</span><b id="d-safety-highrisk">—</b></div>
+            <div class="kpi-line"><span>Scheduled</span><b id="d-vendor-scheduled">—</b></div>
+            <div class="kpi-line"><span>In Progress</span><b id="d-vendor-inprogress">—</b></div>
+            <div class="kpi-line"><span>Remaining</span><b id="d-vendor-remaining">—</b></div>
           </div>
         </div>
       </div>
       <div class="progress-grid">
-        <div class="progress-panel"><div class="progress-panel-title">Today's Operations</div><div id="d-today-operations" class="exec-mini-grid"></div></div>
         <div class="progress-panel"><div class="progress-panel-title">Operational Detail</div><div id="d-progress-system"></div></div>
-        <div class="progress-panel"><div class="progress-panel-title">Meeting Focus</div><div id="d-progress-focus"></div></div>
       </div>
     </div>
 
@@ -3932,12 +3930,6 @@ APPENDIX 6.5B)</div>
         <svg id="d-timeline" style="width:100%;height:100%"></svg>
       </div>
     </div>
-  </div>
-
-  <!-- Row 3: Vendor Readiness (full width) -->
-  <div class="vendor-readiness-section huddle-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
   </div>
 
 </div>
@@ -5867,9 +5859,6 @@ function renderDashboard(){
   const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
   const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
   const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
-  const lotoTasks = activeLeaf.filter(t=>/loto|lock\s*out|tag\s*out/i.test([t.task,t.notes,t.actionComment].join(' ')));
-  const permitTasks = activeLeaf.filter(t=>/permit|hot work|confined space|energized/i.test([t.task,t.notes,t.actionComment].join(' ')));
-  const highRiskTasks = activeLeaf.filter(t=>/high risk|critical|safety|shutdown critical/i.test([t.task,t.notes,t.actionComment].join(' ')) || taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5911,30 +5900,12 @@ function renderDashboard(){
   setText('d-risk-late', lateTasks.length);
   setText('d-risk-delayed', delayedTasks.length);
   setText('d-risk-critical', criticalTasks.length);
-  setText('d-safety-loto', lotoTasks.length);
-  setText('d-safety-permits', permitTasks.length);
-  setText('d-safety-highrisk', highRiskTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
   setText('d-progress-delayed', statusCounts.Delayed || 0);
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
-  const todayOpsEl = document.getElementById('d-today-operations');
-  if(todayOpsEl){
-    const ops = [
-      ['Due Today', dueTodayTasks.length],
-      ['Completed Today', completedTodayTasks.length],
-      ['Remaining Today', remainingTodayTasks.length],
-      ['Critical Tasks', criticalTasks.length],
-      ['Late Tasks', lateTasks.length]
-    ];
-    todayOpsEl.innerHTML = ops.map(([label,value])=>`<div class="exec-mini">
-      <div class="exec-mini-label">${label}</div>
-      <div class="exec-mini-value">${value}</div>
-    </div>`).join('');
-  }
-
   const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
@@ -6351,6 +6322,16 @@ function renderDashboard(){
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
+  const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
+    acc.scheduled += d.scheduled;
+    acc.inProgress += d.inProgress;
+    acc.completed += d.completed;
+    acc.remaining += d.remaining;
+    return acc;
+  }, {scheduled:0,inProgress:0,completed:0,remaining:0});
+  setText('d-vendor-scheduled', vendorTotals.scheduled);
+  setText('d-vendor-inprogress', vendorTotals.inProgress);
+  setText('d-vendor-remaining', vendorTotals.remaining);
   const vEl = document.getElementById('d-by-vendor');
   if(vEl) vEl.innerHTML = topVendors.map(([name,d])=>{
     return `<div class="vendor-progress-row exec">
