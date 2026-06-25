@@ -8804,6 +8804,41 @@ function handleDailyHuddleUrlParams(){
         return String(row.innerText||'').replace(/\s+/g,' ').trim();
       }).filter(Boolean).join(' | ');
     }
+    function operationalDetailCard(id){
+      var el=document.getElementById(id);
+      var rows=el ? Array.from(el.querySelectorAll('.progress-row')).map(function(row){
+        var name=(row.querySelector('.progress-row-name')||{}).innerText||'';
+        var pct=(row.querySelector('.progress-row-pct')||{}).innerText||'0%';
+        var meta=(row.querySelector('.progress-row-meta')||{}).innerText||'';
+        var fill=row.querySelector('.progress-mini-fill');
+        var width=fill ? (fill.style.width || '0%') : pct;
+        return {
+          name:String(name).replace(/\s+/g,' ').trim(),
+          pct:String(pct).replace(/\s+/g,' ').trim(),
+          meta:String(meta).replace(/\s+/g,' ').trim(),
+          width:String(width||'0%')
+        };
+      }).filter(function(r){ return r.name; }) : [];
+      var body=rows.map(function(r){
+        return '<tr>'+
+          '<td style="padding:2px 0;color:#ffffff;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(r.name)+'</td>'+
+          '<td style="padding:2px 4px;color:#f0c040;font-size:10px;font-weight:bold;text-align:right;white-space:nowrap;">'+esc(r.pct)+'</td>'+
+          '<td style="padding:2px 0;width:72px;">'+
+            '<div style="height:6px;background:#486783;border-radius:999px;overflow:hidden;">'+
+              '<div style="height:6px;width:'+esc(r.width)+';background:#4f9be8;border-radius:999px;"></div>'+
+            '</div>'+
+          '</td>'+
+          '<td style="padding:2px 0 2px 5px;color:#d8e8f8;font-size:9px;text-align:right;white-space:nowrap;">'+esc(r.meta)+'</td>'+
+        '</tr>';
+      }).join('');
+      if(!body){
+        body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
+      }
+      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">Operational Detail</div>'+
+        '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
+      '</td>';
+    }
 
     var overall=safe('d-progress-count','—');
     var overallSub=safe('d-progress-pct','—');
@@ -8813,7 +8848,6 @@ function handleDailyHuddleUrlParams(){
     var riskCard=kpiLinesFromChild('d-risk-late');
     var systemsOos=safe('d-systems-oos','0');
     var systemsCard=kpiLinesFromChild('d-systems-normal');
-    var operationalRows=progressRows('d-progress-system');
 
     var systemRows=[];
     var sysEl=document.getElementById('d-system-status');
@@ -8858,7 +8892,7 @@ function handleDailyHuddleUrlParams(){
       kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
       kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
       kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
-      kpiCard('Operational Detail', 'By Area', operationalRows, false)+
+      operationalDetailCard('d-progress-system')+
       '</tr></table></td></tr>'+ 
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
