@@ -7049,7 +7049,11 @@ async function tryAutoLoadSharedData(){
     const payload = await res.json();
     const incoming = payload.generatedAt || '';
     const lastLoaded = localStorage.getItem('sd26_shared_last_loaded') || '';
-    if(incoming && incoming === lastLoaded) return;
+    let localTaskCount = 0;
+    let incomingTaskCount = 0;
+    try{ localTaskCount = JSON.parse(localStorage.getItem('sd26_tasks_v3') || '[]').length || 0; }catch(e){}
+    try{ incomingTaskCount = JSON.parse((payload.data && payload.data.sd26_tasks_v3) || '[]').length || 0; }catch(e){}
+    if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
     if(payload && payload.data){
       Object.keys(payload.data).forEach(k => {
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
