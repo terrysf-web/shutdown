@@ -8937,6 +8937,8 @@ function handleDailyHuddleUrlParams(){
       var s=String(status||'').trim();
       var bg='#6b7280', fg='#ffffff';
       if(/OOS/i.test(s)){ bg='#7a1a1a'; }
+      else if(/Suspending|Blue scrub/i.test(s)){ bg='#8a5a08'; fg='#fff0bd'; }
+      else if(/^Full Gowning$/i.test(s)){ bg='#1f6b42'; fg='#d7ffe5'; }
       else if(/FULL/i.test(s)){ bg='#174a7a'; }
       else if(/COND/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
       else if(/In Progress/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
