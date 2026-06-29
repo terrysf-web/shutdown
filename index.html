@@ -32,11 +32,33 @@ function psFmt(iso){ const d=psDate(iso); return (d.getMonth()+1)+'/'+d.getDate(
 function psDiffDays(a,b){ return Math.round((psDate(b)-psDate(a))/86400000); }
 function psAssignees(t){ return (typeof rcAssignees==='function') ? rcAssignees(t) : String(t.assigned||'Unassigned').split(/[\/;,]+/).map(x=>x.trim()).filter(Boolean); }
 function psCategory(t){ return t.category || (typeof inferCategory==='function' ? inferCategory(t.task) : 'PROJ'); }
+function psCleanSystemName(name){
+  return String(name || '').trim() || 'Other System';
+}
 function psTasks(){
-  return (tasks||[]).filter(t=>!t.isParent && psISO(t.start) && psISO(t.end)).map(t=>({
-    id:t.id, task:t.task||'', start:psISO(t.start), end:psISO(t.end), category:psCategory(t), section:t.section||'Other',
-    assigned:psAssignees(t), vendor:t.vendor||'', status:t.status||'Pending', notes:t.notes||''
-  }));
+  let currentSystem = 'Other System';
+  return (tasks||[]).reduce((out,t)=>{
+    if(t && t.isParent){
+      currentSystem = psCleanSystemName(t.task || t.system || t.section || currentSystem);
+      return out;
+    }
+    if(!t || !psISO(t.start) || !psISO(t.end)) return out;
+    const system = psCleanSystemName(t.system || t.systemName || t.parentSystem || currentSystem || t.section);
+    out.push({
+      id:t.id, task:t.task||'', start:psISO(t.start), end:psISO(t.end), category:psCategory(t), section:t.section||'Other', system:system,
+      assigned:psAssignees(t), vendor:t.vendor||'', status:t.status||'Pending', notes:t.notes||''
+    });
+    return out;
+  }, []);
+}
+function psPopulateSystemOptions(){
+  const sel=document.getElementById('psSystem');
+  if(!sel) return;
+  const cur=sel.value;
+  const systems=[...new Set(psTasks().map(t=>t.system).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+  sel.innerHTML='<option value="">All</option>';
+  systems.forEach(system=>{ const o=document.createElement('option'); o.value=system; o.textContent=system; sel.appendChild(o); });
+  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
 }
 function psProjectStart(items){ return (projectStartDate || (typeof getProjectStartFromTasks==='function' && getProjectStartFromTasks()) || items.map(t=>t.start).sort()[0] || '2026-07-06'); }
 function psProjectEnd(items){ return (projectEndDate || (typeof getProjectEndFromTasks==='function' && getProjectEndFromTasks()) || items.map(t=>t.end).sort().slice(-1)[0] || '2026-08-28'); }
@@ -46,6 +68,7 @@ function psWeeks(start,end){
   return out;
 }
 function initPrintSchedule(){
+  psPopulateSystemOptions();
   const sel=document.getElementById('psResource');
   if(sel){
     const cur=sel.value; sel.innerHTML='<option value="">All</option>';
@@ -56,6 +79,7 @@ function initPrintSchedule(){
 }
 function psFiltered(items, start, end){
   const cat=document.getElementById('psCategory')?.value||'';
+  const sys=document.getElementById('psSystem')?.value||'';
   const res=document.getElementById('psResource')?.value||'';
   const q=(document.getElementById('psSearch')?.value||'').toLowerCase();
   return items
@@ -63,14 +87,15 @@ function psFiltered(items, start, end){
     // Tasks completely before project start, like 6/22–6/28 when range starts 7/6, are hidden.
     .filter(t=>t.end >= start && t.start <= end)
     .filter(t=>!cat || t.category===cat)
+    .filter(t=>!sys || t.system===sys)
     .filter(t=>!res || t.assigned.includes(res))
-    .filter(t=>!q || [t.id,t.task,t.section,t.vendor,t.assigned.join(' '),t.category,t.status].join(' ').toLowerCase().includes(q));
+    .filter(t=>!q || [t.id,t.task,t.system,t.section,t.vendor,t.assigned.join(' '),t.category,t.status].join(' ').toLowerCase().includes(q));
 }
 function psGroupKey(t, mode){
   if(mode==='resource') return t.groupResource || t.assigned.join(', ') || 'Unassigned';
   if(mode==='category') return t.category || 'Uncategorized';
   if(mode==='vendor') return t.vendor || 'No Vendor';
-  return t.section || 'Other';
+  return t.system || t.section || 'Other';
 }
 function renderPrintSchedule(){
   const all=psTasks();
@@ -78,6 +103,7 @@ function renderPrintSchedule(){
   const weeks=psWeeks(start,end);
   let items=psFiltered(all,start,end).sort((a,b)=>(a.start===b.start?String(a.id).localeCompare(String(b.id),undefined,{numeric:true}):a.start.localeCompare(b.start)));
   const groupMode=document.getElementById('psGroup')?.value||'section';
+  const selectedSystem=document.getElementById('psSystem')?.value||'';
   const selectedResource=document.getElementById('psResource')?.value||'';
   if(groupMode==='resource'){
     items = items.flatMap(t=>{
@@ -88,7 +114,7 @@ function renderPrintSchedule(){
   const chart=document.getElementById('psChart'); if(!chart) return;
   chart.style.setProperty('--ps-weeks', weeks.length);
   const meta=document.getElementById('psPrintMeta');
-  if(meta) meta.textContent = `Project range: ${psFmt(start)} to ${psFmt(end)} · ${weeks.length} weeks · ${items.length} scheduled tasks · Group: ${groupMode} · Resource: ${selectedResource||'All'} · Generated ${new Date().toLocaleDateString()}`;
+  if(meta) meta.textContent = `Project range: ${psFmt(start)} to ${psFmt(end)} · ${weeks.length} weeks · ${items.length} scheduled tasks · Group: ${groupMode} · System: ${selectedSystem||'All'} · Resource: ${selectedResource||'All'} · Generated ${new Date().toLocaleDateString()}`;
   if(!items.length){ chart.innerHTML='<div class="ps-empty">No scheduled tasks found for the selected filters.</div>'; return; }
   const header = `<div class="ps-week-row"><div class="ps-left-head">Task / Activity</div>${weeks.map(w=>`<div class="ps-week-cell"><b>${w.label}</b><span>${psFmt(w.start)}–${psFmt(w.end)}</span></div>`).join('')}</div>`;
   const by={}; items.forEach(t=>{ const k=psGroupKey(t,groupMode); (by[k] ||= []).push(t); });
@@ -115,16 +141,32 @@ function renderPrintSchedule(){
   }).join('');
   chart.innerHTML = header + body;
 }
-function printPrintSchedule(){
+function psPrintScheduleActive(){
+  const page = document.getElementById('page-printschedule');
+  return !!(page && (page.classList.contains('active') || document.body.classList.contains('ps-print-mode')));
+}
+function enterPrintScheduleMode(){
   try{ initPrintSchedule(); }catch(e){ try{ renderPrintSchedule(); }catch(err){} }
   document.body.classList.add('ps-print-mode');
-  const cleanup = function(){ document.body.classList.remove('ps-print-mode'); window.removeEventListener('afterprint', cleanup); };
+}
+function exitPrintScheduleMode(){
+  document.body.classList.remove('ps-print-mode');
+}
+function printPrintSchedule(){
+  enterPrintScheduleMode();
+  const cleanup = function(){ exitPrintScheduleMode(); window.removeEventListener('afterprint', cleanup); };
   window.addEventListener('afterprint', cleanup);
   setTimeout(function(){
     try { window.print(); }
     finally { setTimeout(cleanup, 700); }
   }, 50);
 }
+window.addEventListener('beforeprint', function(){
+  if(psPrintScheduleActive()) enterPrintScheduleMode();
+});
+window.addEventListener('afterprint', function(){
+  if(document.body.classList.contains('ps-print-mode')) exitPrintScheduleMode();
+});
 </script>
 
 <style>
@@ -5934,7 +5976,7 @@ function renderDashboard(){
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
-  const huddleSystemDefs = [
+  let huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
     {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
@@ -5963,6 +6005,54 @@ function renderDashboard(){
     {system:'DP Area Release', name:'DP Area Release', match:t=>/DP\s*MFG|DP Area/i.test(t.task||'') && String(t.id).startsWith('13.')},
     {system:'DS Area Release', name:'DS Area Release', match:t=>/DS\s*MFG|DS Area/i.test(t.task||'') && String(t.id).startsWith('13.')}
   ];
+  function huddleSystemCodeFromText(text){
+    const m = String(text || '').toUpperCase().match(/\b\d{2}-[A-Z]{4}-\d{3}(?:\/\d{3})?\b/);
+    return m ? m[0] : '';
+  }
+  function huddleSystemNameFromParent(parentTask, code){
+    if(!code) return String(parentTask || 'System').replace(/\s+/g, ' ').trim() || 'System';
+    const cleaned = String(parentTask || code || 'System')
+      .replace(new RegExp('\\(?\\b'+code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+'\\b\\)?', 'i'), '')
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return cleaned || code || 'System';
+  }
+  function huddleSystemDefKnown(code){
+    if(!code) return true;
+    return huddleSystemDefs.some(function(def){
+      return String(def.system || '').toUpperCase().indexOf(code) >= 0;
+    });
+  }
+  function addDynamicHuddleSystemDef(code, name, parentId){
+    if(!code || huddleSystemDefKnown(code)) return;
+    const codePattern = new RegExp(code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    huddleSystemDefs.push({
+      system: code,
+      name: name || code,
+      parents: parentId ? [String(parentId)] : [],
+      match: function(t){ return codePattern.test(t.task || '') || codePattern.test(t.system || '') || codePattern.test(t.systemName || '') || codePattern.test(t.parentSystem || ''); }
+    });
+  }
+  (tasks || []).forEach(function(t){
+    if(!t || !t.isParent) return;
+    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.section].join(' '));
+    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.task || t.system || t.section, code), t.id);
+  });
+  Object.keys(visualScope || {}).forEach(function(scopeKey){
+    (visualScope[scopeKey] || []).forEach(function(row){
+      if(!row) return;
+      const boxText = ['facBoxes','rtBoxes'].reduce(function(parts, key){
+        return parts.concat((row[key] || []).map(function(box){ return box && box.text; }));
+      }, []).join(' ');
+      const code = huddleSystemCodeFromText([row.system,row.impact,row.rooms,boxText].join(' '));
+      addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(row.system || row.impact || row.rooms, code), null);
+    });
+  });
+  activeLeaf.forEach(function(t){
+    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.notes].join(' '));
+    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.systemName || t.system || t.task, code), null);
+  });
   function huddleTasksFor(def){
     return activeLeaf.filter(t=>{
       const id = String(t.id);
@@ -5991,15 +6081,13 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const downStarted = items.find(t=>downMap[t.id]!=null && isComplete(t));
-    const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
+    const openDownStartedTask = items.find(t=>downMap[t.id]!=null && startupMap[t.id]==null);
     const oosActive = items.find(t=>isInProgress(t));
 
-    // OOS rule: a system becomes OOS only after a Mark as Down Start task is Complete.
-    // It stays OOS until a Mark as Start-Up task is also Complete.
-    // Checkboxes alone do not change operational status.
+    // OOS rule: a system becomes OOS as soon as a matching task is marked Down Start.
+    // It stays OOS for that exact task until the same task's Mark as Start-Up is checked, even if the task is Complete.
     if(breakdownActive) return 'Breakdown';
-    if(downStarted && !startupCompleted) return 'OOS';
+    if(openDownStartedTask) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
     if(condRelComplete) return 'Cond. REL';
     if(oosActive) return 'OOS';
@@ -6020,10 +6108,9 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const downStarted = items.find(t=>downMap[t.id]!=null);
-      const startupChecked = items.find(t=>startupMap[t.id]!=null && !isComplete(t));
+      const downStarted = items.find(t=>downMap[t.id]!=null && startupMap[t.id]==null);
       if(downStarted){
-        return 'OOS since Down Start: '+downStarted.id + (startupChecked ? ' / waiting Start-Up Complete: '+startupChecked.id : '');
+        return 'OOS since Down Start: '+downStarted.id+' / waiting Mark as Start-Up';
       }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
@@ -7496,6 +7583,9 @@ function msActive(id) {
           <option value="">All</option><option>PM</option><option>CAL</option><option>CM</option><option>EM</option><option>PROJ</option>
         </select>
       </label>
+      <label>System
+        <select id="psSystem" onchange="renderPrintSchedule()"><option value="">All</option></select>
+      </label>
       <label>Resource
         <select id="psResource" onchange="renderPrintSchedule()"><option value="">All</option></select>
       </label>
@@ -8454,7 +8544,7 @@ function rcExpandedBarRows(items,start,end){
 
 /* ========== Print Schedule Executive Weekly Gantt ========== */
 .ps-page{padding:12px 16px;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#f5f5f5}
-.ps-toolbar{display:grid;grid-template-columns:repeat(3,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}
+.ps-toolbar{display:grid;grid-template-columns:repeat(4,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}
 .ps-titlebox{display:none}.ps-title{font-size:16px;font-weight:800;color:#1a3a5c}.ps-subtitle{font-size:11px;color:#666;margin-top:2px}
 .ps-toolbar label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.04em;display:flex;flex-direction:column;gap:3px}
 .ps-toolbar select,.ps-toolbar input{font-size:12px;padding:5px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;min-height:29px;width:100%;min-width:0}.ps-toolbar input{min-width:0}
@@ -8604,18 +8694,20 @@ function rcExpandedBarRows(items,start,end){
   // Override filter so Resource matches either assigned resource OR vendor.
   window.psFiltered = function(items, start, end){
     var cat = (document.getElementById('psCategory') && document.getElementById('psCategory').value) || '';
+    var sys = (document.getElementById('psSystem') && document.getElementById('psSystem').value) || '';
     var res = (document.getElementById('psResource') && document.getElementById('psResource').value) || '';
     var q = ((document.getElementById('psSearch') && document.getElementById('psSearch').value) || '').toLowerCase();
     return (items || [])
       .filter(function(t){ return t.end >= start && t.start <= end; })
       .filter(function(t){ return !cat || t.category === cat; })
+      .filter(function(t){ return !sys || t.system === sys; })
       .filter(function(t){
         if(!res) return true;
         return (t.assigned || []).indexOf(res) >= 0 || String(t.vendor || '') === res;
       })
       .filter(function(t){
         if(!q) return true;
-        return [t.id,t.task,t.section,t.vendor,(t.assigned||[]).join(' '),t.category,t.status].join(' ').toLowerCase().indexOf(q) >= 0;
+        return [t.id,t.task,t.system,t.section,t.vendor,(t.assigned||[]).join(' '),t.category,t.status].join(' ').toLowerCase().indexOf(q) >= 0;
       });
   };
 
@@ -8623,12 +8715,14 @@ function rcExpandedBarRows(items,start,end){
   var ps11OriginalRender = window.renderPrintSchedule;
   window.renderPrintSchedule = function(){
     ps11PopulateResourceOptions();
+    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     if(typeof ps11OriginalRender === 'function') return ps11OriginalRender.apply(this, arguments);
   };
 
   // Override init to populate Resource dropdown before rendering.
   window.initPrintSchedule = function(){
     ps11PopulateResourceOptions();
+    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     if(typeof window.renderPrintSchedule === 'function') window.renderPrintSchedule();
   };
 
@@ -8644,16 +8738,18 @@ function rcExpandedBarRows(items,start,end){
     if(typeof ps11OriginalGroupKey === 'function') return ps11OriginalGroupKey(t, mode);
     if(mode === 'category') return t.category || 'Uncategorized';
     if(mode === 'vendor') return t.vendor || 'No Vendor';
-    return t.section || 'Other';
+    return t.system || t.section || 'Other';
   };
 
   // Replace renderPrintSchedule with resource-aware expansion while keeping existing visual style.
   window.renderPrintSchedule = function(){
     ps11PopulateResourceOptions();
+    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     var all = (typeof psTasks === 'function') ? psTasks() : [];
     var start = psProjectStart(all), end = psProjectEnd(all);
     var weeks = psWeeks(start,end);
     var groupMode = (document.getElementById('psGroup') && document.getElementById('psGroup').value) || 'section';
+    var selectedSystem = (document.getElementById('psSystem') && document.getElementById('psSystem').value) || '';
     var selectedResource = (document.getElementById('psResource') && document.getElementById('psResource').value) || '';
     var items = psFiltered(all,start,end).sort(function(a,b){
       return (a.start===b.start ? String(a.id).localeCompare(String(b.id),undefined,{numeric:true}) : a.start.localeCompare(b.start));
@@ -8673,7 +8769,7 @@ function rcExpandedBarRows(items,start,end){
     var meta = document.getElementById('psPrintMeta');
     if(meta){
       var label = groupMode === 'resource' && selectedResource ? 'Resource schedule: '+selectedResource : 'Resource: '+(selectedResource || 'All');
-      meta.textContent = 'Project range: '+psFmt(start)+' to '+psFmt(end)+' · '+weeks.length+' weeks · '+items.length+' scheduled tasks · Group: '+groupMode+' · '+label+' · Generated '+new Date().toLocaleDateString();
+      meta.textContent = 'Project range: '+psFmt(start)+' to '+psFmt(end)+' · '+weeks.length+' weeks · '+items.length+' scheduled tasks · Group: '+groupMode+' · System: '+(selectedSystem || 'All')+' · '+label+' · Generated '+new Date().toLocaleDateString();
     }
     if(!items.length){ chart.innerHTML='<div class="ps-empty">No scheduled tasks found for the selected filters.</div>'; return; }
     var header = '<div class="ps-week-row"><div class="ps-left-head">Task / Activity</div>' + weeks.map(function(w){ return '<div class="ps-week-cell"><b>'+psEsc(w.label)+'</b><span>'+psEsc(psFmt(w.start))+'–'+psEsc(psFmt(w.end))+'</span></div>'; }).join('') + '</div>';
@@ -8793,7 +8889,7 @@ function handleDailyHuddleUrlParams(){
 }
 
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){ ps11PopulateResourceOptions(); }, 100);
+    setTimeout(function(){ ps11PopulateResourceOptions(); if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions(); }, 100);
     setTimeout(function(){ handleDailyHuddleUrlParams(); }, 250);
   });
 })();
@@ -8886,6 +8982,8 @@ function handleDailyHuddleUrlParams(){
       var s=String(status||'').trim();
       var bg='#6b7280', fg='#ffffff';
       if(/OOS/i.test(s)){ bg='#7a1a1a'; }
+      else if(/Suspending|Blue scrub/i.test(s)){ bg='#8a5a08'; fg='#fff0bd'; }
+      else if(/^Full Gowning$/i.test(s)){ bg='#1f6b42'; fg='#d7ffe5'; }
       else if(/FULL/i.test(s)){ bg='#174a7a'; }
       else if(/COND/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
       else if(/In Progress/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
