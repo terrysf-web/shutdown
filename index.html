@@ -6049,6 +6049,11 @@ function renderDashboard(){
     (visualScope[scopeKey] || []).forEach(function(row){
       if(!row) return;
       const boxText = huddleScopeBoxText(row);
+  Object.keys(visualScope || {}).forEach(function(scopeKey){
+    (visualScope[scopeKey] || []).forEach(function(row){
+      const boxText = ['facBoxes','rtBoxes'].flatMap(function(key){
+        return (row[key] || []).map(function(box){ return box && box.text; });
+      }).join(' ');
       const code = huddleSystemCodeFromText([row.system,row.impact,row.rooms,boxText].join(' '));
       addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(row.system || row.impact || row.rooms, code), null);
     });
@@ -6116,6 +6121,7 @@ function renderDashboard(){
     }
     if(status==='OOS'){
       const downStarted = items.find(hasOpenDownStart);
+      const downStarted = items.find(t=>downMap[t.id]!=null && startupMap[t.id]==null);
       if(downStarted){
         return 'OOS since Down Start: '+downStarted.id+' / waiting Mark as Start-Up';
       }
