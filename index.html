@@ -6080,14 +6080,8 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const downStarted = items.find(t=>downMap[t.id]!=null);
-    const startupCompleted = items.find(t=>startupMap[t.id]!=null);
-    const oosActive = items.find(t=>isInProgress(t));
-
-    // OOS rule: a system becomes OOS as soon as a matching task is marked Down Start.
-    // It stays OOS until a matching Mark as Start-Up is checked.
     if(breakdownActive) return 'Breakdown';
-    if(downStarted && !startupCompleted) return 'OOS';
+    if(openDownStartedTask) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
     if(condRelComplete) return 'Cond. REL';
     if(oosActive) return 'OOS';
@@ -6108,10 +6102,9 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const downStarted = items.find(t=>downMap[t.id]!=null);
-      const startupChecked = items.find(t=>startupMap[t.id]!=null && !isComplete(t));
+      const downStarted = items.find(t=>downMap[t.id]!=null && startupMap[t.id]==null);
       if(downStarted){
-        return 'OOS since Down Start: '+downStarted.id + (startupChecked ? ' / waiting Start-Up Complete: '+startupChecked.id : '');
+        return 'OOS since Down Start: '+downStarted.id+' / waiting Mark as Start-Up';
       }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
