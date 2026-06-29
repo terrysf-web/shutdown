@@ -3,6 +3,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>2026 Summer Shutdown Plan – Task Tracker</title>
+<!-- PATCH: OOS latch + embedded shared data package 2026-06-29 -->
 
 
 <script>
@@ -6033,13 +6034,14 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const downStarted = items.find(t=>downMap[t.id]!=null && isComplete(t));
+    const downStarted = items.find(t=>downMap[t.id]!=null);
     const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
     const oosActive = items.find(t=>isInProgress(t));
 
-    // OOS rule: a system becomes OOS only after a Mark as Down Start task is Complete.
-    // It stays OOS until a Mark as Start-Up task is also Complete.
-    // Checkboxes alone do not change operational status.
+    // OOS latch rule:
+    // Once any task in the system is marked as Down Start, the system is OOS.
+    // It must remain OOS even if that task becomes Complete.
+    // Only a marked Start-Up task with status Complete releases the system from OOS.
     if(breakdownActive) return 'Breakdown';
     if(downStarted && !startupCompleted) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
