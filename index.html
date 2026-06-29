@@ -5976,7 +5976,7 @@ function renderDashboard(){
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
-  const huddleSystemDefs = [
+  let huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
     {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
@@ -6005,6 +6005,53 @@ function renderDashboard(){
     {system:'DP Area Release', name:'DP Area Release', match:t=>/DP\s*MFG|DP Area/i.test(t.task||'') && String(t.id).startsWith('13.')},
     {system:'DS Area Release', name:'DS Area Release', match:t=>/DS\s*MFG|DS Area/i.test(t.task||'') && String(t.id).startsWith('13.')}
   ];
+  function huddleSystemCodeFromText(text){
+    const m = String(text || '').toUpperCase().match(/\b\d{2}-[A-Z]{4}-\d{3}(?:\/\d{3})?\b/);
+    return m ? m[0] : '';
+  }
+  function huddleSystemNameFromParent(parentTask, code){
+    if(!code) return String(parentTask || 'System').replace(/\s+/g, ' ').trim() || 'System';
+    const cleaned = String(parentTask || code || 'System')
+      .replace(new RegExp('\\(?\\b'+code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+'\\b\\)?', 'i'), '')
+      .replace(/[()]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim();
+    return cleaned || code || 'System';
+  }
+  function huddleSystemDefKnown(code){
+    if(!code) return true;
+    return huddleSystemDefs.some(function(def){
+      return String(def.system || '').toUpperCase().indexOf(code) >= 0;
+    });
+  }
+  function addDynamicHuddleSystemDef(code, name, parentId){
+    if(!code || huddleSystemDefKnown(code)) return;
+    const codePattern = new RegExp(code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+    huddleSystemDefs.push({
+      system: code,
+      name: name || code,
+      parents: parentId ? [String(parentId)] : [],
+      match: function(t){ return codePattern.test(t.task || '') || codePattern.test(t.system || '') || codePattern.test(t.systemName || '') || codePattern.test(t.parentSystem || ''); }
+    });
+  }
+  (tasks || []).forEach(function(t){
+    if(!t || !t.isParent) return;
+    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.section].join(' '));
+    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.task || t.system || t.section, code), t.id);
+  });
+  Object.keys(visualScope || {}).forEach(function(scopeKey){
+    (visualScope[scopeKey] || []).forEach(function(row){
+      const boxText = ['facBoxes','rtBoxes'].flatMap(function(key){
+        return (row[key] || []).map(function(box){ return box && box.text; });
+      }).join(' ');
+      const code = huddleSystemCodeFromText([row.system,row.impact,row.rooms,boxText].join(' '));
+      addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(row.system || row.impact || row.rooms, code), null);
+    });
+  });
+  activeLeaf.forEach(function(t){
+    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.notes].join(' '));
+    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.systemName || t.system || t.task, code), null);
+  });
   function huddleTasksFor(def){
     return activeLeaf.filter(t=>{
       const id = String(t.id);
@@ -6033,13 +6080,12 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const downStarted = items.find(t=>downMap[t.id]!=null && isComplete(t));
-    const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
+    const downStarted = items.find(t=>downMap[t.id]!=null);
+    const startupCompleted = items.find(t=>startupMap[t.id]!=null);
     const oosActive = items.find(t=>isInProgress(t));
 
-    // OOS rule: a system becomes OOS only after a Mark as Down Start task is Complete.
-    // It stays OOS until a Mark as Start-Up task is also Complete.
-    // Checkboxes alone do not change operational status.
+    // OOS rule: a system becomes OOS as soon as a matching task is marked Down Start.
+    // It stays OOS until a matching Mark as Start-Up is checked.
     if(breakdownActive) return 'Breakdown';
     if(downStarted && !startupCompleted) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
