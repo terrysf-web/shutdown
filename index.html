@@ -32,33 +32,11 @@ function psFmt(iso){ const d=psDate(iso); return (d.getMonth()+1)+'/'+d.getDate(
 function psDiffDays(a,b){ return Math.round((psDate(b)-psDate(a))/86400000); }
 function psAssignees(t){ return (typeof rcAssignees==='function') ? rcAssignees(t) : String(t.assigned||'Unassigned').split(/[\/;,]+/).map(x=>x.trim()).filter(Boolean); }
 function psCategory(t){ return t.category || (typeof inferCategory==='function' ? inferCategory(t.task) : 'PROJ'); }
-function psCleanSystemName(name){
-  return String(name || '').trim() || 'Other System';
-}
 function psTasks(){
-  let currentSystem = 'Other System';
-  return (tasks||[]).reduce((out,t)=>{
-    if(t && t.isParent){
-      currentSystem = psCleanSystemName(t.task || t.system || t.section || currentSystem);
-      return out;
-    }
-    if(!t || !psISO(t.start) || !psISO(t.end)) return out;
-    const system = psCleanSystemName(t.system || t.systemName || t.parentSystem || currentSystem || t.section);
-    out.push({
-      id:t.id, task:t.task||'', start:psISO(t.start), end:psISO(t.end), category:psCategory(t), section:t.section||'Other', system:system,
-      assigned:psAssignees(t), vendor:t.vendor||'', status:t.status||'Pending', notes:t.notes||''
-    });
-    return out;
-  }, []);
-}
-function psPopulateSystemOptions(){
-  const sel=document.getElementById('psSystem');
-  if(!sel) return;
-  const cur=sel.value;
-  const systems=[...new Set(psTasks().map(t=>t.system).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
-  sel.innerHTML='<option value="">All</option>';
-  systems.forEach(system=>{ const o=document.createElement('option'); o.value=system; o.textContent=system; sel.appendChild(o); });
-  if([...sel.options].some(o=>o.value===cur)) sel.value=cur;
+  return (tasks||[]).filter(t=>!t.isParent && psISO(t.start) && psISO(t.end)).map(t=>({
+    id:t.id, task:t.task||'', start:psISO(t.start), end:psISO(t.end), category:psCategory(t), section:t.section||'Other',
+    assigned:psAssignees(t), vendor:t.vendor||'', status:t.status||'Pending', notes:t.notes||''
+  }));
 }
 function psProjectStart(items){ return (projectStartDate || (typeof getProjectStartFromTasks==='function' && getProjectStartFromTasks()) || items.map(t=>t.start).sort()[0] || '2026-07-06'); }
 function psProjectEnd(items){ return (projectEndDate || (typeof getProjectEndFromTasks==='function' && getProjectEndFromTasks()) || items.map(t=>t.end).sort().slice(-1)[0] || '2026-08-28'); }
@@ -68,7 +46,6 @@ function psWeeks(start,end){
   return out;
 }
 function initPrintSchedule(){
-  psPopulateSystemOptions();
   const sel=document.getElementById('psResource');
   if(sel){
     const cur=sel.value; sel.innerHTML='<option value="">All</option>';
@@ -79,7 +56,6 @@ function initPrintSchedule(){
 }
 function psFiltered(items, start, end){
   const cat=document.getElementById('psCategory')?.value||'';
-  const sys=document.getElementById('psSystem')?.value||'';
   const res=document.getElementById('psResource')?.value||'';
   const q=(document.getElementById('psSearch')?.value||'').toLowerCase();
   return items
@@ -87,15 +63,14 @@ function psFiltered(items, start, end){
     // Tasks completely before project start, like 6/22–6/28 when range starts 7/6, are hidden.
     .filter(t=>t.end >= start && t.start <= end)
     .filter(t=>!cat || t.category===cat)
-    .filter(t=>!sys || t.system===sys)
     .filter(t=>!res || t.assigned.includes(res))
-    .filter(t=>!q || [t.id,t.task,t.system,t.section,t.vendor,t.assigned.join(' '),t.category,t.status].join(' ').toLowerCase().includes(q));
+    .filter(t=>!q || [t.id,t.task,t.section,t.vendor,t.assigned.join(' '),t.category,t.status].join(' ').toLowerCase().includes(q));
 }
 function psGroupKey(t, mode){
   if(mode==='resource') return t.groupResource || t.assigned.join(', ') || 'Unassigned';
   if(mode==='category') return t.category || 'Uncategorized';
   if(mode==='vendor') return t.vendor || 'No Vendor';
-  return t.system || t.section || 'Other';
+  return t.section || 'Other';
 }
 function renderPrintSchedule(){
   const all=psTasks();
@@ -103,7 +78,6 @@ function renderPrintSchedule(){
   const weeks=psWeeks(start,end);
   let items=psFiltered(all,start,end).sort((a,b)=>(a.start===b.start?String(a.id).localeCompare(String(b.id),undefined,{numeric:true}):a.start.localeCompare(b.start)));
   const groupMode=document.getElementById('psGroup')?.value||'section';
-  const selectedSystem=document.getElementById('psSystem')?.value||'';
   const selectedResource=document.getElementById('psResource')?.value||'';
   if(groupMode==='resource'){
     items = items.flatMap(t=>{
@@ -114,7 +88,7 @@ function renderPrintSchedule(){
   const chart=document.getElementById('psChart'); if(!chart) return;
   chart.style.setProperty('--ps-weeks', weeks.length);
   const meta=document.getElementById('psPrintMeta');
-  if(meta) meta.textContent = `Project range: ${psFmt(start)} to ${psFmt(end)} · ${weeks.length} weeks · ${items.length} scheduled tasks · Group: ${groupMode} · System: ${selectedSystem||'All'} · Resource: ${selectedResource||'All'} · Generated ${new Date().toLocaleDateString()}`;
+  if(meta) meta.textContent = `Project range: ${psFmt(start)} to ${psFmt(end)} · ${weeks.length} weeks · ${items.length} scheduled tasks · Group: ${groupMode} · Resource: ${selectedResource||'All'} · Generated ${new Date().toLocaleDateString()}`;
   if(!items.length){ chart.innerHTML='<div class="ps-empty">No scheduled tasks found for the selected filters.</div>'; return; }
   const header = `<div class="ps-week-row"><div class="ps-left-head">Task / Activity</div>${weeks.map(w=>`<div class="ps-week-cell"><b>${w.label}</b><span>${psFmt(w.start)}–${psFmt(w.end)}</span></div>`).join('')}</div>`;
   const by={}; items.forEach(t=>{ const k=psGroupKey(t,groupMode); (by[k] ||= []).push(t); });
@@ -141,32 +115,6 @@ function renderPrintSchedule(){
   }).join('');
   chart.innerHTML = header + body;
 }
-function psPrintScheduleActive(){
-  const page = document.getElementById('page-printschedule');
-  return !!(page && (page.classList.contains('active') || document.body.classList.contains('ps-print-mode')));
-}
-function enterPrintScheduleMode(){
-  try{ initPrintSchedule(); }catch(e){ try{ renderPrintSchedule(); }catch(err){} }
-  document.body.classList.add('ps-print-mode');
-}
-function exitPrintScheduleMode(){
-  document.body.classList.remove('ps-print-mode');
-}
-function printPrintSchedule(){
-  enterPrintScheduleMode();
-  const cleanup = function(){ exitPrintScheduleMode(); window.removeEventListener('afterprint', cleanup); };
-  window.addEventListener('afterprint', cleanup);
-  setTimeout(function(){
-    try { window.print(); }
-    finally { setTimeout(cleanup, 700); }
-  }, 50);
-}
-window.addEventListener('beforeprint', function(){
-  if(psPrintScheduleActive()) enterPrintScheduleMode();
-});
-window.addEventListener('afterprint', function(){
-  if(document.body.classList.contains('ps-print-mode')) exitPrintScheduleMode();
-});
 </script>
 
 <style>
@@ -474,37 +422,6 @@ tr.editing{background:#fffceb}
 .vendor-seg{height:100%;min-width:3px}
 .vendor-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:5px;font-size:10px;font-weight:800;color:#9fb4c8}
 .vendor-dot{width:7px;height:7px;border-radius:50%;display:inline-block;margin-right:3px}
-.executive-kpis{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.exec-mini-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px}
-.exec-mini{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:7px;padding:9px 10px}
-.exec-mini-label{font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:.06em;color:#9fb4c8;margin-bottom:5px}
-.exec-mini-value{font-size:22px;font-weight:900;color:#fff;line-height:1}
-.kpi-lines{display:flex;flex-direction:column;gap:3px;margin-top:6px}
-.kpi-line{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:11px;font-weight:900;color:#e8f1fb;white-space:nowrap}
-.kpi-line b{font-size:13px;color:#f0c040}
-.progress-kpi-value.compact{font-size:24px;line-height:1.05}
-.operational-detail-kpi{max-width:330px;background:#1a3a5c;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
-.operational-detail-kpi .progress-kpi-label{color:#cfe1f3;margin-bottom:7px}
-.operational-detail-kpi .progress-row{grid-template-columns:minmax(94px,1fr) 34px minmax(96px,1.15fr) 40px;gap:5px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
-.operational-detail-kpi .progress-row-name{font-weight:900;color:#fff}
-.operational-detail-kpi .progress-row-pct{font-size:11px;color:#f0c040;text-align:right}
-.operational-detail-kpi .progress-row-meta{font-size:10px;color:#d6e7f7;text-align:right}
-.operational-detail-kpi .progress-mini-meter{height:5px;background:rgba(255,255,255,.17)}
-.operational-detail-kpi .progress-mini-meter span{background:#4f9be8}
-.wo-add-btn{font-size:11px;font-weight:800;border:none;border-radius:5px;padding:4px 8px;color:#fff;cursor:pointer}
-.wo-add-panel{display:none;padding:8px 10px;border-bottom:1px solid #eee;background:#fbfcfd;gap:6px;flex-wrap:wrap;align-items:center}
-.wo-add-panel.open{display:flex}
-.wo-add-panel input,.wo-add-panel select{font-size:12px;padding:5px 7px;border:1px solid #ccc;border-radius:5px;min-width:90px}
-.wo-add-panel button{font-size:11px;font-weight:800;border:none;border-radius:5px;padding:5px 9px;cursor:pointer}
-.wo-manual-badge{display:inline-block;font-size:9px;font-weight:800;background:#fff3cd;color:#7a5200;border-radius:8px;padding:1px 5px;margin-left:4px}
-.system-pill.returning{background:#174a7a;color:#cce6ff}
-.system-pill.risk{background:#7a1a1a;color:#ffb4ac}
-.system-pill.ready{background:#1f6b42;color:#d7ffe5}
-.executive-vendor-list{display:flex;flex-direction:column;gap:6px}
-.vendor-progress-row.exec{display:grid;grid-template-columns:minmax(180px,1fr) repeat(4,minmax(72px,90px));align-items:center;gap:8px;width:100%}
-.vendor-progress-row.exec .vendor-meta{margin-top:0;justify-content:flex-end}
-.vendor-metric{text-align:right;font-size:12px;font-weight:900;color:#fff;min-width:0}
-.vendor-metric span{display:block;font-size:8px;color:#9fb4c8;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .huddle-grid{display:grid;grid-template-columns:1.45fr .9fr;gap:12px;margin-bottom:14px}
 .huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:14px}
 .huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px}
@@ -533,10 +450,8 @@ tr.editing{background:#fffceb}
 .gowning-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 9px;display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}
 .gowning-area{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}
 .gowning-select{width:100%;min-width:0;background:#173653;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:800}
-.gowning-select.suspend{background:#8a5a08!important;color:#fff0bd!important;border-color:#d39b2d!important;box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.gowning-select.suspend{background:#80520e;color:#ffe6ae}
 .gowning-select.full{background:#1f6b42;color:#d7ffe5}
-.gowning-select option[value="Suspending - Blue scrub only"]{background:#8a5a08;color:#fff0bd;font-weight:800}
-.gowning-select option[value="Full Gowning"]{background:#1f6b42;color:#d7ffe5;font-weight:800}
 .huddle-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-bottom:14px}
 .huddle-table{width:100%;border-collapse:collapse;font-size:12px}
 .huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
@@ -555,6 +470,7 @@ tr.editing{background:#fffceb}
 .huddle-status.delayed{background:#7a1a1a;color:#ffb4ac}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
 .dash-mode-huddle .kpi-section{display:none!important}
+.dash-mode-huddle .progress-grid{display:none!important}
 .dash-mode-kpi .huddle-section{display:none!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
@@ -632,18 +548,11 @@ select.msf option:checked{background:#ddeeff}
   .system-status-row .system-pill,.system-status-row .system-status-reason{grid-column:auto}
 }
 
-.firebase-sync-status{display:inline-flex;align-items:center;gap:5px;margin-left:8px;border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.12);color:#d9e8f7;font-size:11px;font-weight:800;white-space:nowrap}
-.firebase-sync-status.ok{background:#1f6b42;color:#d7ffe5}
-.firebase-sync-status.warn{background:#80520e;color:#ffe6ae;cursor:pointer}
-.firebase-sync-status.error{background:#7a1a1a;color:#ffb4ac}
-.firebase-sync-status.saving{background:#174a7a;color:#cce6ff}
-.firebase-sync-status.off{background:rgba(255,255,255,.12);color:#cde}
-
 
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -678,7 +587,7 @@ select.msf option:checked{background:#ddeeff}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -706,6 +615,7 @@ select.msf option:checked{background:#ddeeff}
 <div id="sticky-top">
 <header>
   <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Shared Data v11</span></span>
 </header>
 <div class="tab-nav">
   <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
@@ -816,6 +726,9 @@ select.msf option:checked{background:#ddeeff}
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
     <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
+    <button onclick="saveSharedDataFile()" style="background:#1565c0;color:#fff;border:none;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Save current tracker data to shared JSON file">💾 Save Shared Data</button>
+    <button onclick="document.getElementById('sharedDataFileInput').click()" style="background:#fff;color:#1a3a5c;border:1px solid #1a3a5c;padding:6px 12px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="Load shared JSON data from SharePoint/OneDrive">📂 Load Shared Data</button>
+    <input id="sharedDataFileInput" type="file" accept=".json,application/json" style="display:none" onchange="loadSharedDataFromInput(this)">
     </div>
   </div>
   <div class="advanced-filters" id="advancedFilters">
@@ -3788,67 +3701,57 @@ APPENDIX 6.5B)</div>
 
   <!-- Title -->
   <div style="background:#1a3a5c;padding:13px 18px;border-radius:8px;margin-bottom:14px;border-bottom:3px solid #f0c040;display:flex;align-items:center;justify-content:space-between;gap:14px">
-    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Shutdown Executive Dashboard</span>
+    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">2026 Shutdown Daily Huddle</span>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v9</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v8</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
 
-  <!-- Executive Dashboard Top: Operational KPIs + Gowning Status -->
+  <!-- Daily Huddle Top: Project Progress + Gowning Status -->
   <div class="huddle-top-layout huddle-section">
     <div class="progress-brief">
       <div class="progress-brief-head">
         <div>
-          <div class="progress-brief-title">Executive Operations Snapshot</div>
+          <div class="progress-brief-title">Shutdown Project Progress</div>
           <div class="progress-brief-date" id="d-progress-asof">As of —</div>
         </div>
-        <div class="progress-brief-date" id="d-progress-summary" style="display:none">—</div>
+        <div class="progress-brief-date" id="d-progress-summary">—</div>
       </div>
-      <div class="progress-kpis executive-kpis">
+      <div class="progress-kpis">
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Overall Progress (Tasks + Work Orders)</div>
-          <div class="progress-kpi-value compact" id="d-progress-count">—</div>
+          <div class="progress-kpi-label">Overall Complete</div>
+          <div class="progress-kpi-value" id="d-progress-pct">—</div>
           <div class="progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
-          <div class="progress-kpi-sub" id="d-progress-pct">—</div>
-          <div class="progress-kpi-sub" id="d-progress-done" style="display:none">—</div>
+          <div class="progress-kpi-sub" id="d-progress-done">—</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Today's Work</div>
-          <div class="kpi-lines">
-            <div class="kpi-line"><span>Due</span><b id="d-today-due">—</b></div>
-            <div class="kpi-line"><span>Complete</span><b id="d-today-complete">—</b></div>
-            <div class="kpi-line"><span>Remaining</span><b id="d-today-remaining">—</b></div>
-          </div>
-          <div class="progress-kpi-value" id="d-today-work" style="display:none">—</div>
-          <div class="progress-kpi-sub" id="d-today-work-sub" style="display:none">Due today</div>
+          <div class="progress-kpi-label">In Progress</div>
+          <div class="progress-kpi-value" id="d-progress-inprogress">—</div>
+          <div class="progress-kpi-sub">Active tasks</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Schedule Risk</div>
-          <div class="kpi-lines">
-            <div class="kpi-line"><span>Late</span><b id="d-risk-late">—</b></div>
-            <div class="kpi-line"><span>Delayed</span><b id="d-risk-delayed">—</b></div>
-            <div class="kpi-line"><span>Critical</span><b id="d-risk-critical">—</b></div>
-          </div>
-          <div class="progress-kpi-value" id="d-schedule-risk" style="display:none">—</div>
-          <div class="progress-kpi-sub" id="d-schedule-risk-sub" style="display:none">Late / delayed</div>
+          <div class="progress-kpi-label">Pending</div>
+          <div class="progress-kpi-value" id="d-progress-pending">—</div>
+          <div class="progress-kpi-sub">Not started</div>
         </div>
         <div class="progress-kpi">
-          <div class="progress-kpi-label">Systems Status</div>
-          <div class="kpi-lines">
-            <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
-            <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
-            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
-          </div>
-          <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
-          <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
+          <div class="progress-kpi-label">Delayed</div>
+          <div class="progress-kpi-value" id="d-progress-delayed">—</div>
+          <div class="progress-kpi-sub">Needs attention</div>
         </div>
-        <div class="progress-kpi operational-detail-kpi">
-          <div class="progress-kpi-label" id="d-operational-detail-label">Operational Detail</div>
-          <div id="d-progress-system"></div>
+        <div class="progress-kpi">
+          <div class="progress-kpi-label">Lookahead</div>
+          <div class="progress-kpi-value" id="d-progress-lookahead-count">—</div>
+          <div class="progress-kpi-sub">Next 14 days</div>
         </div>
+      </div>
+      <div class="progress-grid">
+        <div class="progress-panel"><div class="progress-panel-title">Progress by System</div><div id="d-progress-system"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Progress by Category</div><div id="d-progress-category"></div></div>
+        <div class="progress-panel"><div class="progress-panel-title">Meeting Focus</div><div id="d-progress-focus"></div></div>
       </div>
     </div>
 
@@ -3873,10 +3776,10 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Executive Dashboard Middle: Systems + Return to Service -->
+  <!-- Daily Huddle Middle: Abnormal Systems + Return to Service -->
   <div class="huddle-middle-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Systems Status</div>
+      <div class="huddle-panel-title">Systems / Utilities Status</div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
     <div class="huddle-panel tight">
@@ -3991,10 +3894,15 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Row 3: Vendor Readiness -->
+  <!-- Row 3: By Vendor (full width) -->
   <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:10px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:6px">WORK ORDER BY TYPE BY VENDOR</div>
+    <div style="display:flex;justify-content:center;gap:18px;margin-bottom:8px">
+      <span style="font-size:11px;color:#f0c040">● CAL</span>
+      <span style="font-size:11px;color:#5db3e8">● CM</span>
+      <span style="font-size:11px;color:#e07840">● PM</span>
+    </div>
+    <div id="d-by-vendor" class="vendor-progress"></div>
   </div>
 
 </div>
@@ -5147,11 +5055,7 @@ function collectEditedRows(){
 }
 function saveAll(){
   // Allow save even if edit mode was just toggled or user expects a manual save.
-  if(!editMode && !dirty){
-    if(typeof saveLocal === 'function') saveLocal();
-    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-    return;
-  }
+  if(!editMode && !dirty){ if(typeof saveLocal === 'function') saveLocal(); return; }
   collectEditedRows();
   projectStartDate = document.getElementById('projectStartInput').value || projectStartDate;
   projectEndDate = document.getElementById('projectEndInput').value || projectEndDate;
@@ -5161,7 +5065,6 @@ function saveAll(){
   editMode = false;
   document.getElementById('editToggleBtn').textContent = 'Edit Mode: Off';
   render();
-  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 function insertRow(afterId){
   if(!editMode) return;
@@ -5767,7 +5670,7 @@ function setDashboardMode(mode){
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
   panel.classList.toggle('dash-mode-huddle', mode !== 'kpi');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : 'Shutdown Executive Dashboard';
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : '2026 Shutdown Daily Huddle';
 }
 
 function getGowningStatus(){
@@ -5812,24 +5715,22 @@ function showTab(tab, btn){
 
 function renderDashboard(){
   const leaf = tasks.filter(t=>!t.isParent);
-  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
-  const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
-  const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
+  const calData = typeof WO_DATA !== 'undefined' ? WO_DATA : [];
+  const pmData  = typeof PM_DATA !== 'undefined' ? PM_DATA : [];
   const calSMap = typeof calStatusMap !== 'undefined' ? calStatusMap : {};
   const pmSMap  = typeof pmStatusMap  !== 'undefined' ? pmStatusMap  : {};
 
   const taskTotal = leaf.length;
-  const calTotal  = typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length;
-  const pmTotal   = typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length;
+  const calTotal  = calData.length;
+  const pmTotal   = pmData.length;
   const grandTotal = taskTotal + calTotal + pmTotal;
 
   const taskDone = leaf.filter(t=>statusMap[t.id]==='Complete').length;
-  const calDone  = calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, calSMap)==='Done' : (calSMap[i]||'Pending')==='Done').length;
-  const pmDone   = pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap)==='Done' : (pmSMap[i]||'Pending')==='Done').length;
+  const calDone  = calData.filter((_,i)=>(calSMap[i]||'Pending')==='Done').length;
+  const pmDone   = pmData.filter((_,i)=>(pmSMap[i]||'Pending')==='Done').length;
   const grandDone = taskDone + calDone + pmDone;
-  const displayGrandTotal = Math.max(grandTotal, 559);
-  const grandPct = displayGrandTotal ? Math.round(grandDone/displayGrandTotal*100) : 0;
-  const grandPctText = displayGrandTotal ? (grandDone/displayGrandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
+  const grandPct  = grandTotal ? Math.round(grandDone/grandTotal*100) : 0;
+
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
   const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
@@ -5912,24 +5813,6 @@ function renderDashboard(){
     // In Progress work belongs only in Maintenance Activities, not Upcoming.
     return startDate > todayDate && startDate <= sevenDayEndDate && (st === 'Pending' || st === 'Scheduled');
   }
-  function taskTouchesToday(t){
-    const startIso = normalizeDateValue(t.start);
-    const endIso = normalizeDateValue(t.end) || startIso;
-    if(!startIso && !endIso) return false;
-    const startDate = new Date((startIso || endIso)+'T00:00:00');
-    const endDate = new Date((endIso || startIso)+'T00:00:00');
-    return startDate <= todayDate && endDate >= todayDate;
-  }
-  function hasOwner(t){
-    return !!String(t.assigned || t.assignedTo || t.resource || t.owner || t.vendor || '').trim();
-  }
-  const dueTodayTasks = activeLeaf.filter(t=>taskTouchesToday(t) && taskStatus(t)!=='N/A');
-  const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
-  const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
-  const lateTasks = overdueTasks;
-  const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
-  const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
-  const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
 
   function setText(id, val){ const el=document.getElementById(id); if(el) el.textContent=val; }
   function setWidth(id, val){ const el=document.getElementById(id); if(el) el.style.width=val; }
@@ -5952,31 +5835,18 @@ function renderDashboard(){
   }
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
-  const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
-  const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
-  setText('d-progress-summary', '');
-  setText('d-operational-detail-label', 'Operational Detail (Tasks-' + taskTotal + ')');
-  setText('d-progress-count', grandDone + ' / ' + displayGrandTotal);
-  setText('d-progress-pct', grandPctText);
-  setWidth('d-progress-meter', grandPct + '%');
+  setText('d-progress-summary', progressDone + ' complete / ' + progressTotal + ' active tracker tasks');
+  setText('d-progress-pct', progressPct + '%');
+  setWidth('d-progress-meter', progressPct + '%');
   setText('d-progress-done', progressDone + ' complete of ' + progressTotal);
-  setText('d-today-work', dueTodayTasks.length);
-  setText('d-today-work-sub', completedTodayTasks.length + ' completed / ' + remainingTodayTasks.length + ' remaining');
-  setText('d-today-due', dueTodayTasks.length);
-  setText('d-today-complete', completedTodayTasks.length);
-  setText('d-today-remaining', remainingTodayTasks.length);
-  setText('d-schedule-risk', scheduleRiskCount);
-  setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
-  setText('d-risk-late', lateTasks.length);
-  setText('d-risk-delayed', delayedTasks.length);
-  setText('d-risk-critical', criticalTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
   setText('d-progress-delayed', statusCounts.Delayed || 0);
   setText('d-progress-lookahead-count', lookaheadTasks.length);
   setText('dashboardModeMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
   renderGowningStatus();
-  let huddleSystemDefs = [
+
+  const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
     {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
     {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
@@ -6005,63 +5875,6 @@ function renderDashboard(){
     {system:'DP Area Release', name:'DP Area Release', match:t=>/DP\s*MFG|DP Area/i.test(t.task||'') && String(t.id).startsWith('13.')},
     {system:'DS Area Release', name:'DS Area Release', match:t=>/DS\s*MFG|DS Area/i.test(t.task||'') && String(t.id).startsWith('13.')}
   ];
-  function huddleSystemCodeFromText(text){
-    const m = String(text || '').toUpperCase().match(/\b\d{2}-[A-Z]{4}-\d{3}(?:\/\d{3})?\b/);
-    return m ? m[0] : '';
-  }
-  function huddleSystemNameFromParent(parentTask, code){
-    if(!code) return String(parentTask || 'System').replace(/\s+/g, ' ').trim() || 'System';
-    const cleaned = String(parentTask || code || 'System')
-      .replace(new RegExp('\\(?\\b'+code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')+'\\b\\)?', 'i'), '')
-      .replace(/[()]/g, '')
-      .replace(/\s+/g, ' ')
-      .trim();
-    return cleaned || code || 'System';
-  }
-  function huddleSystemDefKnown(code){
-    if(!code) return true;
-    return huddleSystemDefs.some(function(def){
-      return String(def.system || '').toUpperCase().indexOf(code) >= 0;
-    });
-  }
-  function addDynamicHuddleSystemDef(code, name, parentId){
-    if(!code || huddleSystemDefKnown(code)) return;
-    const codePattern = new RegExp(code.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
-    huddleSystemDefs.push({
-      system: code,
-      name: name || code,
-      parents: parentId ? [String(parentId)] : [],
-      match: function(t){ return codePattern.test(t.task || '') || codePattern.test(t.system || '') || codePattern.test(t.systemName || '') || codePattern.test(t.parentSystem || ''); }
-    });
-  }
-  (tasks || []).forEach(function(t){
-    if(!t || !t.isParent) return;
-    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.section].join(' '));
-    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.task || t.system || t.section, code), t.id);
-  });
-  function huddleScopeBoxText(row){
-    if(!row) return '';
-    return ['facBoxes','rtBoxes'].reduce(function(parts, key){
-      return parts.concat((row[key] || []).map(function(box){ return box && box.text; }));
-    }, []).join(' ');
-  }
-  Object.keys(visualScope || {}).forEach(function(scopeKey){
-    (visualScope[scopeKey] || []).forEach(function(row){
-      if(!row) return;
-      const boxText = huddleScopeBoxText(row);
-  Object.keys(visualScope || {}).forEach(function(scopeKey){
-    (visualScope[scopeKey] || []).forEach(function(row){
-      const boxText = ['facBoxes','rtBoxes'].flatMap(function(key){
-        return (row[key] || []).map(function(box){ return box && box.text; });
-      }).join(' ');
-      const code = huddleSystemCodeFromText([row.system,row.impact,row.rooms,boxText].join(' '));
-      addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(row.system || row.impact || row.rooms, code), null);
-    });
-  });
-  activeLeaf.forEach(function(t){
-    const code = huddleSystemCodeFromText([t.system,t.systemName,t.parentSystem,t.task,t.notes].join(' '));
-    addDynamicHuddleSystemDef(code, huddleSystemNameFromParent(t.systemName || t.system || t.task, code), null);
-  });
   function huddleTasksFor(def){
     return activeLeaf.filter(t=>{
       const id = String(t.id);
@@ -6082,9 +5895,6 @@ function renderDashboard(){
   function isDelayed(t){
     return taskStatus(t) === 'Delayed';
   }
-  function hasOpenDownStart(t){
-    return downMap[t.id]!=null && startupMap[t.id]==null;
-  }
   function isFullRelTask(t){ return /full\s*rel|ful\s*rel|full release/i.test(t.task||''); }
   function isCondRelTask(t){ return /cond\s*rel|conditional release/i.test(t.task||''); }
   function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
@@ -6093,13 +5903,15 @@ function renderDashboard(){
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const openDownStartedTask = items.find(hasOpenDownStart);
+    const downStarted = items.find(t=>downMap[t.id]!=null && isComplete(t));
+    const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
     const oosActive = items.find(t=>isInProgress(t));
 
-    // OOS rule: a system becomes OOS as soon as a matching task is marked Down Start.
-    // It stays OOS for that exact task until the same task's Mark as Start-Up is checked, even if the task is Complete.
+    // OOS rule: a system becomes OOS only after a Mark as Down Start task is Complete.
+    // It stays OOS until a Mark as Start-Up task is also Complete.
+    // Checkboxes alone do not change operational status.
     if(breakdownActive) return 'Breakdown';
-    if(openDownStartedTask) return 'OOS';
+    if(downStarted && !startupCompleted) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
     if(condRelComplete) return 'Cond. REL';
     if(oosActive) return 'OOS';
@@ -6120,10 +5932,10 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const downStarted = items.find(hasOpenDownStart);
-      const downStarted = items.find(t=>downMap[t.id]!=null && startupMap[t.id]==null);
+      const downStarted = items.find(t=>downMap[t.id]!=null);
+      const startupChecked = items.find(t=>startupMap[t.id]!=null && !isComplete(t));
       if(downStarted){
-        return 'OOS since Down Start: '+downStarted.id+' / waiting Mark as Start-Up';
+        return 'OOS since Down Start: '+downStarted.id + (startupChecked ? ' / waiting Start-Up Complete: '+startupChecked.id : '');
       }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
@@ -6157,30 +5969,8 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    function executiveSystemStatus(status){
-      if(status === 'OOS' || status === 'Breakdown') return 'OOS';
-      if(status === 'Cond. REL' || status === 'FUL REL') return 'Returning to Service';
-      return 'Normal';
-    }
-    function executiveSystemClass(status){
-      const st = executiveSystemStatus(status);
-      return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
-    }
-    const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
-    const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
-    const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
-    const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
-    setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
-    setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
-    setText('d-systems-normal', normalCount);
-    setText('d-systems-oos', oosCount);
-    setText('d-systems-returning', rtsCount);
-    const visibleSystems = executiveSystems.filter(s=>s.execStatus !== 'Normal');
-    systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
-      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
-      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
+    const abnormalSystems = huddleSystems.filter(s=>s.status==='OOS');
+    systemStatusEl.innerHTML = abnormalSystems.length ? abnormalSystems.map(s=>`<div class="system-status-row"><div class="system-status-id" title="${s.def.system}">${s.def.system}</div><div class="system-status-name" title="${s.def.name}">${s.def.name}</div><div class="system-pill ${pillClass(s.status)}">OOS</div></div>`).join('') : '<div class="progress-empty">No systems currently OOS.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -6307,7 +6097,7 @@ function renderDashboard(){
   const tn = document.getElementById('d-total-num');
   const ts = document.getElementById('d-total-sub');
   if(tn) tn.textContent = grandTotal;
-  if(ts) ts.textContent = 'Progress '+grandPct+'%  •  Risk '+scheduleRiskCount+'  •  Active '+progressTotal;
+  if(ts) ts.textContent = (daysLeft>0 ? daysLeft+' days left' : 'Shutdown started') + '  •  Done: '+grandDone+' ('+grandPct+'%)';
 
   const bc = document.getElementById('d-delayed-badge-card');
   const bn = document.getElementById('d-delayed-badge-num');
@@ -6425,52 +6215,51 @@ function renderDashboard(){
       `).join('')}`;
   }
 
-  // ── Vendor Readiness ──────────────────────────────────────────────────────
+  // ── By Vendor ─────────────────────────────────────────────────────────────
   const vendorMap = {};
-  function ensureVendor(name){
-    const key = (name || '').trim() || 'Internal';
-    if(!vendorMap[key]) vendorMap[key] = {scheduled:0,inProgress:0,completed:0,remaining:0,total:0};
-    return vendorMap[key];
-  }
-  function addVendorStatus(name, status){
-    const d = ensureVendor(name);
-    const st = String(status || 'Pending');
-    d.total++;
-    if(st === 'Complete' || st === 'Done') d.completed++;
-    else if(st === 'In Progress') d.inProgress++;
-    else d.scheduled++;
-    d.remaining = d.total - d.completed;
-  }
-  leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
-  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
-  pmData.forEach((r,i)=>{
+  leaf.forEach(t=>{
+    const v=(t.vendor||'').trim()||'Internal';
+    const c=(t.category||inferCategory(t.task)).toUpperCase();
+    if(!vendorMap[v]) vendorMap[v]={CAL:0,PM:0,CM:0,total:0};
+    if(c==='CAL') vendorMap[v].CAL++;
+    else if(c==='PM') vendorMap[v].PM++;
+    else if(c==='CM') vendorMap[v].CM++;
+    vendorMap[v].total++;
+  });
+  // Add CAL WO vendor data (A&P is main vendor)
+  if(!vendorMap['A&P']) vendorMap['A&P']={CAL:0,PM:0,CM:0,total:0};
+  vendorMap['A&P'].CAL += calTotal;
+  vendorMap['A&P'].total += calTotal;
+  // Add PM WO vendors
+  pmData.forEach(r=>{
     const v=(r.mfr||'').trim()||'Internal';
     const key = v.length>12 ? v.slice(0,11) : v;
-    addVendorStatus(key, typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
+    if(!vendorMap[key]) vendorMap[key]={CAL:0,PM:0,CM:0,total:0};
+    vendorMap[key].PM++;
+    vendorMap[key].total++;
   });
 
   const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
-  const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
-    acc.scheduled += d.scheduled;
-    acc.inProgress += d.inProgress;
-    acc.completed += d.completed;
-    acc.remaining += d.remaining;
-    return acc;
-  }, {scheduled:0,inProgress:0,completed:0,remaining:0});
-  setText('d-vendor-scheduled', vendorTotals.scheduled);
-  setText('d-vendor-inprogress', vendorTotals.inProgress);
-  setText('d-vendor-remaining', vendorTotals.remaining);
   const vEl = document.getElementById('d-by-vendor');
   if(vEl) vEl.innerHTML = topVendors.map(([name,d])=>{
-    return `<div class="vendor-progress-row exec">
+    const calPct = d.total ? Math.max(3, Math.round(d.CAL/d.total*100)) : 0;
+    const cmPct = d.total ? Math.max(3, Math.round(d.CM/d.total*100)) : 0;
+    const pmPct = d.total ? Math.max(3, Math.round(d.PM/d.total*100)) : 0;
+    return `<div class="vendor-progress-row">
       <div class="vendor-progress-top">
         <div class="vendor-progress-name" title="${name}">${name}</div>
         <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div class="vendor-metric">${d.scheduled}<span>Scheduled</span></div>
-      <div class="vendor-metric">${d.inProgress}<span>In Progress</span></div>
-      <div class="vendor-metric">${d.completed}<span>Completed</span></div>
-      <div class="vendor-metric">${d.remaining}<span>Remaining</span></div>
+      <div class="vendor-stack">
+        ${d.CAL>0?`<span class="vendor-seg" style="width:${calPct}%;background:#f0c040"></span>`:''}
+        ${d.CM>0?`<span class="vendor-seg" style="width:${cmPct}%;background:#5db3e8"></span>`:''}
+        ${d.PM>0?`<span class="vendor-seg" style="width:${pmPct}%;background:#e07840"></span>`:''}
+      </div>
+      <div class="vendor-meta">
+        ${d.CAL>0?`<span><i class="vendor-dot" style="background:#f0c040"></i>CAL ${d.CAL}</span>`:''}
+        ${d.CM>0?`<span><i class="vendor-dot" style="background:#5db3e8"></i>CM ${d.CM}</span>`:''}
+        ${d.PM>0?`<span><i class="vendor-dot" style="background:#e07840"></i>PM ${d.PM}</span>`:''}
+      </div>
     </div>`;
   }).join('');
 }
@@ -6879,126 +6668,35 @@ var PM_DATA = [{"name":"PM-ACLE-Q, SA & A","tag":"01-ACLE-001","desc":"Autoclave
 var WO_CAL_STATUS_KEY = 'sd26_wo_status_v1';
 var WO_CAL_NOTES_KEY  = 'sd26_wo_notes_v1';
 var WO_PM_STATUS_KEY  = 'sd26_wo_pm_status_v1';
-var WO_MANUAL_KEY     = 'sd26_wo_manual_v1';
 
 var calStatusMap = {};
 var pmStatusMap  = {};
-var woManualData = [];
 var woInitialized = false;
 
 function woLoadStorage(){
   try{ var s=localStorage.getItem(WO_CAL_STATUS_KEY); if(s) calStatusMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_PM_STATUS_KEY);  if(s) pmStatusMap=JSON.parse(s);  }catch(e){}
-  try{ var s=localStorage.getItem(WO_MANUAL_KEY);     woManualData=s?JSON.parse(s):[]; if(!Array.isArray(woManualData)) woManualData=[]; }catch(e){ woManualData=[]; }
 }
 function woSaveCAL(){ try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){} }
 function woSavePM(){  try{ localStorage.setItem(WO_PM_STATUS_KEY,  JSON.stringify(pmStatusMap));  }catch(e){} }
-function woSaveManual(){
-  try{ localStorage.setItem(WO_MANUAL_KEY, JSON.stringify(woManualData)); }catch(e){}
-  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-}
-
-function woEsc(v){
-  return String(v == null ? '' : v).replace(/[&<>"']/g,function(c){
-    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
-  });
-}
-function woManualRows(category){
-  return woManualData.filter(function(r){ return (r.category||'') === category; }).map(function(r){
-    var copy = Object.assign({}, r);
-    copy._woType = 'manual';
-    copy._woId = r.id;
-    return copy;
-  });
-}
-function woAllCalData(){
-  return WO_DATA.map(function(r,i){
-    var copy = Object.assign({_woType:'base', _woIndex:i}, r);
-    return copy;
-  }).concat(woManualRows('CAL'));
-}
-function woAllPmData(){
-  return PM_DATA.map(function(r,i){
-    var copy = Object.assign({_woType:'base', _woIndex:i}, r);
-    return copy;
-  }).concat(woManualRows('PM'));
-}
-function woRowStatus(row, map){
-  if(row && row._woType === 'manual') return woNormalizeStatus(row.status);
-  return woNormalizeStatus(map[row._woIndex]);
-}
-function woManualFind(id){
-  return woManualData.find(function(r){ return r.id === id; });
-}
-function woNormalizeStatus(status){
-  return status === 'Pending' ? 'Scheduled' : (status || 'Scheduled');
-}
-function woStatusOptions(){
-  return ['Scheduled','Done','N/A'];
-}
-function woToggleAddPanel(id){
-  var el = document.getElementById(id);
-  if(el) el.classList.toggle('open');
-}
-function woAddManual(category){
-  var now = Date.now();
-  if(category === 'CAL'){
-    var system = (document.getElementById('wo-add-cal-system')||{}).value || '';
-    var tag = (document.getElementById('wo-add-cal-tag')||{}).value || '';
-    var interval = (document.getElementById('wo-add-cal-interval')||{}).value || '';
-    if(!tag.trim()){ alert('Please enter a CAL Tag / ID.'); return; }
-    woManualData.push({id:'manual-cal-'+now, category:'CAL', system:system.trim()||'Manual', tag:tag.trim(), interval:interval.trim(), flag:'', status:'Scheduled'});
-    ['wo-add-cal-system','wo-add-cal-tag','wo-add-cal-interval'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-    woSaveManual();
-    woRefreshFilterOptions();
-    calRender();
-  }else{
-    var name = (document.getElementById('wo-add-pm-name')||{}).value || '';
-    var tagPm = (document.getElementById('wo-add-pm-tag')||{}).value || '';
-    var desc = (document.getElementById('wo-add-pm-desc')||{}).value || '';
-    var assigned = (document.getElementById('wo-add-pm-assigned')||{}).value || '';
-    if(!name.trim() && !tagPm.trim()){ alert('Please enter a PM Name or Tag.'); return; }
-    woManualData.push({id:'manual-pm-'+now, category:'PM', name:name.trim()||'Manual PM', tag:tagPm.trim(), desc:desc.trim(), assigned:assigned.trim(), dept:'Manual', mfr:'', location:'', status:'Scheduled'});
-    ['wo-add-pm-name','wo-add-pm-tag','wo-add-pm-desc','wo-add-pm-assigned'].forEach(function(id){ var el=document.getElementById(id); if(el) el.value=''; });
-    woSaveManual();
-    woRefreshFilterOptions();
-    pmRender();
-  }
-  try{ renderDashboard(); }catch(e){}
-}
-function woDeleteManual(id){
-  if(!confirm('Delete this manual work order?')) return;
-  woManualData = woManualData.filter(function(r){ return r.id !== id; });
-  woSaveManual();
-  woRefreshFilterOptions();
-  calRender();
-  pmRender();
-  try{ renderDashboard(); }catch(e){}
-}
-function woRefreshFilterOptions(){
-  var calSel = document.getElementById('cal-sys-filter');
-  if(calSel){
-    var calValue = calSel.value;
-    calSel.innerHTML = '<option value="">All Systems</option>';
-    [...new Set(woAllCalData().map(function(r){return r.system;}).filter(Boolean))].sort().forEach(function(s){
-      var o=document.createElement('option'); o.value=s; o.textContent=s; calSel.appendChild(o);
-    });
-    calSel.value = [...calSel.options].some(function(o){return o.value===calValue;}) ? calValue : '';
-  }
-  var pmSel = document.getElementById('pm-dept-filter');
-  if(pmSel){
-    var pmValue = pmSel.value;
-    pmSel.innerHTML = '<option value="">All Depts</option>';
-    [...new Set(woAllPmData().map(function(r){return r.dept;}).filter(Boolean))].sort().forEach(function(d){
-      var o=document.createElement('option'); o.value=d; o.textContent=d; pmSel.appendChild(o);
-    });
-    pmSel.value = [...pmSel.options].some(function(o){return o.value===pmValue;}) ? pmValue : '';
-  }
-}
 
 function woInit(){
   woLoadStorage();
-  woRefreshFilterOptions();
+  // CAL system filter
+  var calSel = document.getElementById('cal-sys-filter');
+  if(calSel && calSel.options.length === 1){
+    WO_SYSTEMS.forEach(function(s){
+      var o=document.createElement('option'); o.value=s; o.textContent=s; calSel.appendChild(o);
+    });
+  }
+  // PM dept filter
+  var pmSel = document.getElementById('pm-dept-filter');
+  if(pmSel && pmSel.options.length === 1){
+    var depts = [...new Set(PM_DATA.map(function(r){return r.dept;}).filter(Boolean))].sort();
+    depts.forEach(function(d){
+      var o=document.createElement('option'); o.value=d; o.textContent=d; pmSel.appendChild(o);
+    });
+  }
   calRender();
   pmRender();
   woUpdateBadges();
@@ -7038,11 +6736,11 @@ function calCurrentData(){
   var search = (document.getElementById('cal-search')||{}).value||'';
   var sys    = (document.getElementById('cal-sys-filter')||{}).value||'';
   var stat   = (document.getElementById('cal-status-filter')||{}).value||'';
-  return woAllCalData().filter(function(r){
-    var status = woRowStatus(r, calStatusMap);
+  return WO_DATA.filter(function(r,i){
+    var status = calStatusMap[i]||'Pending';
     if(sys  && r.system!==sys)  return false;
     if(stat && status!==stat)   return false;
-    if(search && String(r.tag||'').toLowerCase().indexOf(search.toLowerCase())<0) return false;
+    if(search && r.tag.toLowerCase().indexOf(search.toLowerCase())<0) return false;
     return true;
   });
 }
@@ -7052,40 +6750,31 @@ function calRender(){
   var tbody = document.getElementById('cal-tbody');
   if(!tbody) return;
   var html='';
-  rows.forEach(function(r, rowNum){
-    var idx = r._woIndex;
-    var status = woRowStatus(r, calStatusMap);
-    var key = r._woType === 'manual' ? r._woId : idx;
+  rows.forEach(function(r){
+    var idx = WO_DATA.indexOf(r);
+    var status = calStatusMap[idx]||'Pending';
     var bc = status==='Done'?'#c8e6c9;color:#1b5e20':status==='N/A'?'#fff9c4;color:#827717':'#f5f5f5;color:#555;border:1px solid #ccc';
     var flag = r.flag==='?'?' <span style="color:#e65100;font-size:10px">[?]</span>':'';
     html+='<tr style="border-bottom:1px solid #eee">'
-      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(r._woType==='manual'?'M'+(rowNum+1):(idx+1))+'</td>'
-      +'<td style="padding:5px 8px"><span style="font-size:10px;background:#e8edf2;padding:1px 6px;border-radius:8px;white-space:nowrap;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.system)+'">'+woEsc(r.system)+'</span></td>'
-      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+woEsc(r.tag)+flag+(r._woType==='manual'?'<span class="wo-manual-badge">Manual</span>':'')+'</td>'
-      +'<td style="padding:5px 8px;text-align:center;color:#666">'+(r.interval?woEsc(r.interval)+'mo':'')+'</td>'
-      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="calStatusChange(this)">'
-      +woStatusOptions().map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
+      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(idx+1)+'</td>'
+      +'<td style="padding:5px 8px"><span style="font-size:10px;background:#e8edf2;padding:1px 6px;border-radius:8px;white-space:nowrap;display:inline-block;max-width:120px;overflow:hidden;text-overflow:ellipsis" title="'+r.system+'">'+r.system+'</span></td>'
+      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px">'+r.tag+flag+'</td>'
+      +'<td style="padding:5px 8px;text-align:center;color:#666">'+(r.interval?r.interval+'mo':'')+'</td>'
+      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-idx="'+idx+'" onchange="calStatusChange(this)">'
+      +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
-      +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
   });
-  tbody.innerHTML = html||'<tr><td colspan="6" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
+  tbody.innerHTML = html||'<tr><td colspan="5" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
   var cnt=document.getElementById('cal-count');
-  if(cnt) cnt.textContent = rows.length+' / '+woAllCalData().length+' items';
+  if(cnt) cnt.textContent = rows.length+' / '+WO_DATA.length+' items';
   woUpdateBadges();
 }
 
 function calStatusChange(sel){
-  if(sel.dataset.type === 'manual'){
-    var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
-  }else{
-    calStatusMap[parseInt(sel.dataset.key)] = sel.value;
-    woSaveCAL();
-    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-  }
+  calStatusMap[parseInt(sel.dataset.idx)] = sel.value;
+  woSaveCAL();
   woUpdateBadges();
-  try{ renderDashboard(); }catch(e){}
 }
 
 function calFilter(){ calRender(); }
@@ -7095,11 +6784,11 @@ function pmCurrentData(){
   var search = (document.getElementById('pm-search')||{}).value||'';
   var dept   = (document.getElementById('pm-dept-filter')||{}).value||'';
   var stat   = (document.getElementById('pm-status-filter')||{}).value||'';
-  return woAllPmData().filter(function(r){
-    var status = woRowStatus(r, pmStatusMap);
+  return PM_DATA.filter(function(r,i){
+    var status = pmStatusMap[i]||'Pending';
     if(dept && r.dept!==dept) return false;
     if(stat && status!==stat) return false;
-    if(search && (String(r.name||'')+String(r.tag||'')+String(r.desc||'')).toLowerCase().indexOf(search.toLowerCase())<0) return false;
+    if(search && (r.name+r.tag+r.desc).toLowerCase().indexOf(search.toLowerCase())<0) return false;
     return true;
   });
 }
@@ -7109,52 +6798,41 @@ function pmRender(){
   var tbody = document.getElementById('pm-tbody');
   if(!tbody) return;
   var html='';
-  rows.forEach(function(r, rowNum){
-    var idx = r._woIndex;
-    var status = woRowStatus(r, pmStatusMap);
-    var key = r._woType === 'manual' ? r._woId : idx;
+  rows.forEach(function(r){
+    var idx = PM_DATA.indexOf(r);
+    var status = pmStatusMap[idx]||'Pending';
     var bc = status==='Done'?'#c8e6c9;color:#1b5e20':status==='N/A'?'#fff9c4;color:#827717':'#f5f5f5;color:#555;border:1px solid #ccc';
     html+='<tr style="border-bottom:1px solid #eee">'
-      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(r._woType==='manual'?'M'+(rowNum+1):(idx+1))+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.name)+'">'+woEsc(r.name)+(r._woType==='manual'?'<span class="wo-manual-badge">Manual</span>':'')+'</td>'
-      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px;color:#1a3a5c">'+woEsc(r.tag)+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;color:#555;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.desc)+'">'+woEsc(r.desc)+'</td>'
-      +'<td style="padding:5px 8px;font-size:11px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+woEsc(r.assigned)+'">'+woEsc(r.assigned)+'</td>'
-      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-type="'+r._woType+'" data-key="'+woEsc(key)+'" onchange="pmStatusChange(this)">'
-      +woStatusOptions().map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
+      +'<td style="padding:5px 8px;color:#bbb;font-size:10px">'+(idx+1)+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;font-weight:600;max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.name+'">'+r.name+'</td>'
+      +'<td style="padding:5px 8px;font-family:monospace;font-size:11px;color:#1a3a5c">'+r.tag+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;color:#555;max-width:100px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.desc+'">'+r.desc+'</td>'
+      +'<td style="padding:5px 8px;font-size:11px;max-width:80px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="'+r.assigned+'">'+r.assigned+'</td>'
+      +'<td style="padding:4px 8px"><select style="font-size:11px;padding:2px 4px;border:1px solid #ccc;border-radius:4px;background:#'+bc+';width:88px" data-idx="'+idx+'" onchange="pmStatusChange(this)">'
+      +['Pending','Done','N/A'].map(function(s){return'<option'+(s===status?' selected':'')+'>'+s+'</option>';}).join('')
       +'</select></td>'
-      +'<td style="padding:4px 8px;width:54px">'+(r._woType==='manual'?'<button onclick="woDeleteManual(\''+woEsc(r._woId)+'\')" style="font-size:10px;border:none;background:#f3d4d4;color:#8a1f1f;border-radius:4px;padding:3px 6px;cursor:pointer">Delete</button>':'')+'</td>'
       +'</tr>';
   });
-  tbody.innerHTML = html||'<tr><td colspan="7" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
+  tbody.innerHTML = html||'<tr><td colspan="6" style="text-align:center;padding:16px;color:#999">No results found</td></tr>';
   var cnt=document.getElementById('pm-count');
-  if(cnt) cnt.textContent = rows.length+' / '+woAllPmData().length+' items';
+  if(cnt) cnt.textContent = rows.length+' / '+PM_DATA.length+' items';
   woUpdateBadges();
 }
 
 function pmStatusChange(sel){
-  if(sel.dataset.type === 'manual'){
-    var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
-  }else{
-    pmStatusMap[parseInt(sel.dataset.key)] = sel.value;
-    woSavePM();
-    if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-  }
+  pmStatusMap[parseInt(sel.dataset.idx)] = sel.value;
+  woSavePM();
   woUpdateBadges();
-  try{ renderDashboard(); }catch(e){}
 }
 
 function pmFilter(){ pmRender(); }
 
 // ── Badges & progress ─────────────────────────────────────────────────────────
 function woUpdateBadges(){
-  var calRows = woAllCalData();
-  var pmRows = woAllPmData();
-  var calTotal = calRows.length;
-  var calDone  = calRows.filter(function(r){return woRowStatus(r, calStatusMap)==='Done';}).length;
-  var pmTotal  = pmRows.length;
-  var pmDone   = pmRows.filter(function(r){return woRowStatus(r, pmStatusMap)==='Done';}).length;
+  var calTotal = WO_DATA.length;
+  var calDone  = WO_DATA.filter(function(r,i){return (calStatusMap[i]||'Pending')==='Done';}).length;
+  var pmTotal  = PM_DATA.length;
+  var pmDone   = PM_DATA.filter(function(r,i){return (pmStatusMap[i]||'Pending')==='Done';}).length;
 
   var calBadge = document.getElementById('cal-done-badge');
   if(calBadge) calBadge.textContent = calDone+' / '+calTotal+' Done';
@@ -7276,25 +6954,20 @@ async function tryAutoLoadSharedData(){
     const payload = await res.json();
     const incoming = payload.generatedAt || '';
     const lastLoaded = localStorage.getItem('sd26_shared_last_loaded') || '';
-    let localTaskCount = 0;
-    let incomingTaskCount = 0;
-    try{ localTaskCount = JSON.parse(localStorage.getItem('sd26_tasks_v3') || '[]').length || 0; }catch(e){}
-    try{ incomingTaskCount = JSON.parse((payload.data && payload.data.sd26_tasks_v3) || '[]').length || 0; }catch(e){}
-    if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
+    if(incoming && incoming === lastLoaded) return;
     if(payload && payload.data){
       Object.keys(payload.data).forEach(k => {
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
       });
       if(incoming) localStorage.setItem('sd26_shared_last_loaded', incoming);
-      // Avoid loops: mark the URL once without navigating, then render in place.
-      const __p = new URLSearchParams(location.search || '');
-      if(!__p.has('autoloaded') && window.history && history.replaceState){
+      // Avoid loops: render with loaded data once.
+      const __p=new URLSearchParams(location.search);
+      if(!__p.has('autoloaded')){
         __p.set('autoloaded','1');
-        history.replaceState(null, '', location.pathname + '?' + __p.toString() + location.hash);
+        location.replace(location.pathname+'?'+__p.toString());
+      } else {
+        renderAll?.();
       }
-      if(typeof renderAll === 'function') renderAll();
-      else if(typeof refreshSd26FromLocalStorage === 'function') refreshSd26FromLocalStorage();
-      else if(typeof render === 'function') render();
     }
   }catch(e){
     // Silent because shared file may not exist yet.
@@ -7308,195 +6981,6 @@ if(document.readyState === 'loading'){
   tryAutoLoadSharedData();
 }
 // ── End Shared Data JSON Sync ───────────────────────────────────────────────
-
-// ── Firebase Firestore Shared Sync ──────────────────────────────────────────
-const FIREBASE_SHARED_CONFIG = {
-  apiKey: "AIzaSyCsNY_jvkOyFm1VlovKu_42PQ441cs5nV8",
-  authDomain: "shutdown-1b5e4.firebaseapp.com",
-  projectId: "shutdown-1b5e4",
-  storageBucket: "shutdown-1b5e4.firebasestorage.app",
-  messagingSenderId: "1026582555298",
-  appId: "1:1026582555298:web:02368892db5fee868f05fb"
-};
-const FIREBASE_SHARED_COLLECTION = 'shutdown_tracker';
-const FIREBASE_SHARED_DOC = 'shared_state';
-const FIREBASE_LAST_LOADED_KEY = 'sd26_firebase_last_loaded';
-let firebaseSharedApi = null;
-let firebaseSharedSavePending = false;
-let firebaseSharedApplyingRemote = false;
-
-function setFirebaseSyncStatus(text, cls, title){
-  const el = document.getElementById('firebaseSyncStatus');
-  if(!el) return;
-  el.textContent = text;
-  el.className = 'firebase-sync-status ' + (cls || 'off');
-  el.title = title || '';
-}
-
-function refreshSd26FromLocalStorage(){
-  try{ if(typeof loadLocal === 'function') loadLocal(); }catch(e){}
-  try{ if(typeof loadDownMaps === 'function') loadDownMaps(); }catch(e){}
-  try{ if(typeof loadEndImpact === 'function') loadEndImpact(); }catch(e){}
-  try{ if(typeof loadVisualScope === 'function') loadVisualScope(); }catch(e){}
-  try{ const s=localStorage.getItem('sd26_tl_v1'); tlData = s ? JSON.parse(s) : {}; }catch(e){}
-  try{ if(typeof updateDerivedFields === 'function') updateDerivedFields(); }catch(e){}
-  try{ if(typeof refreshFilters === 'function') refreshFilters(); }catch(e){}
-  try{ if(typeof render === 'function') render(); }catch(e){}
-  try{ if(typeof renderScope === 'function') renderScope(); }catch(e){}
-  try{ if(typeof renderTimeline === 'function') renderTimeline(); }catch(e){}
-  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
-  try{ if(typeof woRefreshFilterOptions === 'function') woRefreshFilterOptions(); }catch(e){}
-  try{ if(typeof calRender === 'function') calRender(); }catch(e){}
-  try{ if(typeof pmRender === 'function') pmRender(); }catch(e){}
-  try{ if(typeof renderDashboard === 'function') renderDashboard(); }catch(e){}
-  try{ if(typeof renderGowningStatus === 'function') renderGowningStatus(); }catch(e){}
-  try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
-  try{ if(typeof renderResourceCalendar === 'function') renderResourceCalendar(); }catch(e){}
-  try{ if(typeof renderPrintSchedule === 'function') renderPrintSchedule(); }catch(e){}
-  try{ if(typeof updateStats === 'function') updateStats(); }catch(e){}
-}
-
-function applyFirebaseSharedPayload(payload, opts){
-  opts = opts || {};
-  if(!payload || !payload.data) return false;
-  firebaseSharedApplyingRemote = true;
-  Object.keys(payload.data).forEach(k => {
-    if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
-  });
-  if(payload.generatedAt) localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
-  refreshSd26FromLocalStorage();
-  firebaseSharedApplyingRemote = false;
-  if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
-  return true;
-}
-
-async function loadFirebaseSharedData(){
-  if(!firebaseSharedApi){
-    setFirebaseSyncStatus('Firebase: not ready', 'warn', 'Firebase is still connecting.');
-    return false;
-  }
-  return firebaseSharedApi.load();
-}
-
-function queueFirebaseSharedSave(){
-  if(firebaseSharedApplyingRemote) return;
-  if(!firebaseSharedApi){
-    firebaseSharedSavePending = true;
-    setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Save will sync after Firebase connects.');
-    return;
-  }
-  firebaseSharedApi.save();
-}
-
-(function initFirebaseSharedSync(){
-  if(location.protocol === 'file:'){
-    setFirebaseSyncStatus('Firebase: local off', 'off', 'Firebase sync runs from the hosted site.');
-    return;
-  }
-  const appUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
-  const firestoreUrl = 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
-  Promise.all([import(appUrl), import(firestoreUrl)]).then(([appMod, fsMod]) => {
-    const app = appMod.initializeApp(FIREBASE_SHARED_CONFIG);
-    const db = fsMod.initializeFirestore(app, {experimentalAutoDetectLongPolling:true});
-    const sharedRef = fsMod.doc(db, FIREBASE_SHARED_COLLECTION, FIREBASE_SHARED_DOC);
-    let lastSeenRemote = '';
-    function firebaseWithTimeout(promise, action){
-      return Promise.race([
-        promise,
-        new Promise((_, reject) => setTimeout(() => reject(new Error(action + ' timed out. Check Firestore setup and network access.')), 15000))
-      ]);
-    }
-
-    async function save(){
-      try{
-        setFirebaseSyncStatus('Firebase: saving', 'saving', 'Saving shared data to Firestore...');
-        const currentSnap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase save check');
-        const current = currentSnap.exists() ? currentSnap.data() : null;
-        const remoteRev = current && current.generatedAt ? current.generatedAt : '';
-        const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
-        if(remoteRev && localRev && remoteRev !== localRev){
-          setFirebaseSyncStatus('Firebase: newer data', 'warn', 'Another user saved first. Click to load latest.');
-          const el = document.getElementById('firebaseSyncStatus');
-          if(el) el.onclick = loadFirebaseSharedData;
-          alert('Another user saved newer shared data. Your local save was kept, but Firebase was not overwritten. Click the Firebase status badge to load the latest shared data, then save again.');
-          return false;
-        }
-        const payload = getSd26Snapshot();
-        await firebaseWithTimeout(fsMod.setDoc(sharedRef, Object.assign({}, payload, {
-          updatedAt: fsMod.serverTimestamp(),
-          updateId: String(Date.now()) + '-' + Math.random().toString(36).slice(2),
-          updatedBy: (navigator && navigator.userAgent) ? navigator.userAgent : ''
-        })), 'Firebase save');
-        localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
-        lastSeenRemote = payload.generatedAt;
-        setFirebaseSyncStatus('Firebase: saved', 'ok', 'Shared data saved to Firestore.');
-        const el = document.getElementById('firebaseSyncStatus');
-        if(el) el.onclick = loadFirebaseSharedData;
-        return true;
-      }catch(e){
-        console.error('Firebase shared save failed:', e);
-        setFirebaseSyncStatus('Firebase: save failed', 'error', e.message || 'Firebase save failed.');
-        return false;
-      }
-    }
-
-    async function load(){
-      try{
-        setFirebaseSyncStatus('Firebase: loading', 'saving', 'Loading latest shared data...');
-        const snap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase load');
-        if(!snap.exists()){
-          setFirebaseSyncStatus('Firebase: ready', 'ok', 'No shared data exists yet. Save once to create it.');
-          return false;
-        }
-        const payload = snap.data();
-        applyFirebaseSharedPayload(payload, {silent:true});
-        lastSeenRemote = payload.generatedAt || '';
-        setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
-        return true;
-      }catch(e){
-        console.error('Firebase shared load failed:', e);
-        setFirebaseSyncStatus('Firebase: load failed', 'error', e.message || 'Firebase load failed.');
-        return false;
-      }
-    }
-
-    firebaseSharedApi = {save, load};
-    setFirebaseSyncStatus('Firebase: connected', 'ok', 'Realtime shared sync connected.');
-    const el = document.getElementById('firebaseSyncStatus');
-    if(el) el.onclick = loadFirebaseSharedData;
-    if(firebaseSharedSavePending){
-      firebaseSharedSavePending = false;
-      save();
-    }else{
-      load();
-    }
-
-    fsMod.onSnapshot(sharedRef, snap => {
-      if(!snap.exists() || snap.metadata.hasPendingWrites) return;
-      const payload = snap.data();
-      const remoteRev = payload.generatedAt || '';
-      if(!remoteRev || remoteRev === lastSeenRemote) return;
-      lastSeenRemote = remoteRev;
-      const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
-      if(localRev === remoteRev) return;
-      if(editMode || dirty){
-        setFirebaseSyncStatus('Firebase: new update', 'warn', 'Another user saved changes. Click to load latest after saving or canceling edits.');
-        const badge = document.getElementById('firebaseSyncStatus');
-        if(badge) badge.onclick = loadFirebaseSharedData;
-        return;
-      }
-      applyFirebaseSharedPayload(payload, {silent:true});
-      setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded automatically.');
-    }, e => {
-      console.error('Firebase shared listener failed:', e);
-      setFirebaseSyncStatus('Firebase: listener error', 'error', e.message || 'Firebase listener failed.');
-    });
-  }).catch(e => {
-    console.error('Firebase initialization failed:', e);
-    setFirebaseSyncStatus('Firebase: unavailable', 'error', e.message || 'Firebase could not initialize.');
-  });
-})();
-// ── End Firebase Firestore Shared Sync ──────────────────────────────────────
 
 function exportSnapshot(){
   // Save current edits first, then export a portable HTML snapshot.
@@ -7596,16 +7080,13 @@ function msActive(id) {
           <option value="">All</option><option>PM</option><option>CAL</option><option>CM</option><option>EM</option><option>PROJ</option>
         </select>
       </label>
-      <label>System
-        <select id="psSystem" onchange="renderPrintSchedule()"><option value="">All</option></select>
-      </label>
       <label>Resource
         <select id="psResource" onchange="renderPrintSchedule()"><option value="">All</option></select>
       </label>
       <label>Search
         <input id="psSearch" oninput="renderPrintSchedule()" placeholder="task / ID / vendor / system">
       </label>
-      <button class="ps-btn" onclick="printPrintSchedule()">Print / Save PDF</button>
+      <button class="ps-btn" onclick="window.print()">Print / Save PDF</button>
     </div>
     <div id="psPrintArea" class="ps-print-area">
       <div class="ps-print-header">
@@ -7686,13 +7167,6 @@ function msActive(id) {
       <div style="background:#1a3a5c;color:#fff;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center">
         <span style="font-size:13px;font-weight:700">🔬 CAL Work Orders</span>
         <span id="cal-done-badge" style="font-size:11px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;margin-left:4px"></span>
-        <button class="wo-add-btn" onclick="woToggleAddPanel('wo-add-cal-panel')" style="margin-left:auto;background:#3d7fb8">+ Add CAL</button>
-      </div>
-      <div id="wo-add-cal-panel" class="wo-add-panel">
-        <input id="wo-add-cal-system" placeholder="System">
-        <input id="wo-add-cal-tag" placeholder="Tag / ID">
-        <input id="wo-add-cal-interval" placeholder="Interval mo">
-        <button onclick="woAddManual('CAL')" style="background:#1a3a5c;color:#fff">Add</button>
       </div>
       <div style="flex-shrink:0;padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:6px;flex-wrap:wrap">
         <input type="text" id="cal-search" placeholder="🔍 Search tag..." oninput="calFilter()" style="font-size:12px;padding:5px 8px;border:1px solid #ccc;border-radius:5px;flex:1;min-width:120px">
@@ -7701,7 +7175,7 @@ function msActive(id) {
         </select>
         <select id="cal-status-filter" onchange="calFilter()" style="font-size:12px;padding:5px 6px;border:1px solid #ccc;border-radius:5px">
           <option value="">All</option>
-          <option value="Scheduled">Scheduled</option>
+          <option value="Pending">Pending</option>
           <option value="Done">Done</option>
           <option value="N/A">N/A</option>
         </select>
@@ -7718,7 +7192,6 @@ function msActive(id) {
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;color:#555">Tag / ID</th>
               <th style="padding:7px 8px;text-align:center;border-bottom:1px solid #ccc;width:50px;color:#555">Int.</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:95px;color:#555">Status</th>
-              <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:60px;color:#555"></th>
             </tr>
           </thead>
           <tbody id="cal-tbody"></tbody>
@@ -7731,14 +7204,6 @@ function msActive(id) {
       <div style="background:#2e5c1e;color:#fff;padding:10px 14px;flex-shrink:0;display:flex;gap:8px;align-items:center">
         <span style="font-size:13px;font-weight:700">🔧 PM Work Orders</span>
         <span id="pm-done-badge" style="font-size:11px;background:rgba(255,255,255,0.2);padding:2px 8px;border-radius:10px;margin-left:4px"></span>
-        <button class="wo-add-btn" onclick="woToggleAddPanel('wo-add-pm-panel')" style="margin-left:auto;background:#4f8c35">+ Add PM</button>
-      </div>
-      <div id="wo-add-pm-panel" class="wo-add-panel">
-        <input id="wo-add-pm-name" placeholder="PM Name">
-        <input id="wo-add-pm-tag" placeholder="Tag">
-        <input id="wo-add-pm-desc" placeholder="Description">
-        <input id="wo-add-pm-assigned" placeholder="Assigned">
-        <button onclick="woAddManual('PM')" style="background:#2e5c1e;color:#fff">Add</button>
       </div>
       <div style="flex-shrink:0;padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:6px;flex-wrap:wrap">
         <input type="text" id="pm-search" placeholder="🔍 Search name/tag..." oninput="pmFilter()" style="font-size:12px;padding:5px 8px;border:1px solid #ccc;border-radius:5px;flex:1;min-width:120px">
@@ -7747,7 +7212,7 @@ function msActive(id) {
         </select>
         <select id="pm-status-filter" onchange="pmFilter()" style="font-size:12px;padding:5px 6px;border:1px solid #ccc;border-radius:5px">
           <option value="">All</option>
-          <option value="Scheduled">Scheduled</option>
+          <option value="Pending">Pending</option>
           <option value="Done">Done</option>
           <option value="N/A">N/A</option>
         </select>
@@ -7765,7 +7230,6 @@ function msActive(id) {
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:100px;color:#555">Description</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:80px;color:#555">Assigned</th>
               <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:95px;color:#555">Status</th>
-              <th style="padding:7px 8px;text-align:left;border-bottom:1px solid #ccc;width:60px;color:#555"></th>
             </tr>
           </thead>
           <tbody id="pm-tbody"></tbody>
@@ -8084,7 +7548,7 @@ function renderRcVendor(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -8119,7 +7583,7 @@ function renderRcVendor(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -8250,7 +7714,7 @@ function renderRcMonthlyCalendar(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -8285,7 +7749,7 @@ function renderRcMonthlyCalendar(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -8557,7 +8021,7 @@ function rcExpandedBarRows(items,start,end){
 
 /* ========== Print Schedule Executive Weekly Gantt ========== */
 .ps-page{padding:12px 16px;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#f5f5f5}
-.ps-toolbar{display:grid;grid-template-columns:repeat(4,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}
+.ps-toolbar{display:grid;grid-template-columns:repeat(3,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}
 .ps-titlebox{display:none}.ps-title{font-size:16px;font-weight:800;color:#1a3a5c}.ps-subtitle{font-size:11px;color:#666;margin-top:2px}
 .ps-toolbar label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.04em;display:flex;flex-direction:column;gap:3px}
 .ps-toolbar select,.ps-toolbar input{font-size:12px;padding:5px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;min-height:29px;width:100%;min-width:0}.ps-toolbar input{min-width:0}
@@ -8587,7 +8051,7 @@ function rcExpandedBarRows(items,start,end){
 /* ========== Dashboard Huddle Layout FIX 2026-06-16 ========== */
 .huddle-top-layout{display:grid;grid-template-columns:1.55fr .75fr;gap:12px;margin-bottom:14px}
 .huddle-top-layout .progress-brief{margin-bottom:0;height:100%}
-.huddle-top-layout .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-bottom:0}
+.huddle-top-layout .progress-kpis{grid-template-columns:1.4fr repeat(4,.85fr);gap:8px;margin-bottom:0}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
@@ -8622,7 +8086,7 @@ function rcExpandedBarRows(items,start,end){
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
   .progress-brief-date{font-size:8px!important}
-  .progress-kpis{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:5px!important;margin-bottom:4px!important}
+  .progress-kpis{grid-template-columns:1.3fr repeat(4,.8fr)!important;gap:5px!important;margin-bottom:4px!important}
   .progress-kpi{padding:6px!important;border-radius:5px!important;min-width:0!important}
   .progress-kpi-label{font-size:7px!important;letter-spacing:.04em!important;margin-bottom:3px!important;white-space:nowrap!important}
   .progress-kpi-value{font-size:18px!important;line-height:1!important;white-space:nowrap!important}
@@ -8707,20 +8171,18 @@ function rcExpandedBarRows(items,start,end){
   // Override filter so Resource matches either assigned resource OR vendor.
   window.psFiltered = function(items, start, end){
     var cat = (document.getElementById('psCategory') && document.getElementById('psCategory').value) || '';
-    var sys = (document.getElementById('psSystem') && document.getElementById('psSystem').value) || '';
     var res = (document.getElementById('psResource') && document.getElementById('psResource').value) || '';
     var q = ((document.getElementById('psSearch') && document.getElementById('psSearch').value) || '').toLowerCase();
     return (items || [])
       .filter(function(t){ return t.end >= start && t.start <= end; })
       .filter(function(t){ return !cat || t.category === cat; })
-      .filter(function(t){ return !sys || t.system === sys; })
       .filter(function(t){
         if(!res) return true;
         return (t.assigned || []).indexOf(res) >= 0 || String(t.vendor || '') === res;
       })
       .filter(function(t){
         if(!q) return true;
-        return [t.id,t.task,t.system,t.section,t.vendor,(t.assigned||[]).join(' '),t.category,t.status].join(' ').toLowerCase().indexOf(q) >= 0;
+        return [t.id,t.task,t.section,t.vendor,(t.assigned||[]).join(' '),t.category,t.status].join(' ').toLowerCase().indexOf(q) >= 0;
       });
   };
 
@@ -8728,14 +8190,12 @@ function rcExpandedBarRows(items,start,end){
   var ps11OriginalRender = window.renderPrintSchedule;
   window.renderPrintSchedule = function(){
     ps11PopulateResourceOptions();
-    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     if(typeof ps11OriginalRender === 'function') return ps11OriginalRender.apply(this, arguments);
   };
 
   // Override init to populate Resource dropdown before rendering.
   window.initPrintSchedule = function(){
     ps11PopulateResourceOptions();
-    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     if(typeof window.renderPrintSchedule === 'function') window.renderPrintSchedule();
   };
 
@@ -8751,18 +8211,16 @@ function rcExpandedBarRows(items,start,end){
     if(typeof ps11OriginalGroupKey === 'function') return ps11OriginalGroupKey(t, mode);
     if(mode === 'category') return t.category || 'Uncategorized';
     if(mode === 'vendor') return t.vendor || 'No Vendor';
-    return t.system || t.section || 'Other';
+    return t.section || 'Other';
   };
 
   // Replace renderPrintSchedule with resource-aware expansion while keeping existing visual style.
   window.renderPrintSchedule = function(){
     ps11PopulateResourceOptions();
-    if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions();
     var all = (typeof psTasks === 'function') ? psTasks() : [];
     var start = psProjectStart(all), end = psProjectEnd(all);
     var weeks = psWeeks(start,end);
     var groupMode = (document.getElementById('psGroup') && document.getElementById('psGroup').value) || 'section';
-    var selectedSystem = (document.getElementById('psSystem') && document.getElementById('psSystem').value) || '';
     var selectedResource = (document.getElementById('psResource') && document.getElementById('psResource').value) || '';
     var items = psFiltered(all,start,end).sort(function(a,b){
       return (a.start===b.start ? String(a.id).localeCompare(String(b.id),undefined,{numeric:true}) : a.start.localeCompare(b.start));
@@ -8782,7 +8240,7 @@ function rcExpandedBarRows(items,start,end){
     var meta = document.getElementById('psPrintMeta');
     if(meta){
       var label = groupMode === 'resource' && selectedResource ? 'Resource schedule: '+selectedResource : 'Resource: '+(selectedResource || 'All');
-      meta.textContent = 'Project range: '+psFmt(start)+' to '+psFmt(end)+' · '+weeks.length+' weeks · '+items.length+' scheduled tasks · Group: '+groupMode+' · System: '+(selectedSystem || 'All')+' · '+label+' · Generated '+new Date().toLocaleDateString();
+      meta.textContent = 'Project range: '+psFmt(start)+' to '+psFmt(end)+' · '+weeks.length+' weeks · '+items.length+' scheduled tasks · Group: '+groupMode+' · '+label+' · Generated '+new Date().toLocaleDateString();
     }
     if(!items.length){ chart.innerHTML='<div class="ps-empty">No scheduled tasks found for the selected filters.</div>'; return; }
     var header = '<div class="ps-week-row"><div class="ps-left-head">Task / Activity</div>' + weeks.map(function(w){ return '<div class="ps-week-cell"><b>'+psEsc(w.label)+'</b><span>'+psEsc(psFmt(w.start))+'–'+psEsc(psFmt(w.end))+'</span></div>'; }).join('') + '</div>';
@@ -8851,22 +8309,14 @@ function downloadDailyHuddleSummary(){
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const lines = [];
   const textOf = function(id){ return (document.getElementById(id)?.innerText || '').trim(); };
-  const cardLines = function(childId){
-    const child = document.getElementById(childId);
-    const card = child ? child.closest('.progress-kpi') : null;
-    if(!card) return '';
-    return Array.from(card.querySelectorAll('.kpi-line,.progress-row')).map(function(row){
-      return String(row.innerText || '').replace(/\s+/g,' ').trim();
-    }).filter(Boolean).join(' | ');
-  };
   lines.push('2026 Shutdown Daily Huddle - ' + todayIso);
   lines.push('Generated: ' + new Date().toLocaleString());
   lines.push('');
-  lines.push('Overall Progress (Tasks + Work Orders): ' + textOf('d-progress-count') + ' (' + textOf('d-progress-pct') + ')');
-  lines.push("Today's Work: " + cardLines('d-today-due'));
-  lines.push('Schedule Risk: ' + cardLines('d-risk-late'));
-  lines.push('Systems Status: ' + cardLines('d-systems-normal'));
-  lines.push(textOf('d-operational-detail-label') + ': ' + cardLines('d-progress-system'));
+  lines.push('Overall Complete: ' + textOf('d-progress-pct'));
+  lines.push('In Progress: ' + textOf('d-progress-inprogress'));
+  lines.push('Pending: ' + textOf('d-progress-pending'));
+  lines.push('Delayed: ' + textOf('d-progress-delayed'));
+  lines.push('Lookahead: ' + textOf('d-progress-lookahead-count'));
   lines.push('');
   lines.push('Systems / Utilities Status');
   const sys = document.getElementById('d-system-status');
@@ -8902,7 +8352,7 @@ function handleDailyHuddleUrlParams(){
 }
 
   document.addEventListener('DOMContentLoaded', function(){
-    setTimeout(function(){ ps11PopulateResourceOptions(); if(typeof psPopulateSystemOptions === 'function') psPopulateSystemOptions(); }, 100);
+    setTimeout(function(){ ps11PopulateResourceOptions(); }, 100);
     setTimeout(function(){ handleDailyHuddleUrlParams(); }, 250);
   });
 })();
@@ -8995,8 +8445,6 @@ function handleDailyHuddleUrlParams(){
       var s=String(status||'').trim();
       var bg='#6b7280', fg='#ffffff';
       if(/OOS/i.test(s)){ bg='#7a1a1a'; }
-      else if(/Suspending|Blue scrub/i.test(s)){ bg='#8a5a08'; fg='#fff0bd'; }
-      else if(/^Full Gowning$/i.test(s)){ bg='#1f6b42'; fg='#d7ffe5'; }
       else if(/FULL/i.test(s)){ bg='#174a7a'; }
       else if(/COND/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
       else if(/In Progress/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
@@ -9013,7 +8461,7 @@ function handleDailyHuddleUrlParams(){
       return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
         '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
         '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
-        '<div style="font-size:11px;margin-top:6px;color:'+subc+';line-height:1.25;">'+esc(sub||'')+'</div>'+ '</td>';
+        '<div style="font-size:11px;margin-top:6px;color:'+subc+';white-space:nowrap;">'+esc(sub||'')+'</div>'+ '</td>';
     }
     function panel(title, innerHtml){
       return '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#ffffff;border:1px solid #d9e2ec;">'+
@@ -9043,66 +8491,13 @@ function handleDailyHuddleUrlParams(){
         return '<tr><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;font-size:12px;color:#222;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+esc(r[0]||'')+'</td><td style="padding:7px 10px;border-bottom:1px solid #edf2f7;text-align:right;">'+statusBadge(r[1]||'')+'</td></tr>';
       }).join('')+'</table>';
     }
-    function kpiLinesFromChild(childId){
-      var child=document.getElementById(childId);
-      var el=child ? child.closest('.progress-kpi') : null;
-      if(!el) return '';
-      return Array.from(el.querySelectorAll('.kpi-line')).map(function(line){
-        return String(line.innerText||'').replace(/\s+/g,' ').trim();
-      }).filter(Boolean).join(' | ');
-    }
-    function progressRows(id){
-      var el=document.getElementById(id);
-      if(!el) return '';
-      return Array.from(el.querySelectorAll('.progress-row')).map(function(row){
-        return String(row.innerText||'').replace(/\s+/g,' ').trim();
-      }).filter(Boolean).join(' | ');
-    }
-    function operationalDetailCard(id){
-      var el=document.getElementById(id);
-      var rows=el ? Array.from(el.querySelectorAll('.progress-row')).map(function(row){
-        var name=(row.querySelector('.progress-row-name')||{}).innerText||'';
-        var pct=(row.querySelector('.progress-row-pct')||{}).innerText||'0%';
-        var meta=(row.querySelector('.progress-row-meta')||{}).innerText||'';
-        var fill=row.querySelector('.progress-mini-fill');
-        var width=fill ? (fill.style.width || '0%') : pct;
-        return {
-          name:String(name).replace(/\s+/g,' ').trim(),
-          pct:String(pct).replace(/\s+/g,' ').trim(),
-          meta:String(meta).replace(/\s+/g,' ').trim(),
-          width:String(width||'0%')
-        };
-      }).filter(function(r){ return r.name; }) : [];
-      var body=rows.map(function(r){
-        return '<tr>'+
-          '<td style="padding:2px 0;color:#ffffff;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(r.name)+'</td>'+
-          '<td style="padding:2px 4px;color:#f0c040;font-size:10px;font-weight:bold;text-align:right;white-space:nowrap;">'+esc(r.pct)+'</td>'+
-          '<td style="padding:2px 0;width:72px;">'+
-            '<div style="height:6px;background:#486783;border-radius:999px;overflow:hidden;">'+
-              '<div style="height:6px;width:'+esc(r.width)+';background:#4f9be8;border-radius:999px;"></div>'+
-            '</div>'+
-          '</td>'+
-          '<td style="padding:2px 0 2px 5px;color:#d8e8f8;font-size:9px;text-align:right;white-space:nowrap;">'+esc(r.meta)+'</td>'+
-        '</tr>';
-      }).join('');
-      if(!body){
-        body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
-      }
-      var detailLabel=(document.getElementById('d-operational-detail-label')||{}).innerText || 'Operational Detail';
-      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
-        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">'+esc(detailLabel)+'</div>'+
-        '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
-      '</td>';
-    }
 
-    var overall=safe('d-progress-count','—');
-    var overallSub=safe('d-progress-pct','—');
-    var todayDue=safe('d-today-due','0');
-    var todayCard=kpiLinesFromChild('d-today-due');
-    var riskLate=safe('d-risk-late','0');
-    var riskCard=kpiLinesFromChild('d-risk-late');
-    var systemsOos=safe('d-systems-oos','0');
-    var systemsCard=kpiLinesFromChild('d-systems-normal');
+    var overall=safe('d-progress-pct','0%');
+    var done=safe('d-progress-done','');
+    var inProgress=safe('d-progress-inprogress','0');
+    var pending=safe('d-progress-pending','0');
+    var delayed=safe('d-progress-delayed','0');
+    var lookahead=safe('d-progress-lookahead-count','0');
 
     var systemRows=[];
     var sysEl=document.getElementById('d-system-status');
@@ -9143,11 +8538,11 @@ function handleDailyHuddleUrlParams(){
       '</td></tr>'+ 
       '<tr><td style="padding:12px 0 0 0;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      kpiCard('Overall Progress (Tasks + Work Orders)', overall, overallSub, true)+
-      kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
-      kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
-      kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
-      operationalDetailCard('d-progress-system')+
+      kpiCard('Overall Complete', overall, done, true)+
+      kpiCard('In Progress', inProgress, 'Active tasks', false)+
+      kpiCard('Pending', pending, 'Not started', false)+
+      kpiCard('Delayed', delayed, 'Needs attention', false)+
+      kpiCard('Lookahead', lookahead, 'Next 14 days', false)+
       '</tr></table></td></tr>'+ 
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
@@ -9228,7 +8623,7 @@ function handleDailyHuddleUrlParams(){
   body.huddle-print-mode .huddle-top-layout,
   body.huddle-print-mode .huddle-middle-layout,
   body.huddle-print-mode .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important;margin-bottom:10px!important;}
-  body.huddle-print-mode .progress-kpis{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:8px!important;}
+  body.huddle-print-mode .progress-kpis{display:grid!important;grid-template-columns:1.4fr repeat(4,.85fr)!important;gap:8px!important;}
   body.huddle-print-mode .progress-grid{display:none!important;}
   body.huddle-print-mode .dash{overflow:visible!important;height:auto!important;}
 }`;
@@ -9323,28 +8718,5 @@ function handleDailyHuddleUrlParams(){
   });
 })();
 </script>
-
-<style id="psPrintModeFinalFix">
-@media print{
-  body.ps-print-mode{background:#fff!important;color:#111!important;height:auto!important;overflow:visible!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-  body.ps-print-mode *{visibility:hidden!important}
-  body.ps-print-mode #page-printschedule,
-  body.ps-print-mode #page-printschedule *{visibility:visible!important}
-  body.ps-print-mode #sticky-top,
-  body.ps-print-mode header,
-  body.ps-print-mode .tab-nav,
-  body.ps-print-mode .no-print,
-  body.ps-print-mode .page:not(#page-printschedule){display:none!important;visibility:hidden!important}
-  body.ps-print-mode #page-printschedule{display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;min-height:0!important;overflow:visible!important;background:#fff!important}
-  body.ps-print-mode .ps-page{display:block!important;padding:0!important;background:#fff!important;overflow:visible!important}
-  body.ps-print-mode .ps-print-area{display:block!important;border:none!important;border-radius:0!important;overflow:visible!important;padding:0!important;background:#fff!important}
-  body.ps-print-mode .ps-chart{min-width:0!important;width:100%!important}
-  body.ps-print-mode .ps-week-row,
-  body.ps-print-mode .ps-task-row,
-  body.ps-print-mode .ps-group-row{display:grid!important;grid-template-columns:235px repeat(var(--ps-weeks), minmax(68px,1fr))!important}
-  body.ps-print-mode .ps-left-head,
-  body.ps-print-mode .ps-task-label{position:static!important;left:auto!important}
-}
-</style>
 
 </body></html>
