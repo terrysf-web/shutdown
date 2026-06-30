@@ -816,7 +816,8 @@ select.msf option:checked{background:#ddeeff}
       <button class="btn secondary" onclick="collapseAll()">Collapse All</button>
       <button class="btn secondary" id="editToggleBtn" onclick="toggleEditMode()">Edit Mode: Off</button>
       <button class="btn" id="saveBtn" onclick="saveAll()" disabled="">Save</button>
-    <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
+      <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
+      <span id="firebaseSyncStatus" class="firebase-sync-status off" title="Hosted site only">Firebase: connecting</span>
     </div>
   </div>
   <div class="advanced-filters" id="advancedFilters">
