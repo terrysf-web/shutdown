@@ -8865,8 +8865,11 @@ function handleDailyHuddleUrlParams(){
     }, 250);
     return false;
   };
+  var dailyHuddleEmailSaveInProgress=false;
   window.downloadDailyHuddleSummary=async function(ev){
     if(ev && ev.preventDefault) ev.preventDefault();
+    if(dailyHuddleEmailSaveInProgress) return false;
+    dailyHuddleEmailSaveInProgress=true;
     window.ensureDailyHuddleView();
     var today=isoToday();
     var generated=new Date().toLocaleString();
@@ -9039,57 +9042,59 @@ function handleDailyHuddleUrlParams(){
       return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
     }
     function emailTimelinePanel(){
-      var rows=(typeof tasks!=='undefined'?tasks:[]).filter(function(t){
-        return !t.isParent && (downMap[t.id]!=null || startupMap[t.id]!=null);
-      }).map(function(t){
-        var parentId=String(t.id).split('.')[0];
-        var parent=(typeof tasks!=='undefined'?tasks:[]).find(function(p){ return p.isParent && String(p.id)===parentId; });
-        return [String(t.id), parent ? parent.task : (t.section||'System'), t.task||'', emailDate(downMap[t.id]), emailDate(startupMap[t.id])];
-      }).sort(function(a,b){ return a[0].localeCompare(b[0], undefined, {numeric:true}); });
-      if(!rows.length) return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
-      var body=rows.map(function(r){
-        var hasDown=!!r[3], hasUp=!!r[4];
-        var label=(hasDown?'▼ '+r[3]:'')+(hasDown&&hasUp?' → ':'')+(hasUp?'▲ '+r[4]:'');
-        return '<tr>'+
-          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#1a3a5c;font-weight:bold;white-space:nowrap;">'+esc(r[0])+'</td>'+
-          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#222;white-space:nowrap;">'+esc(r[1])+'</td>'+
-          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#222;">'+esc(r[2])+'</td>'+
-          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#e65100;font-weight:bold;white-space:nowrap;">'+esc(label)+'</td>'+
-        '</tr>';
-      }).join('');
-      return panel('System Down / Start-Up Timeline', '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:auto;">'+
-        '<tr><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">Task</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">System</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;">Item</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">Down / Start-Up</th></tr>'+body+'</table>');
+      try{ if(typeof initTimelineFilter==='function') initTimelineFilter(); }catch(e){}
+      try{ if(typeof renderTimeline==='function') renderTimeline(); }catch(e){}
+      var headerEl=document.getElementById('tl-header-sticky');
+      var bodyEl=document.getElementById('tl-container');
+      var headerSvg=headerEl ? (headerEl.innerHTML||'') : '';
+      var bodySvg=bodyEl ? (bodyEl.innerHTML||'') : '';
+      if(!headerSvg && !bodySvg){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      return panel('System Down / Start-Up Timeline',
+        '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;">'+
+          '<div style="min-width:900px;">'+headerSvg+bodySvg+'</div>'+
+        '</div>');
     }
     async function saveEmailBodyToSharePointOrDownload(blob, filename){
       var key='sd26_sharepoint_email_body_url_v1';
+      var folderLink='https://revancetherapeuticsinc.sharepoint.com/:f:/r/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown?csf=1&web=1&e=bgvyre';
+      var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+      function normalizeSharePointUrl(url){
+        url=String(url||'').trim();
+        if(!url) return '';
+        if(url.indexOf(':f:/r/')>=0){
+          var clean=url.split('?')[0].replace('/:f:/r','');
+          return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+        }
+        if(/\/$/.test(url) || !/\.html?(\?|$)/i.test(url)) return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+        return url;
+      }
       var url='';
       try{ url=localStorage.getItem(key)||''; }catch(e){}
-      if(!url && /sharepoint\.com|onedrive\.live\.com/i.test(location.hostname)){
-        url=filename;
-      }
-      if(!url){
-        url=prompt('SharePoint file URL to overwrite for Email Body Dashboard. Leave blank to download locally.', filename)||'';
-        if(url){ try{ localStorage.setItem(key,url); }catch(e){} }
-      }
-      if(url){
-        try{
-          var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', headers:{'Content-Type':'text/html;charset=utf-8'}});
-          if(res.ok || res.status===201 || res.status===204){ setExportStatus('Email Body Dashboard saved to SharePoint'); setTimeout(function(){setExportStatus('');}, 2600); return true; }
-          throw new Error('SharePoint save failed: HTTP '+res.status);
-        }catch(e){
-          console.warn(e);
-          alert('Could not save directly to SharePoint. The file will download locally instead. If needed, open the Dashboard from SharePoint and use a same-folder file URL.');
+      url=normalizeSharePointUrl(url || defaultFileUrl || folderLink);
+      try{ localStorage.setItem(key,url); }catch(e){}
+      try{
+        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'text/html;charset=utf-8'}});
+        if(res.ok || res.status===200 || res.status===201 || res.status===204){
+          setExportStatus('Email Body Dashboard saved to SharePoint');
+          setTimeout(function(){setExportStatus('');}, 2600);
+          return true;
         }
+        throw new Error('SharePoint save failed: HTTP '+res.status);
+      }catch(e){
+        console.warn(e);
+        setExportStatus('SharePoint save blocked; downloading local copy');
       }
       var dlUrl=URL.createObjectURL(blob);
       var a=document.createElement('a');
       a.href=dlUrl; a.download=filename; a.style.display='none';
       document.body.appendChild(a); a.click();
       setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
-      setExportStatus('Email Body Dashboard downloaded');
-      setTimeout(function(){setExportStatus('');}, 2200);
+      setTimeout(function(){setExportStatus('');}, 2600);
       return false;
     }
+
 
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Shutdown Daily Huddle</title></head>'+ 
       '<body style="margin:0;padding:0;background:#eef2f6;font-family:Arial,Helvetica,sans-serif;color:#222;text-align:left;">'+
@@ -9097,7 +9102,7 @@ function handleDailyHuddleUrlParams(){
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#0d2137;text-align:left;">'+
       '<tr><td style="background:#1a3a5c;border-bottom:4px solid #f0c040;padding:14px 16px;color:#fff;text-align:left;">'+
       '<div style="font-size:21px;font-weight:bold;letter-spacing:.10em;text-transform:uppercase;white-space:nowrap;">2026 Shutdown Daily Huddle</div>'+ 
-      '<div style="font-size:12px;color:#cde;margin-top:5px;">Date: '+esc(today)+' &nbsp;|&nbsp; Generated: '+esc(generated)+'</div>'+ 
+      '<div style="font-size:12px;color:#cde;margin-top:5px;">Date: '+esc(today)+' &nbsp;|&nbsp; Generated: '+esc(generated)+'</div>'+
       '</td></tr>'+ 
       '<tr><td style="padding:12px 0 0 0;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
@@ -9126,6 +9131,8 @@ function handleDailyHuddleUrlParams(){
       var w=window.open('', '_blank');
       if(w){ w.document.open(); w.document.write(html); w.document.close(); w.document.title=filename; }
       else alert('Could not save or download email body dashboard.');
+    }finally{
+      dailyHuddleEmailSaveInProgress=false;
     }
     return false;
   };
