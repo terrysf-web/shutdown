@@ -8896,9 +8896,12 @@ function handleDailyHuddleUrlParams(){
     return false;
   };
   var dailyHuddleEmailSaveInProgress=false;
+  var dailyHuddleEmailLastSaveAt=0;
   window.downloadDailyHuddleSummary=async function(ev){
     if(ev && ev.preventDefault) ev.preventDefault();
-    if(dailyHuddleEmailSaveInProgress) return false;
+    var now=Date.now();
+    if(dailyHuddleEmailSaveInProgress || (now-dailyHuddleEmailLastSaveAt)<3500) return false;
+    dailyHuddleEmailLastSaveAt=now;
     dailyHuddleEmailSaveInProgress=true;
     window.ensureDailyHuddleView();
     var today=isoToday();
@@ -9072,19 +9075,66 @@ function handleDailyHuddleUrlParams(){
       return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
     }
     function emailTimelinePanel(){
-      try{ if(typeof initTimelineFilter==='function') initTimelineFilter(); }catch(e){}
-      try{ if(typeof renderTimeline==='function') renderTimeline(); }catch(e){}
-      var headerEl=document.getElementById('tl-header-sticky');
-      var bodyEl=document.getElementById('tl-container');
-      var headerSvg=headerEl ? (headerEl.innerHTML||'') : '';
-      var bodySvg=bodyEl ? (bodyEl.innerHTML||'') : '';
-      if(!headerSvg && !bodySvg){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
         return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
       }
-      return panel('System Down / Start-Up Timeline',
-        '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;">'+
-          '<div style="min-width:900px;">'+headerSvg+bodySvg+'</div>'+
-        '</div>');
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        dArr.map(function(d){ var dow=d.getDay(); var isToday=d.getTime()===todayD.getTime(); return '<td style="width:26px;background:'+(isToday?'#ff5722':(dow===0||dow===6?'#203a55':'#142d47'))+';color:#fff;text-align:center;font-size:9px;font-weight:bold;padding:4px 0;border-left:1px solid #24425f;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        var cells=[];
+        for(var i=0;i<dArr.length;i++){
+          var cur=dArr[i], bg=(cur.getDay()===0||cur.getDay()===6)?'#10243a':'#0f2236', content='&nbsp;';
+          var isToday=cur.getTime()===todayD.getTime();
+          if(isToday) bg='#3a2a22';
+          var inRange=false, isDown=false, isUp=false;
+          if(r.downD&&r.upD){
+            var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+            inRange=cur>=first && cur<=last;
+            isDown=cur.getTime()===r.downD.getTime(); isUp=cur.getTime()===r.upD.getTime();
+          }else if(r.downD){ isDown=cur.getTime()===r.downD.getTime(); }
+          else if(r.upD){ isUp=cur.getTime()===r.upD.getTime(); }
+          if(inRange) bg=cur<todayD?lc:sc;
+          if(isDown) content='<span style="color:#ffffff;font-size:10px;font-weight:bold;">▼</span>';
+          if(isUp) content='<span style="color:#ffffff;font-size:10px;font-weight:bold;">▲</span>';
+          cells.push('<td style="width:26px;height:24px;background:'+bg+';text-align:center;border-left:1px solid #24425f;border-bottom:1px solid #203a55;font-size:9px;line-height:24px;">'+content+'</td>');
+        }
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+cells.join('')+'</tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Past dates use lighter section color; current/future uses full section color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:auto;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
     }
     async function saveEmailBodyToSharePointOrDownload(blob, filename){
       var key='sd26_sharepoint_email_body_url_v1';
@@ -9168,6 +9218,8 @@ function handleDailyHuddleUrlParams(){
   };
 
   window.handleDailyHuddleUrlParams=function(){
+    if(window.__dailyHuddleUrlParamsHandled) return;
+    window.__dailyHuddleUrlParamsHandled=true;
     try{
       var params=new URLSearchParams(window.location.search||'');
       var view=String(params.get('view')||'').toLowerCase();
@@ -9291,6 +9343,8 @@ function handleDailyHuddleUrlParams(){
     return false;
   };
   window.handleDailyHuddleUrlParams=function(){
+    if(window.__dailyHuddleUrlParamsHandled) return;
+    window.__dailyHuddleUrlParamsHandled=true;
     try{
       var params=new URLSearchParams(window.location.search||'');
       var view=String(params.get('view')||'').toLowerCase();
