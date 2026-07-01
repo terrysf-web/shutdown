@@ -6715,15 +6715,16 @@ function renderTimeline(){
       svg+=`<text x="${todayCutX}" y="12" fill="#fff" font-size="8" font-weight="800" text-anchor="middle">TODAY</text>`;
     }
     function timelinePastOpacity(d){ return d && d < tod ? 0.45 : 0.94; }
-    function appendTimelineRangeBar(x,y,w,h){
-      svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#f6a36a" opacity="0.45"/>`;
+    function appendTimelineRangeBar(x,y,w,h,color){
+      const barColor=color||'#e65100';
+      svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.35"/>`;
       if(todayCutX==null){
-        if(tod<rS) svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#e65100" opacity="0.94"/>`;
+        if(tod<rS) svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
       }else if(todayCutX<=x){
-        svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="#e65100" opacity="0.94"/>`;
+        svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
       }else if(todayCutX<x+w){
         const futureX=todayCutX, futureW=x+w-todayCutX;
-        svg+=`<rect x="${futureX}" y="${y}" width="${futureW}" height="${h}" rx="3" fill="#e65100" opacity="0.94"/>`;
+        svg+=`<rect x="${futureX}" y="${y}" width="${futureW}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
       }
       svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
     }
@@ -6757,7 +6758,7 @@ function renderTimeline(){
           const bw=Math.max(ex-bx,DW);
           appendConnector(bx-6);
           svg+=`<rect x="${bx+1}" y="${barY+1}" width="${bw}" height="${BAR_H}" rx="3" fill="rgba(0,0,0,0.25)"/>`;
-          appendTimelineRangeBar(bx, barY, bw, BAR_H);
+          appendTimelineRangeBar(bx, barY, bw, BAR_H, sc);
           svg+=`<text x="${bx+5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800">▼ ${md(r.downD)}</text>`;
           if(bw>70) svg+=`<text x="${bx+bw-5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800" text-anchor="end">▲ ${md(r.upD)}</text>`;
         }else if(r.downD){
