@@ -6579,79 +6579,62 @@ function renderTimeline(){
     function md(d){ const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
 
     const allT=typeof tasks!=='undefined'?tasks:[];
-    const sMap=typeof statusMap!=='undefined'?statusMap:{};
+    const selected=allT.filter(t=>!t.isParent&&(!filterSec||t.section===filterSec)&&(downMap[t.id]!=null||startupMap[t.id]!=null))
+      .map(t=>{
+        const parentId=String(t.id).split('.')[0];
+        const parent=allT.find(p=>p.isParent&&String(p.id)===parentId);
+        const downD=downMap[t.id]!=null ? xl(downMap[t.id]) : null;
+        const upD=startupMap[t.id]!=null ? xl(startupMap[t.id]) : null;
+        return {task:t,parent,parentId,downD,upD};
+      })
+      .filter(r=>r.downD||r.upD)
+      .sort((a,b)=>{
+        const pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        const da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
 
-    const parents=allT.filter(t=>t.isParent&&xl(t.start)&&xl(t.end)&&(!filterSec||t.section===filterSec))
-      .sort((a,b)=>Number(a.id)-Number(b.id));
-    if(!parents.length){ container.innerHTML='<p style="color:#cde;padding:20px">데이터 없음</p>'; return; }
-
-    // ── Build per-parent child item lists (checked ▼/▲) ─────────────────────
-    function getChildItems(parentId){
-      return allT.filter(t=>!t.isParent&&String(t.id).startsWith(parentId+'.')&&
-        (downMap[t.id]!=null||startupMap[t.id]!=null));
+    if(!selected.length){
+      const stickyEl=document.getElementById('tl-header-sticky');
+      if(stickyEl) stickyEl.innerHTML='';
+      container.innerHTML='<p style="color:#cde;padding:20px">Mark Down / Start-Up에서 선택된 항목이 없습니다.</p>';
+      return;
     }
 
-    // Fixed sub-bar label per parent system
-    const FIXED_SUB_LABELS = {
-      '1':'PW','2':'WFI/CSTG','3':'PMES','4':'PLANT STEAM',
-      '5':'HVAC','6':'CDA','7':'N2','8':'GENERATOR','9':'VACUUM',
-      '10':'DP MFG  (13.01.01/13.01.03)','11':'DS MFG  (13.02.01/13.02.03)',
-      '12':'QC','13':'AREA RELEASE'
-    };
-
-    // ── Timeline range: use max of all task.end AND all Up dates ─────────────
     let minD=null, maxD=null;
-    parents.forEach(t=>{
-      const s=xl(t.start), e=xl(t.end);
-      if(s&&(!minD||s<minD)) minD=new Date(s);
-      if(e&&(!maxD||e>maxD)) maxD=new Date(e);
-      // Also check Up dates of children
-      getChildItems(t.id).forEach(child=>{
-        const upD = startupMap[child.id] ? xl(startupMap[child.id]) : null;
-        if(upD&&(!maxD||upD>maxD)) maxD=new Date(upD);
+    selected.forEach(r=>{
+      [r.downD,r.upD].forEach(d=>{
+        if(!d) return;
+        if(!minD||d<minD) minD=new Date(d);
+        if(!maxD||d>maxD) maxD=new Date(d);
       });
     });
-    const rS=new Date(minD); rS.setDate(rS.getDate()-1);
+    const rS=new Date(minD); rS.setDate(rS.getDate()-3);
     const rE=new Date(maxD); rE.setDate(rE.getDate()+3);
 
     // ── Layout constants ─────────────────────────────────────────────────────
     const DW=26, LW=230, MH=24, DH=22, HDR=MH+DH, PAD=8;
-    const MAIN_H=26, SUB_H=18, SUB_GAP=4, LBL_H=14;
-    const days=Math.ceil((rE-rS)/86400000);
+    const ROW_H=32, GROUP_GAP=8, BAR_H=18;
+    const days=Math.ceil((rE-rS)/86400000)+1;
     const TW=LW+days*DW;
-
     function off(d){ return Math.floor((d-rS)/86400000); }
-
     const secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
-    function bc(t){
-      const kids=allT.filter(c=>!c.isParent&&String(c.id).startsWith(t.id+'.'));
-      if(!kids.length) return secC[t.section]||'#1565c0';
-      const sts=kids.map(c=>sMap[c.id]||'Pending');
-      if(sts.every(s=>s==='Complete')) return '#2e7d32';
-      if(sts.some(s=>s==='Delayed')) return '#c62828';
-      if(sts.some(s=>s==='In Progress')) return '#f57f17';
-      return secC[t.section]||'#1565c0';
-    }
 
-    // ── Pre-calculate row heights ─────────────────────────────────────────────
-    // Each parent row: MAIN_H + (N sub-items * (SUB_H + SUB_GAP)) + padding
-    const rowHeights = parents.map(t=>{
-      const items = getChildItems(t.id);
-      let nSubs = 0;
-      if(items.length > 0){
-        if(t.id==='10')      nSubs = 5;
-        else if(t.id==='11') nSubs = allT.filter(k=>!k.isParent&&String(k.id).startsWith('11.')).length;
-        else if(t.id==='13') nSubs = 2;
-        else                 nSubs = 1;
+    const grouped=[];
+    selected.forEach(r=>{
+      let g=grouped[grouped.length-1];
+      if(!g||g.parentId!==r.parentId){
+        g={parentId:r.parentId,parent:r.parent,section:r.task.section,items:[]};
+        grouped.push(g);
       }
-      return PAD + MAIN_H + (nSubs > 0 ? nSubs*(SUB_H+SUB_GAP)+PAD : 0) + PAD;
+      g.items.push(r);
     });
-    const rowYs = [];
-    let curY = HDR+PAD;
-    parents.forEach((t,i)=>{ rowYs.push(curY); curY+=rowHeights[i]; });
-    const SH = curY + PAD;
 
-    // ── Dates array & month groups ────────────────────────────────────────────
+    let bodyH=PAD;
+    grouped.forEach(g=>{ bodyH += g.items.length*ROW_H + GROUP_GAP; });
+    bodyH += PAD;
+
     const dArr=[];
     for(let d=new Date(rS);d<=rE;d.setDate(d.getDate()+1)) dArr.push(new Date(d));
     const months={};
@@ -6661,7 +6644,6 @@ function renderTimeline(){
       months[k].count++;
     });
 
-    // ── Build SVG header (separate for sticky) ────────────────────────────────
     let hdr=`<svg width="${TW}" height="${HDR}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;display:block">`;
     hdr+=`<rect width="${TW}" height="${HDR}" fill="#0f2236"/>`;
     hdr+=`<rect x="0" y="0" width="${TW}" height="${MH}" fill="#1a3a5c"/>`;
@@ -6679,25 +6661,15 @@ function renderTimeline(){
     hdr+=`<rect x="${LW}" y="0" width="2" height="${HDR}" fill="rgba(255,255,255,0.2)"/>`;
     hdr+=`</svg>`;
 
-    // ── Build SVG body (rows only, no header) ─────────────────────────────────
-    const bodyH = SH - HDR;
     let svg=`<svg width="${TW}" height="${bodyH}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;display:block">`;
     svg+=`<rect width="${TW}" height="${bodyH}" fill="#0f2236"/>`;
 
-    // Alternating row bg
-    parents.forEach((t,i)=>{
-      const y=rowYs[i]-HDR-PAD;
-      svg+=`<rect x="0" y="${y}" width="${TW}" height="${rowHeights[i]}" fill="${i%2===0?'rgba(255,255,255,0.02)':'rgba(255,255,255,0.06)'}"/>`;
-    });
-
-    // Weekend columns & day lines
     dArr.forEach((d,i)=>{
       const x=LW+i*DW, dow=d.getDay();
       if(dow===0||dow===6) svg+=`<rect x="${x}" y="0" width="${DW}" height="${bodyH}" fill="rgba(0,0,0,0.15)"/>`;
       svg+=`<line x1="${x}" y1="0" x2="${x}" y2="${bodyH}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
     });
 
-    // TODAY line
     const tod=new Date(); tod.setHours(0,0,0,0);
     if(tod>=rS&&tod<=rE){
       const tx=LW+off(tod)*DW+DW/2;
@@ -6706,133 +6678,50 @@ function renderTimeline(){
       svg+=`<text x="${tx}" y="12" fill="#fff" font-size="8" font-weight="800" text-anchor="middle">TODAY</text>`;
     }
 
-    // ── Draw each parent row ──────────────────────────────────────────────────
-    parents.forEach((t,i)=>{
-      try{
-        const rowY = rowYs[i] - HDR - PAD;
-        const rowH = rowHeights[i];
-        const sd=xl(t.start), ed=xl(t.end);
-        if(!sd||!ed) return;
-        const color=bc(t), sc=secC[t.section]||'#1565c0';
+    let y=PAD;
+    grouped.forEach((g,gi)=>{
+      const groupH=g.items.length*ROW_H;
+      const sc=secC[g.section]||'#1565c0';
+      svg+=`<rect x="0" y="${y-2}" width="${TW}" height="${groupH+4}" fill="${gi%2===0?'rgba(255,255,255,0.02)':'rgba(255,255,255,0.06)'}"/>`;
+      svg+=`<rect x="0" y="${y-2}" width="5" height="${groupH+4}" fill="${sc}"/>`;
+      g.items.forEach((r,idx)=>{
+        const rowY=y+idx*ROW_H;
+        const taskLabel=(r.task.task||'').length>24?(r.task.task||'').slice(0,22)+'…':(r.task.task||'');
+        const parentLabel=r.parent ? ((r.parent.task||'').length>20?(r.parent.task||'').slice(0,18)+'…':r.parent.task) : (r.task.section||'System');
+        svg+=`<text x="12" y="${rowY+13}" fill="#fff" font-size="10" font-weight="800">${esc(r.task.id)}</text>`;
+        svg+=`<text x="58" y="${rowY+13}" fill="#f0c040" font-size="10" font-weight="700">${esc(parentLabel)}</text>`;
+        svg+=`<text x="58" y="${rowY+27}" fill="#fff" font-size="10" font-weight="600">${esc(taskLabel)}</text>`;
 
-        // ── Main bar: start = task.start, end = max(task.end, all Up dates) ──
-        const childItems = getChildItems(t.id);
-        let mainEnd = new Date(ed);
-        childItems.forEach(child=>{
-          const upD=startupMap[child.id]?xl(startupMap[child.id]):null;
-          if(upD&&upD>mainEnd) mainEnd=new Date(upD);
-        });
-
-        const mainBx = LW+off(sd)*DW;
-        const mainEx = LW+(off(mainEnd)+1)*DW;
-        const mainBw = Math.max(mainEx-mainBx, DW*2);
-        const mainY  = rowY + PAD;
-
-        // Label panel
-        svg+=`<rect x="0" y="${rowY}" width="${LW}" height="${rowH}" fill="rgba(0,0,0,0.3)"/>`;
-        svg+=`<rect x="0" y="${rowY}" width="5" height="${rowH}" fill="${sc}"/>`;
-        svg+=`<rect x="8" y="${rowY+PAD+4}" width="24" height="16" rx="3" fill="${sc}" opacity="0.85"/>`;
-        svg+=`<text x="20" y="${rowY+PAD+15}" fill="#fff" font-size="9" font-weight="800" text-anchor="middle">${t.id}.0</text>`;
-        const lbl=t.task.length>26?t.task.slice(0,24)+'…':t.task;
-        svg+=`<text x="38" y="${rowY+PAD+15}" fill="#fff" font-size="11" font-weight="600">${lbl}</text>`;
-
-        // Main bar
-        svg+=`<rect x="${mainBx+1}" y="${mainY+1}" width="${mainBw}" height="${MAIN_H}" rx="4" fill="rgba(0,0,0,0.25)"/>`;
-        svg+=`<rect x="${mainBx}" y="${mainY}" width="${mainBw}" height="${MAIN_H}" rx="4" fill="${color}" opacity="0.9"/>`;
-        svg+=`<rect x="${mainBx}" y="${mainY}" width="${mainBw}" height="${MAIN_H*0.4}" rx="4" fill="rgba(255,255,255,0.15)"/>`;
-        svg+=`<text x="${mainBx+5}" y="${mainY+MAIN_H/2+4}" fill="#fff" font-size="9" font-weight="700">${md(sd)}</text>`;
-        if(mainBw>65) svg+=`<text x="${mainBx+mainBw-5}" y="${mainY+MAIN_H/2+4}" fill="#fff" font-size="9" font-weight="700" text-anchor="end">${md(mainEnd)}</text>`;
-
-        // ── Sub bars: custom grouping per system ──────────────────────────────────
-        if(childItems.length > 0){
-          // Build sub-bar group definitions for this parent
-          let subGroups = []; // [{label, downIds[], upIds[]}]
-
-          if(t.id === '10'){
-            subGroups = [
-              {label:'Smart Filler', downIds:['10.01'],  upIds:['10.02a']},
-              {label:'LYO',          downIds:['10.02b'], upIds:['10.02c']},
-              {label:'DP Oven',      downIds:['10.02d'], upIds:['10.02e']},
-              {label:'Vial Washer',  downIds:['10.02f'], upIds:['10.02h']},
-              {label:'DP CAL',       downIds:['10.02i'], upIds:['10.02j']},
-            ];
-          } else if(t.id === '11'){
-            const kids11 = allT.filter(k=>!k.isParent&&String(k.id).startsWith('11.'));
-            subGroups = kids11.map(k=>({label:k.task.length>22?k.task.slice(0,20)+'…':k.task, downIds:[k.id], upIds:[k.id]}));
-          } else if(t.id === '13'){
-            subGroups = [
-              {label:'DP MFG', downIds:['13.01.01'], upIds:['13.01.03']},
-              {label:'DS MFG', downIds:['13.02.01'], upIds:['13.02.03']},
-            ];
-          } else {
-            const lbl = FIXED_SUB_LABELS[t.id] || (t.task.length>16?t.task.slice(0,14)+'…':t.task);
-            subGroups = [{label:lbl, downIds:childItems.map(k=>k.id), upIds:childItems.map(k=>k.id)}];
-          }
-
-          // Helper: get earliest date from a list of task IDs (using downMap or task.start)
-          function getEarliestDate(ids, useDown){
-            let best=null;
-            ids.forEach(id=>{
-              const task=allT.find(k=>k.id===id); if(!task) return;
-              const d = useDown && downMap[id]!=null ? xl(downMap[id]) : xl(task.start);
-              if(d&&(!best||d<best)) best=d;
-            });
-            return best;
-          }
-          // Helper: get latest date from a list of task IDs (using startupMap or task.end)
-          function getLatestDate(ids, useUp){
-            let best=null;
-            ids.forEach(id=>{
-              const task=allT.find(k=>k.id===id); if(!task) return;
-              const d = useUp && startupMap[id]!=null ? xl(startupMap[id]) : xl(task.end);
-              if(d&&(!best||d>best)) best=d;
-            });
-            return best;
-          }
-
-          subGroups.forEach((grp, gi)=>{
-            // Get oStart: use downMap date if checked, else task.start of first downId
-            let oStart = null, oEnd = null;
-            // Check if any item in this group is checked
-            const anyChecked = [...grp.downIds,...grp.upIds].some(id=>downMap[id]!=null||startupMap[id]!=null);
-            if(!anyChecked) return; // only draw if at least one checked
-
-            // oStart = earliest Down-checked date, or earliest task.start
-            oStart = getEarliestDate(grp.downIds, true);
-            if(!oStart) oStart = getEarliestDate(grp.downIds, false);
-            // oEnd = latest Up-checked date, or latest task.end
-            oEnd = getLatestDate(grp.upIds, true);
-            if(!oEnd) oEnd = getLatestDate(grp.upIds, false);
-            if(!oStart || !oEnd) return;
-
-            const subY = rowY + PAD + MAIN_H + SUB_GAP + gi*(SUB_H+SUB_GAP);
-            const sbx = LW+off(oStart)*DW;
-            const sex = LW+(off(oEnd)+1)*DW;
-            const sbw = Math.max(sex-sbx, DW);
-
-            // Label in left panel
-            svg+=`<text x="38" y="${subY+SUB_H/2+4}" fill="rgba(255,210,100,0.92)" font-size="10" font-weight="700">${grp.label}</text>`;
-
-            // Orange bar
-            svg+=`<rect x="${sbx+1}" y="${subY+1}" width="${sbw}" height="${SUB_H}" rx="3" fill="rgba(0,0,0,0.25)"/>`;
-            svg+=`<rect x="${sbx}" y="${subY}" width="${sbw}" height="${SUB_H}" rx="3" fill="#e65100" opacity="0.92"/>`;
-            svg+=`<rect x="${sbx}" y="${subY}" width="${sbw}" height="${SUB_H*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
-            // Label + dates inside bar
-            svg+=`<text x="${sbx+5}" y="${subY+SUB_H/2+4}" fill="#fff" font-size="9" font-weight="800">${grp.label}  ${md(oStart)}</text>`;
-            if(sbw>90) svg+=`<text x="${sbx+sbw-5}" y="${subY+SUB_H/2+4}" fill="#fff" font-size="9" font-weight="800" text-anchor="end">${md(oEnd)}</text>`;
-          });
+        const barY=rowY+7;
+        if(r.downD&&r.upD){
+          const first=r.downD<=r.upD?r.downD:r.upD;
+          const last=r.downD<=r.upD?r.upD:r.downD;
+          const bx=LW+off(first)*DW;
+          const ex=LW+(off(last)+1)*DW;
+          const bw=Math.max(ex-bx,DW);
+          svg+=`<rect x="${bx+1}" y="${barY+1}" width="${bw}" height="${BAR_H}" rx="3" fill="rgba(0,0,0,0.25)"/>`;
+          svg+=`<rect x="${bx}" y="${barY}" width="${bw}" height="${BAR_H}" rx="3" fill="#e65100" opacity="0.94"/>`;
+          svg+=`<rect x="${bx}" y="${barY}" width="${bw}" height="${BAR_H*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
+          svg+=`<text x="${bx+5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800">▼ ${md(r.downD)}</text>`;
+          if(bw>70) svg+=`<text x="${bx+bw-5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800" text-anchor="end">▲ ${md(r.upD)}</text>`;
+        }else if(r.downD){
+          const x=LW+off(r.downD)*DW+DW/2;
+          svg+=`<polygon points="${x},${barY+BAR_H} ${x-6},${barY+4} ${x+6},${barY+4}" fill="#e53935"/>`;
+          svg+=`<text x="${x+9}" y="${barY+13}" fill="#fff" font-size="9" font-weight="800">Down ${md(r.downD)}</text>`;
+        }else if(r.upD){
+          const x=LW+off(r.upD)*DW+DW/2;
+          svg+=`<polygon points="${x},${barY+4} ${x-6},${barY+BAR_H} ${x+6},${barY+BAR_H}" fill="#43a047"/>`;
+          svg+=`<text x="${x+9}" y="${barY+13}" fill="#fff" font-size="9" font-weight="800">Start-Up ${md(r.upD)}</text>`;
         }
-
-        // Row separator
-        svg+=`<line x1="0" y1="${rowY+rowH}" x2="${TW}" y2="${rowY+rowH}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-      }catch(e){ console.warn('Row error:',t.task,e); }
+        svg+=`<line x1="0" y1="${rowY+ROW_H}" x2="${TW}" y2="${rowY+ROW_H}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+      });
+      y += groupH + GROUP_GAP;
     });
 
     svg+=`<rect x="${LW}" y="0" width="2" height="${bodyH}" fill="rgba(255,255,255,0.15)"/>`;
     svg+=`</svg>`;
 
-    // ── Render: sticky header (above) + scrollable body (below) ────────────────
-    const stickyEl = document.getElementById('tl-header-sticky');
+    const stickyEl=document.getElementById('tl-header-sticky');
     if(stickyEl){
       stickyEl.style.width='100%';
       stickyEl.innerHTML=hdr;
