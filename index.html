@@ -3794,7 +3794,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v9</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save an Outlook-ready dashboard HTML email body to SharePoint, with local download fallback">☁ Email Body Dashboard v10</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -8865,7 +8865,7 @@ function handleDailyHuddleUrlParams(){
     }, 250);
     return false;
   };
-  window.downloadDailyHuddleSummary=function(ev){
+  window.downloadDailyHuddleSummary=async function(ev){
     if(ev && ev.preventDefault) ev.preventDefault();
     window.ensureDailyHuddleView();
     var today=isoToday();
@@ -8907,8 +8907,8 @@ function handleDailyHuddleUrlParams(){
       var fg=primary?'#ffffff':'#1a3a5c';
       var val=primary?'#f0c040':'#1a3a5c';
       var subc=primary?'#d8e8f8':'#526b83';
-      return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
-        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
+      return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:12px 14px;border:3px solid #ffffff;vertical-align:top;min-width:190px;">'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
         '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
         '<div style="font-size:11px;margin-top:6px;color:'+subc+';line-height:1.25;">'+esc(sub||'')+'</div>'+ '</td>';
     }
@@ -8922,13 +8922,14 @@ function handleDailyHuddleUrlParams(){
       if(!rows || !rows.length){
         return '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">'+esc(emptyText||'None')+'</div>';
       }
-      var html='<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:fixed;">';
+      var html='<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:auto;">';
       html+='<tr>' + headers.map(function(h){return '<th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">'+esc(h)+'</th>';}).join('') + '</tr>';
       rows.forEach(function(cells){
         html+='<tr>' + headers.map(function(h,i){
           var value=cells[i]||'';
           var isStatus=statusCols.indexOf(i)>=0;
-          return '<td style="padding:7px 8px;border-bottom:1px solid #edf2f7;color:#222;font-size:11px;line-height:1.2;vertical-align:top;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(isStatus?statusBadge(value):esc(value))+'</td>';
+          var nowrap = isStatus || /^(Start|Target|Progress|Owner|Status)$/i.test(h);
+          return '<td style="padding:7px 8px;border-bottom:1px solid #edf2f7;color:#222;font-size:11px;line-height:1.25;vertical-align:top;'+(nowrap?'white-space:nowrap;':'white-space:normal;')+'">'+(isStatus?statusBadge(value):esc(value))+'</td>';
         }).join('') + '</tr>';
       });
       html+='</table>';
@@ -8986,7 +8987,7 @@ function handleDailyHuddleUrlParams(){
         body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
       }
       var detailLabel=(document.getElementById('d-operational-detail-label')||{}).innerText || 'Operational Detail';
-      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
+      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:10px 12px;border:3px solid #ffffff;vertical-align:top;min-width:220px;">'+
         '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">'+esc(detailLabel)+'</div>'+
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
@@ -9030,9 +9031,69 @@ function handleDailyHuddleUrlParams(){
       return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
     });
 
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      var rows=(typeof tasks!=='undefined'?tasks:[]).filter(function(t){
+        return !t.isParent && (downMap[t.id]!=null || startupMap[t.id]!=null);
+      }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=(typeof tasks!=='undefined'?tasks:[]).find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return [String(t.id), parent ? parent.task : (t.section||'System'), t.task||'', emailDate(downMap[t.id]), emailDate(startupMap[t.id])];
+      }).sort(function(a,b){ return a[0].localeCompare(b[0], undefined, {numeric:true}); });
+      if(!rows.length) return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      var body=rows.map(function(r){
+        var hasDown=!!r[3], hasUp=!!r[4];
+        var label=(hasDown?'▼ '+r[3]:'')+(hasDown&&hasUp?' → ':'')+(hasUp?'▲ '+r[4]:'');
+        return '<tr>'+
+          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#1a3a5c;font-weight:bold;white-space:nowrap;">'+esc(r[0])+'</td>'+
+          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#222;white-space:nowrap;">'+esc(r[1])+'</td>'+
+          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#222;">'+esc(r[2])+'</td>'+
+          '<td style="padding:6px 8px;border-bottom:1px solid #edf2f7;font-size:11px;color:#e65100;font-weight:bold;white-space:nowrap;">'+esc(label)+'</td>'+
+        '</tr>';
+      }).join('');
+      return panel('System Down / Start-Up Timeline', '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:auto;">'+
+        '<tr><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">Task</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">System</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;">Item</th><th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">Down / Start-Up</th></tr>'+body+'</table>');
+    }
+    async function saveEmailBodyToSharePointOrDownload(blob, filename){
+      var key='sd26_sharepoint_email_body_url_v1';
+      var url='';
+      try{ url=localStorage.getItem(key)||''; }catch(e){}
+      if(!url && /sharepoint\.com|onedrive\.live\.com/i.test(location.hostname)){
+        url=filename;
+      }
+      if(!url){
+        url=prompt('SharePoint file URL to overwrite for Email Body Dashboard. Leave blank to download locally.', filename)||'';
+        if(url){ try{ localStorage.setItem(key,url); }catch(e){} }
+      }
+      if(url){
+        try{
+          var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', headers:{'Content-Type':'text/html;charset=utf-8'}});
+          if(res.ok || res.status===201 || res.status===204){ setExportStatus('Email Body Dashboard saved to SharePoint'); setTimeout(function(){setExportStatus('');}, 2600); return true; }
+          throw new Error('SharePoint save failed: HTTP '+res.status);
+        }catch(e){
+          console.warn(e);
+          alert('Could not save directly to SharePoint. The file will download locally instead. If needed, open the Dashboard from SharePoint and use a same-folder file URL.');
+        }
+      }
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl; a.download=filename; a.style.display='none';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
+      setExportStatus('Email Body Dashboard downloaded');
+      setTimeout(function(){setExportStatus('');}, 2200);
+      return false;
+    }
+
     var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Shutdown Daily Huddle</title></head>'+ 
       '<body style="margin:0;padding:0;background:#eef2f6;font-family:Arial,Helvetica,sans-serif;color:#222;text-align:left;">'+
-      '<div style="width:100%;max-width:1120px;margin:0;padding:14px;background:#0d2137;text-align:left;">'+
+      '<div style="width:1400px;max-width:none;margin:0;padding:14px;background:#0d2137;text-align:left;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#0d2137;text-align:left;">'+
       '<tr><td style="background:#1a3a5c;border-bottom:4px solid #f0c040;padding:14px 16px;color:#fff;text-align:left;">'+
       '<div style="font-size:21px;font-weight:bold;letter-spacing:.10em;text-transform:uppercase;white-space:nowrap;">2026 Shutdown Daily Huddle</div>'+ 
@@ -9047,29 +9108,24 @@ function handleDailyHuddleUrlParams(){
       operationalDetailCard('d-progress-system')+
       '</tr></table></td></tr>'+ 
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
-      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+ 
+      '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+
+      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+
       '</tr></table></td></tr>'+ 
-      '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+ 
+      '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      '<td style="width:50%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+ 
-      '<td style="width:50%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+ 
+      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+
+      '<td style="width:56%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+
       '</tr></table></td></tr>'+ 
+      '<tr><td style="padding-top:10px;">'+emailTimelinePanel()+'</td></tr>'+
       '</table></div></body></html>';
     var filename='Shutdown_Daily_Huddle_Email_Body.html';
     try{
       var blob=new Blob([html], {type:'text/html;charset=utf-8'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=url; a.download=filename; a.style.display='none';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){URL.revokeObjectURL(url); a.remove();}, 1500);
-      setExportStatus('Email Body Dashboard downloaded');
-      setTimeout(function(){setExportStatus('');}, 2200);
+      await saveEmailBodyToSharePointOrDownload(blob, filename);
     }catch(e){
       var w=window.open('', '_blank');
       if(w){ w.document.open(); w.document.write(html); w.document.close(); w.document.title=filename; }
-      else alert('Could not download email body dashboard.');
+      else alert('Could not save or download email body dashboard.');
     }
     return false;
   };
