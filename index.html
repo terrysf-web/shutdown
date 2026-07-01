@@ -6053,22 +6053,31 @@ function renderDashboard(){
   function isFullRelTask(t){ return /full\s*rel|ful\s*rel|full release/i.test(t.task||''); }
   function isCondRelTask(t){ return /cond\s*rel|conditional release/i.test(t.task||''); }
   function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
-  function taskTrackerOosActiveItem(items){
-    return items.find(function(t){
-      const downIso = normalizeDateValue(taskTrackerDownOosMap[t.id]);
-      if(!downIso) return false;
-      const downDate = new Date(downIso + 'T00:00:00');
-      const upIso = normalizeDateValue(taskTrackerStartupOosMap[t.id]);
-      const upDate = upIso ? new Date(upIso + 'T00:00:00') : null;
-      return todayDate >= downDate && (!upDate || todayDate < upDate);
-    });
+  function taskTrackerOosWindow(items){
+    const downs = items.map(function(t){
+      const iso = normalizeDateValue(taskTrackerDownOosMap[t.id]);
+      return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
+    }).filter(Boolean).sort(function(a,b){ return b.date - a.date; });
+    const startups = items.map(function(t){
+      const iso = normalizeDateValue(taskTrackerStartupOosMap[t.id]);
+      return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
+    }).filter(Boolean).sort(function(a,b){ return a.date - b.date; });
+    for(const down of downs){
+      if(todayDate < down.date) continue;
+      const startup = startups.find(function(up){ return up.date >= down.date; });
+      if(!startup || todayDate < startup.date){
+        return {downTask:down.task, downIso:down.iso, startupTask:startup&&startup.task, startupIso:startup&&startup.iso};
+      }
+    }
+    return null;
   }
+
   function huddleStatus(items){
     if(!items.length) return 'Normal';
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const trackerOosActive = taskTrackerOosActiveItem(items);
+    const trackerOosActive = taskTrackerOosWindow(items);
     const oosActive = items.find(t=>isInProgress(t));
 
     // Task Tracker Mark Down / Start-Up controls drive date-based OOS.
@@ -6096,11 +6105,9 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const trackerActive = taskTrackerOosActiveItem(items);
+      const trackerActive = taskTrackerOosWindow(items);
       if(trackerActive){
-        const downIso = normalizeDateValue(taskTrackerDownOosMap[trackerActive.id]);
-        const upIso = normalizeDateValue(taskTrackerStartupOosMap[trackerActive.id]);
-        return 'OOS by Task Tracker Down: '+trackerActive.id+' since '+displayDate(downIso)+(upIso ? ' / clears '+displayDate(upIso) : '');
+        return 'OOS by Task Tracker Down: '+trackerActive.downTask.id+' since '+displayDate(trackerActive.downIso)+(trackerActive.startupIso ? ' / clears '+displayDate(trackerActive.startupIso)+' by '+trackerActive.startupTask.id : '');
       }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
