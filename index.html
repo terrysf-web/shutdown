@@ -5933,9 +5933,10 @@ function renderDashboard(){
     if(!startIso) return false;
     const startDate = new Date(startIso+'T00:00:00');
     const st = statusMap[t.id] || t.status || 'Pending';
-    // Upcoming Schedule is for future work only.
-    // In Progress work belongs only in Maintenance Activities, not Upcoming.
-    return startDate > todayDate && startDate <= sevenDayEndDate && (st === 'Pending' || st === 'Scheduled');
+    // Upcoming Schedule should mirror Task Tracker items that start inside
+    // the next 7-day window, regardless of status, so the dashboard/email
+    // export does not hide tracker rows that users expect to see.
+    return startDate >= todayDate && startDate <= sevenDayEndDate && st !== 'N/A';
   }
   function taskTouchesToday(t){
     const startIso = normalizeDateValue(t.start);
@@ -6236,11 +6237,10 @@ function renderDashboard(){
         const as = normalizeDateValue(a.start) || '';
         const bs = normalizeDateValue(b.start) || '';
         return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
-      })
-      .slice(0,12);
+      });
     upcomingEl.innerHTML = upcomingItems.length ? upcomingItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
-      const owner = t.assignedTo || t.resource || t.vendor || t.owner || '—';
+      const owner = t.assigned || t.assignedTo || t.resource || t.owner || t.vendor || '—';
       return `<tr>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
