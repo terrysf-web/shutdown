@@ -9153,6 +9153,31 @@ function handleDailyHuddleUrlParams(){
       var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
       return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
     }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function canvasToPngBlob(canvas){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+      });
+    }
+
     async function renderDailyHuddleHtmlToPngBlob(html){
       setExportStatus('Rendering dashboard PNG...');
       const width=1400;
@@ -9167,29 +9192,45 @@ function handleDailyHuddleUrlParams(){
       wrap.style.zIndex='-1';
       wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
       document.body.appendChild(wrap);
-      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-      const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
-      const xhtml='<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+width+'px;background:#eef2f6;">'+wrap.innerHTML+'</div>';
-      const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
-      const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-      const url=URL.createObjectURL(svgBlob);
       try{
-        const img=new Image();
-        const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
-        img.src=url;
-        await loaded;
-        const canvas=document.createElement('canvas');
-        canvas.width=width;
-        canvas.height=height;
-        const ctx=canvas.getContext('2d');
-        ctx.fillStyle='#eef2f6';
-        ctx.fillRect(0,0,width,height);
-        ctx.drawImage(img,0,0);
-        return await new Promise((resolve,reject)=>{
-          canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
-        });
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
+        try{
+          const h2c=await ensureHtml2Canvas();
+          if(typeof h2c==='function'){
+            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
+            return await canvasToPngBlob(canvas);
+          }
+        }catch(primaryErr){
+          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
+        }
+        const clone=wrap.cloneNode(true);
+        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+        clone.style.position='static';
+        clone.style.left='auto';
+        clone.style.top='auto';
+        clone.style.zIndex='auto';
+        const xhtml=new XMLSerializer().serializeToString(clone);
+        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+        const url=URL.createObjectURL(svgBlob);
+        try{
+          const img=new Image();
+          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+          img.src=url;
+          await loaded;
+          const canvas=document.createElement('canvas');
+          canvas.width=width;
+          canvas.height=height;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#eef2f6';
+          ctx.fillRect(0,0,width,height);
+          ctx.drawImage(img,0,0);
+          return await canvasToPngBlob(canvas);
+        }finally{
+          URL.revokeObjectURL(url);
+        }
       }finally{
-        URL.revokeObjectURL(url);
         wrap.remove();
       }
     }
