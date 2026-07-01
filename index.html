@@ -4245,13 +4245,23 @@ function loadEndImpact(){ try{ const s=localStorage.getItem('sd26_endImpact'); i
 // ── Down/Up maps: childTaskId → date value (excel serial) ──
 let downMap = {};
 let startupMap = {};
+let timelineDownMap = {};
+let timelineStartupMap = {};
 let taskTrackerDownOosMap = {};
 let taskTrackerStartupOosMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_startup_v2'); if(u) startupMap=JSON.parse(u); }catch(e){}
+  try{ const d=localStorage.getItem('sd26_timeline_down_v1'); if(d) timelineDownMap=JSON.parse(d); }catch(e){}
+  try{ const u=localStorage.getItem('sd26_timeline_startup_v1'); if(u) timelineStartupMap=JSON.parse(u); }catch(e){}
   try{ const d=localStorage.getItem('sd26_task_tracker_down_oos_v1'); if(d) taskTrackerDownOosMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_task_tracker_startup_oos_v1'); if(u) taskTrackerStartupOosMap=JSON.parse(u); }catch(e){}
+}
+function saveTimelineMarkMaps(){
+  try{
+    localStorage.setItem('sd26_timeline_down_v1',JSON.stringify(timelineDownMap));
+    localStorage.setItem('sd26_timeline_startup_v1',JSON.stringify(timelineStartupMap));
+  }catch(e){}
 }
 function saveDownMaps(){
   try{
@@ -4259,6 +4269,7 @@ function saveDownMaps(){
     localStorage.setItem('sd26_startup_v2',JSON.stringify(startupMap));
     localStorage.setItem('sd26_task_tracker_down_oos_v1',JSON.stringify(taskTrackerDownOosMap));
     localStorage.setItem('sd26_task_tracker_startup_oos_v1',JSON.stringify(taskTrackerStartupOosMap));
+    saveTimelineMarkMaps();
   }catch(e){}
 }
 function toggleDown(taskId, dateVal, checked){
@@ -6500,8 +6511,8 @@ function renderTlEditTable(){
     const parentId=String(t.id).split('.')[0];
     const parent=tasks.find(p=>p.isParent&&String(p.id)===parentId);
     const noteData=tlData[t.id]||{};
-    const downDate=toDateInputValue(downMap[t.id]||t.start)||'';
-    const startupDate=toDateInputValue(startupMap[t.id]||t.end)||'';
+    const downDate=toDateInputValue(timelineDownMap[t.id]||t.start)||'';
+    const startupDate=toDateInputValue(timelineStartupMap[t.id]||t.end)||'';
     const taskLabel=t.task.length>34?t.task.slice(0,32)+'…':t.task;
     const parentLabel=parent ? (parent.task.length>22?parent.task.slice(0,20)+'…':parent.task) : (t.section||'System');
     return `<tr style="background:${i%2===0?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.07)'}">
@@ -6511,13 +6522,13 @@ function renderTlEditTable(){
         <span title="${esc(t.task)}">${esc(taskLabel)}</span>
       </td>
       <td style="text-align:center;padding:6px">
-        <input type="checkbox" ${downMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#e53935;cursor:pointer" onchange="tlSet('${t.id}','down',this.checked)" title="Mark as Down start">
+        <input type="checkbox" ${timelineDownMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#e53935;cursor:pointer" onchange="tlSet('${t.id}','down',this.checked)" title="Mark as Down start">
       </td>
       <td style="text-align:center;padding:6px">
         <input type="date" value="${downDate}" style="font-size:11px;padding:2px 5px;border-radius:4px;border:1px solid rgba(255,255,255,0.4);background:#1a3a5c;color:#fff;" onchange="tlSet('${t.id}','downDate',this.value)">
       </td>
       <td style="text-align:center;padding:6px">
-        <input type="checkbox" ${startupMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#43a047;cursor:pointer" onchange="tlSet('${t.id}','startup',this.checked)" title="Mark as Start-Up">
+        <input type="checkbox" ${timelineStartupMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#43a047;cursor:pointer" onchange="tlSet('${t.id}','startup',this.checked)" title="Mark as Start-Up">
       </td>
       <td style="text-align:center;padding:6px">
         <input type="date" value="${startupDate}" style="font-size:11px;padding:2px 5px;border-radius:4px;border:1px solid rgba(255,255,255,0.4);background:#1a3a5c;color:#fff;" onchange="tlSet('${t.id}','startupDate',this.value)">
@@ -6532,25 +6543,25 @@ function renderTlEditTable(){
 function tlSet(id,field,val){
   const task=tasks.find(t=>t.id===id);
   if(field==='down'){
-    if(val) downMap[id]=downMap[id]||toDateInputValue(task?.start)||task?.start||new Date().toISOString().slice(0,10);
-    else delete downMap[id];
-    saveDownMaps();
+    if(val) timelineDownMap[id]=timelineDownMap[id]||toDateInputValue(task?.start)||task?.start||new Date().toISOString().slice(0,10);
+    else delete timelineDownMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='startup'){
-    if(val) startupMap[id]=startupMap[id]||toDateInputValue(task?.end)||task?.end||new Date().toISOString().slice(0,10);
-    else delete startupMap[id];
-    saveDownMaps();
+    if(val) timelineStartupMap[id]=timelineStartupMap[id]||toDateInputValue(task?.end)||task?.end||new Date().toISOString().slice(0,10);
+    else delete timelineStartupMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='downDate'){
-    if(val) downMap[id]=val; else delete downMap[id];
-    saveDownMaps();
+    if(val) timelineDownMap[id]=val; else delete timelineDownMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='startupDate'){
-    if(val) startupMap[id]=val; else delete startupMap[id];
-    saveDownMaps();
+    if(val) timelineStartupMap[id]=val; else delete timelineStartupMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else{
@@ -6587,12 +6598,12 @@ function renderTimeline(){
     function md(d){ const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
 
     const allT=typeof tasks!=='undefined'?tasks:[];
-    const selected=allT.filter(t=>!t.isParent&&(!filterSec||t.section===filterSec)&&(downMap[t.id]!=null||startupMap[t.id]!=null))
+    const selected=allT.filter(t=>!t.isParent&&(!filterSec||t.section===filterSec)&&(timelineDownMap[t.id]!=null||timelineStartupMap[t.id]!=null))
       .map(t=>{
         const parentId=String(t.id).split('.')[0];
         const parent=allT.find(p=>p.isParent&&String(p.id)===parentId);
-        const downD=downMap[t.id]!=null ? xl(downMap[t.id]) : null;
-        const upD=startupMap[t.id]!=null ? xl(startupMap[t.id]) : null;
+        const downD=timelineDownMap[t.id]!=null ? xl(timelineDownMap[t.id]) : null;
+        const upD=timelineStartupMap[t.id]!=null ? xl(timelineStartupMap[t.id]) : null;
         return {task:t,parent,parentId,downD,upD};
       })
       .filter(r=>r.downD||r.upD)
