@@ -6055,11 +6055,11 @@ function renderDashboard(){
   function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
   function taskTrackerOosWindow(items){
     const downs = items.map(function(t){
-      const iso = normalizeDateValue(taskTrackerDownOosMap[t.id]);
+      const iso = normalizeDateValue(taskTrackerDownOosMap[t.id] != null ? taskTrackerDownOosMap[t.id] : downMap[t.id]);
       return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
     }).filter(Boolean).sort(function(a,b){ return b.date - a.date; });
     const startups = items.map(function(t){
-      const iso = normalizeDateValue(taskTrackerStartupOosMap[t.id]);
+      const iso = normalizeDateValue(taskTrackerStartupOosMap[t.id] != null ? taskTrackerStartupOosMap[t.id] : startupMap[t.id]);
       return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
     }).filter(Boolean).sort(function(a,b){ return a.date - b.date; });
     for(const down of downs){
