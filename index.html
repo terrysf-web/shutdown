@@ -3794,7 +3794,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save an Outlook-ready dashboard HTML email body to SharePoint, with local download fallback">☁ Email Body Dashboard v10</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard to SharePoint, with local download fallback">🖼 Dashboard PNG</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -9153,6 +9153,47 @@ function handleDailyHuddleUrlParams(){
       var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
       return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
     }
+    async function renderDailyHuddleHtmlToPngBlob(html){
+      setExportStatus('Rendering dashboard PNG...');
+      const width=1400;
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html, 'text/html');
+      const wrap=document.createElement('div');
+      wrap.style.position='fixed';
+      wrap.style.left='-10000px';
+      wrap.style.top='0';
+      wrap.style.width=width+'px';
+      wrap.style.background='#eef2f6';
+      wrap.style.zIndex='-1';
+      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
+      document.body.appendChild(wrap);
+      await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+      const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
+      const xhtml='<div xmlns="http://www.w3.org/1999/xhtml" style="width:'+width+'px;background:#eef2f6;">'+wrap.innerHTML+'</div>';
+      const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+      const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+      const url=URL.createObjectURL(svgBlob);
+      try{
+        const img=new Image();
+        const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+        img.src=url;
+        await loaded;
+        const canvas=document.createElement('canvas');
+        canvas.width=width;
+        canvas.height=height;
+        const ctx=canvas.getContext('2d');
+        ctx.fillStyle='#eef2f6';
+        ctx.fillRect(0,0,width,height);
+        ctx.drawImage(img,0,0);
+        return await new Promise((resolve,reject)=>{
+          canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+        });
+      }finally{
+        URL.revokeObjectURL(url);
+        wrap.remove();
+      }
+    }
+
     async function saveEmailBodyToSharePointOrDownload(blob, filename){
       var key='sd26_sharepoint_email_body_url_v1';
       var folderLink='https://revancetherapeuticsinc.sharepoint.com/:f:/r/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown?csf=1&web=1&e=bgvyre';
@@ -9164,24 +9205,24 @@ function handleDailyHuddleUrlParams(){
           var clean=url.split('?')[0].replace('/:f:/r','');
           return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
         }
-        if(/\/$/.test(url) || !/\.html?(\?|$)/i.test(url)) return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
-        return url;
+        if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+        return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
       }
       var url='';
       try{ url=localStorage.getItem(key)||''; }catch(e){}
       url=normalizeSharePointUrl(url || defaultFileUrl || folderLink);
       try{ localStorage.setItem(key,url); }catch(e){}
       try{
-        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'text/html;charset=utf-8'}});
+        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'application/octet-stream'}});
         if(res.ok || res.status===200 || res.status===201 || res.status===204){
-          setExportStatus('Email Body Dashboard saved to SharePoint');
+          setExportStatus('Dashboard PNG saved to SharePoint');
           setTimeout(function(){setExportStatus('');}, 2600);
           return true;
         }
         throw new Error('SharePoint save failed: HTTP '+res.status);
       }catch(e){
         console.warn(e);
-        setExportStatus('SharePoint save blocked; downloading local copy');
+        setExportStatus('SharePoint save blocked; downloading PNG');
       }
       var dlUrl=URL.createObjectURL(blob);
       var a=document.createElement('a');
@@ -9220,14 +9261,14 @@ function handleDailyHuddleUrlParams(){
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+emailTimelinePanel()+'</td></tr>'+
       '</table></div></body></html>';
-    var filename='Shutdown_Daily_Huddle_Email_Body.html';
+    var filename='Shutdown_Daily_Huddle_Dashboard.png';
     try{
-      var blob=new Blob([html], {type:'text/html;charset=utf-8'});
+      var blob=await renderDailyHuddleHtmlToPngBlob(html);
       await saveEmailBodyToSharePointOrDownload(blob, filename);
     }catch(e){
       var w=window.open('', '_blank');
       if(w){ w.document.open(); w.document.write(html); w.document.close(); w.document.title=filename; }
-      else alert('Could not save or download email body dashboard.');
+      else alert('Could not save or download dashboard PNG.');
     }finally{
       dailyHuddleEmailSaveInProgress=false;
     }
