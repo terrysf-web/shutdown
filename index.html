@@ -9107,10 +9107,12 @@ function handleDailyHuddleUrlParams(){
       var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
       var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
       var todayD=new Date(); todayD.setHours(0,0,0,0);
-      var dayW=14;
+      var dayW=16;
       var totalW=dArr.length*dayW;
       var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
-        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>';
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
       function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
       function segment(cols,bg,content,fg){
         if(cols<=0) return '';
