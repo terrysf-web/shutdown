@@ -557,29 +557,34 @@ tr.editing{background:#fffceb}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
 .dash-mode-huddle .kpi-section{display:none!important}
 .dash-mode-kpi .huddle-section{display:none!important}
-.dash-mode-kpi .kpi-section{gap:8px!important;margin-bottom:8px!important}
 .dash-mode-kpi #d-delayed-alert{display:none!important}
-.dash-mode-kpi .kpi-section>div{border-radius:7px!important;padding:10px 12px!important;border:1px solid rgba(255,255,255,.08)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.04)}
-.dash-mode-kpi .kpi-section>div>div:first-child{font-size:10px!important;letter-spacing:.09em!important;margin-bottom:7px!important;color:#d5e5f5!important;text-align:left!important}
-.dash-mode-kpi #d-total-num{font-size:46px!important;line-height:.95!important}
-.dash-mode-kpi #d-total-sub{font-size:15px!important;margin-top:6px!important}
-.dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:108px!important}
+.kpi-overview-grid{display:grid;grid-template-columns:.78fr 1.35fr 1.1fr 1.05fr;gap:10px;margin-bottom:10px}
+.kpi-detail-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;margin-bottom:10px}
+.kpi-card{background:#1a3a5c;border:1px solid rgba(255,255,255,.10);border-radius:7px;padding:10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);min-width:0}
+.kpi-card-title{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#d5e5f5;margin-bottom:7px;text-align:left}
+.dash-mode-kpi #d-total-num{font-size:44px!important;line-height:.95!important}
+.dash-mode-kpi #d-total-sub{font-size:14px!important;margin-top:6px!important}
+.dash-mode-kpi #d-delayed-badge-card{display:none!important}
+.dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:118px!important}
 .dash-mode-kpi #d-by-area [style*="bottom:20px"],.dash-mode-kpi #d-by-resource [style*="bottom:20px"],.dash-mode-kpi #d-by-type [style*="bottom:20px"]{bottom:16px!important}
-.dash-mode-kpi #d-timeline{min-height:108px!important}
-.dash-mode-kpi .kpi-section svg text{font-size:10px!important}
-.dash-mode-kpi .vendor-progress{gap:5px!important}
-.dash-mode-kpi .executive-vendor-list{display:flex!important;flex-direction:column!important}
-.dash-mode-kpi .vendor-progress-row{padding:7px 8px!important;border-radius:6px!important}
-.dash-mode-kpi .vendor-progress-row.exec{grid-template-columns:minmax(140px,1fr) repeat(4,minmax(58px,74px))!important;gap:6px!important}
-.dash-mode-kpi .vendor-progress-top{margin-bottom:4px!important}
-.dash-mode-kpi .vendor-progress-name,.dash-mode-kpi .vendor-progress-total{font-size:11px!important}
-.dash-mode-kpi .vendor-metric{font-size:11px!important}
-.dash-mode-kpi .vendor-metric span{font-size:7px!important}
-.dash-mode-kpi .vendor-stack{height:8px!important}
-.dash-mode-kpi .vendor-meta{font-size:9px!important;gap:5px!important;margin-top:4px!important}
+.dash-mode-kpi .bar-wrap{gap:2px!important}
+.dash-mode-kpi .bar-count{font-size:11px!important}
+.dash-mode-kpi .bar-pct{font-size:9px!important}
+.dash-mode-kpi .bar-label{font-size:10px!important;margin-top:2px!important}
+.dash-mode-kpi .bar{width:46px!important}
+.dash-mode-kpi #d-timeline{min-height:120px!important}
+.dash-mode-kpi .kpi-card svg text{font-size:10px!important}
+.dash-mode-kpi .executive-vendor-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+.dash-mode-kpi .vendor-progress-row.exec{grid-template-columns:minmax(92px,1fr) repeat(4,44px)!important;gap:5px!important;padding:7px 8px!important;border-radius:6px!important;align-items:center}
+.dash-mode-kpi .vendor-progress-top{display:block!important;margin-bottom:0!important;min-width:0}
+.dash-mode-kpi .vendor-progress-name{font-size:11px!important;line-height:1.1!important}
+.dash-mode-kpi .vendor-progress-total{font-size:11px!important;margin-top:2px!important;color:#f0c040!important}
+.dash-mode-kpi .vendor-metric{font-size:11px!important;text-align:right!important}
+.dash-mode-kpi .vendor-metric span{font-size:7px!important;letter-spacing:.03em!important}
 @media (max-width:1100px){
-  .dash-mode-kpi .kpi-section{grid-template-columns:1fr!important}
+  .kpi-overview-grid,.kpi-detail-grid{grid-template-columns:1fr!important}
   .dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:96px!important}
+  .dash-mode-kpi .executive-vendor-list{grid-template-columns:1fr!important}
 }
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
@@ -3965,11 +3970,11 @@ APPENDIX 6.5B)</div>
     </table>
   </div>
 
-  <!-- Row 1: Total | By Area | By Resource -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
+  <!-- KPI Overview -->
+  <div class="kpi-section kpi-overview-grid">
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;margin-bottom:10px">TOTAL WORK ORDERS</div>
+    <div class="kpi-card kpi-total-card" style="text-align:center;display:flex;flex-direction:column;justify-content:center">
+      <div class="kpi-card-title" style="text-align:center">TOTAL WORK ORDERS</div>
       <div style="font-size:72px;font-weight:800;line-height:1;color:#fff" id="d-total-num">—</div>
       <div style="font-size:22px;font-weight:700;color:#f0c040;margin-top:10px;font-style:italic" id="d-total-sub">—</div>
       <div id="d-delayed-badge-card" style="display:none;margin-top:10px">
@@ -3977,8 +3982,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY AREA</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY AREA</div>
       <div id="d-by-area" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -3993,8 +3998,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY RESOURCE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY RESOURCE</div>
       <div id="d-by-resource" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -4008,13 +4013,9 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Row 2: By Type | Timeline -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 1.8fr;gap:12px;margin-bottom:12px">
-
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY TYPE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY TYPE</div>
       <div id="d-by-type" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -4028,19 +4029,22 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">TASKS BY WEEK</div>
+  <!-- KPI Detail -->
+  <div class="kpi-section kpi-detail-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">TASKS BY WEEK</div>
       <div style="position:relative;height:150px">
         <svg id="d-timeline" style="width:100%;height:100%"></svg>
       </div>
     </div>
-  </div>
 
-  <!-- Row 3: Vendor Readiness -->
-  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:10px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">VENDOR READINESS</div>
+      <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    </div>
   </div>
 
 </div>
@@ -6385,15 +6389,15 @@ function renderDashboard(){
   function drawBars(elId, items, totalRef, colorFn){
     const el = document.getElementById(elId); if(!el) return;
     const maxVal = Math.max(...items.map(i=>i.v), 1);
-    const BAR_AREA_H = 110; // px height for 100%
+    const BAR_AREA_H = 58; // compact KPI chart height for 100%
     const html = items.map(i=>{
       const barH = Math.max(4, Math.round(i.v/maxVal*BAR_AREA_H));
       const pct  = totalRef ? (i.v/totalRef*100).toFixed(1) : 0;
       const color = typeof colorFn === 'function' ? colorFn(i.k) : colorFn;
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;z-index:1;margin-right:4px">
-        <span style="font-size:13px;font-weight:800;color:#fff">${i.v}</span>
-        <span style="font-size:10px;color:#f0c040;font-weight:600">${pct}%</span>
-        <div style="width:54px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
+        <span style="font-size:11px;font-weight:800;color:#fff">${i.v}</span>
+        <span style="font-size:9px;color:#f0c040;font-weight:600">${pct}%</span>
+        <div style="width:46px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
           <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 60%);border-radius:4px 4px 0 0"></div>
         </div>
         <span style="font-size:10px;color:#cde;font-weight:700;margin-top:2px;text-align:center">${i.k}</span>
@@ -6495,14 +6499,12 @@ function renderDashboard(){
     d.remaining = d.total - d.completed;
   }
   leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
-  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
+  calData.forEach((r,i)=>addVendorStatus(r.vendor || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
   pmData.forEach((r,i)=>{
-    const v=(r.mfr||'').trim()||'Internal';
-    const key = v.length>12 ? v.slice(0,11) : v;
-    addVendorStatus(key, typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
+    addVendorStatus(r.vendor || 'Internal', typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
   });
 
-  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
+  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
   const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
     acc.scheduled += d.scheduled;
     acc.inProgress += d.inProgress;
@@ -6520,10 +6522,10 @@ function renderDashboard(){
         <div class="vendor-progress-name" title="${name}">${name}</div>
         <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div class="vendor-metric">${d.scheduled}<span>Scheduled</span></div>
-      <div class="vendor-metric">${d.inProgress}<span>In Progress</span></div>
-      <div class="vendor-metric">${d.completed}<span>Completed</span></div>
-      <div class="vendor-metric">${d.remaining}<span>Remaining</span></div>
+      <div class="vendor-metric">${d.scheduled}<span>SCH</span></div>
+      <div class="vendor-metric">${d.inProgress}<span>WIP</span></div>
+      <div class="vendor-metric">${d.completed}<span>DONE</span></div>
+      <div class="vendor-metric">${d.remaining}<span>REM</span></div>
     </div>`;
   }).join('');
 }
@@ -6532,7 +6534,7 @@ function renderBars(elId, items, total){
   const max = Math.max(...items.map(i=>i.count), 1);
   const el = document.getElementById(elId);
   el.innerHTML = items.map(i=>{
-    const h = Math.max(4, Math.round(i.count/max*110));
+    const h = Math.max(4, Math.round(i.count/max*44));
     const pct = total ? Math.round(i.count/total*100) : 0;
     return `<div class="bar-wrap">
       <span class="bar-count">${i.count}</span>
