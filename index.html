@@ -486,7 +486,7 @@ tr.editing{background:#fffceb}
 .progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .operational-detail-kpi{max-width:330px;background:#1a3a5c;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
 .operational-detail-kpi .progress-kpi-label{color:#cfe1f3;margin-bottom:7px}
-.operational-detail-kpi .progress-row{grid-template-columns:minmax(94px,1fr) 34px minmax(96px,1.15fr) 40px;gap:5px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.operational-detail-kpi .progress-row{grid-template-columns:minmax(74px,1fr) 30px minmax(46px,.8fr) 34px;gap:4px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .operational-detail-kpi .progress-row-name{font-weight:900;color:#fff}
 .operational-detail-kpi .progress-row-pct{font-size:11px;color:#f0c040;text-align:right}
 .operational-detail-kpi .progress-row-meta{font-size:10px;color:#d6e7f7;text-align:right}
@@ -3794,7 +3794,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard plus timeline to SharePoint, with local download fallback">🖼 Dashboard + Timeline PNG</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save separate Dashboard and Timeline PNGs to SharePoint, with local download fallback">🖼 Email PNGs</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -9472,10 +9472,6 @@ function handleDailyHuddleUrlParams(){
 <script id="dashboard-timeline-png-export">
 (function(){
   var exportInProgress=false;
-  function isoToday(){
-    var el=document.getElementById('todayInput');
-    return (el && el.value) ? el.value : new Date().toISOString().slice(0,10);
-  }
   function setExportStatus(msg){
     var el=document.getElementById('huddleExportStatus');
     if(el) el.textContent=msg || '';
@@ -9564,7 +9560,51 @@ function handleDailyHuddleUrlParams(){
     section.appendChild(wrap);
     return section;
   }
-  async function saveDashboardTimelinePng(blob, filename){
+  async function renderNodeToPngBlob(node, width){
+    var root=document.createElement('div');
+    root.style.position='fixed';
+    root.style.left='-10000px';
+    root.style.top='0';
+    root.style.width=width+'px';
+    root.style.background='#0d2137';
+    root.style.zIndex='-1';
+    root.style.overflow='visible';
+    root.appendChild(node);
+    document.body.appendChild(root);
+    try{
+      await waitFrames(2);
+      var h2c=await ensureHtml2Canvas();
+      var height=Math.max(500, Math.ceil(root.scrollHeight || root.offsetHeight || 0));
+      var canvas=await h2c(root, {
+        backgroundColor:'#0d2137',
+        scale:1,
+        useCORS:true,
+        logging:false,
+        width:width,
+        height:height,
+        windowWidth:width,
+        windowHeight:height,
+        scrollX:0,
+        scrollY:0
+      });
+      return await canvasToBlob(canvas);
+    }finally{
+      root.remove();
+    }
+  }
+  function downloadBlob(blob, filename, delayMs){
+    setTimeout(function(){
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl;
+      a.download=filename;
+      a.style.display='none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(dlUrl); a.remove(); }, 1500);
+    }, delayMs || 0);
+  }
+  async function savePng(blob, filename){
     var key='sd26_sharepoint_email_body_url_v1';
     var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
     var url='';
@@ -9584,30 +9624,19 @@ function handleDailyHuddleUrlParams(){
     try{
       var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'image/png'}});
       if(res.ok || res.status===200 || res.status===201 || res.status===204){
-        setExportStatus('Dashboard + Timeline PNG saved to SharePoint');
-        setTimeout(function(){ setExportStatus(''); }, 2600);
-        return;
+        return true;
       }
       throw new Error('SharePoint save failed: HTTP '+res.status);
     }catch(e){
       console.warn(e);
-      setExportStatus('SharePoint save blocked; downloading PNG');
+      return false;
     }
-    var dlUrl=URL.createObjectURL(blob);
-    var a=document.createElement('a');
-    a.href=dlUrl;
-    a.download=filename;
-    a.style.display='none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(function(){ URL.revokeObjectURL(dlUrl); a.remove(); }, 1500);
-    setTimeout(function(){ setExportStatus(''); }, 2600);
   }
   window.downloadDailyHuddleSummary=async function(ev){
     if(ev && ev.preventDefault) ev.preventDefault();
     if(exportInProgress) return false;
     exportInProgress=true;
-    setExportStatus('Rendering Dashboard + Timeline PNG...');
+    setExportStatus('Rendering Dashboard and Timeline PNGs...');
     try{
       if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
       if(typeof initTimelineFilter==='function') initTimelineFilter();
@@ -9617,49 +9646,31 @@ function handleDailyHuddleUrlParams(){
       var tlHeader=document.getElementById('tl-header-sticky');
       var tlBody=document.getElementById('tl-container');
       if(!dashboard) throw new Error('Dashboard panel not found.');
-      var width=Math.max(
+      var dashboardWidth=Math.max(1800, Math.ceil(dashboard.scrollWidth || dashboard.clientWidth || 0));
+      var timelineWidth=Math.max(
         1400,
-        Math.ceil(dashboard.scrollWidth || dashboard.clientWidth || 0),
         Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
         Math.ceil(tlBody ? tlBody.scrollWidth : 0),
         svgWidth(tlHeader),
         svgWidth(tlBody)
       );
-      var root=document.createElement('div');
-      root.style.position='fixed';
-      root.style.left='-10000px';
-      root.style.top='0';
-      root.style.width=width+'px';
-      root.style.background='#0d2137';
-      root.style.zIndex='-1';
-      root.style.overflow='visible';
-      root.appendChild(prepDashboardClone(dashboard, width));
-      root.appendChild(buildTimelineClone(width));
-      document.body.appendChild(root);
-      try{
-        await waitFrames(2);
-        var h2c=await ensureHtml2Canvas();
-        var height=Math.max(900, Math.ceil(root.scrollHeight || root.offsetHeight || 0));
-        var canvas=await h2c(root, {
-          backgroundColor:'#0d2137',
-          scale:1,
-          useCORS:true,
-          logging:false,
-          width:width,
-          height:height,
-          windowWidth:width,
-          windowHeight:height,
-          scrollX:0,
-          scrollY:0
-        });
-        var blob=await canvasToBlob(canvas);
-        await saveDashboardTimelinePng(blob, 'Shutdown_Daily_Huddle_Dashboard_Timeline_'+isoToday()+'.png');
-      }finally{
-        root.remove();
+      var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
+      var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var timelineSaved=await savePng(timelineBlob, timelineFile);
+      if(dashSaved && timelineSaved){
+        setExportStatus('Dashboard and Timeline PNGs saved to SharePoint');
+      }else{
+        setExportStatus('SharePoint save blocked; downloading PNGs');
+        if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 0);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 650);
       }
+      setTimeout(function(){ setExportStatus(''); }, 3000);
     }catch(e){
-      console.error('Dashboard + Timeline PNG export failed:', e);
-      alert('Could not create Dashboard + Timeline PNG: '+(e && e.message ? e.message : e));
+      console.error('Dashboard and Timeline PNG export failed:', e);
+      alert('Could not create Dashboard and Timeline PNGs: '+(e && e.message ? e.message : e));
       setExportStatus('');
     }finally{
       exportInProgress=false;
@@ -9669,8 +9680,8 @@ function handleDailyHuddleUrlParams(){
   document.addEventListener('DOMContentLoaded', function(){
     var btn=document.getElementById('btnDownloadHuddleSummary');
     if(btn){
-      btn.textContent='🖼 Dashboard + Timeline PNG';
-      btn.title='Save a PNG screenshot of the dashboard plus timeline to SharePoint, with local download fallback';
+      btn.textContent='🖼 Email PNGs';
+      btn.title='Save separate Dashboard and Timeline PNGs to SharePoint, with local download fallback';
       btn.onclick=window.downloadDailyHuddleSummary;
     }
   });
