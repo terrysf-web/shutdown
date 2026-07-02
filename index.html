@@ -6226,7 +6226,28 @@ function renderDashboard(){
       const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
       return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
     }
-    rtsEl.innerHTML = rtsItems.length ? rtsItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
+    const releaseRows = rtsItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`);
+    const delayRows = delayedTasks
+      .slice()
+      .sort((a,b)=>{
+        const ae = normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+        const be = normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+        return ae.localeCompare(be) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+      })
+      .map(t=>{
+        const note = [notesMap[t.id] || t.notes || '', t.actionComment || '']
+          .map(v=>String(v||'').trim())
+          .filter(Boolean)
+          .join(' | Action: ');
+        return `<tr>
+          <td>${huddleStatusHtml('Delayed')}</td>
+          <td>${huddleSystemForTask(t)}</td>
+          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+          <td>—</td>
+          <td><b>${esc(t.id)} ${esc(t.task)}</b>${note ? '<br>'+esc(note) : ''}</td>
+        </tr>`;
+      });
+    rtsEl.innerHTML = releaseRows.concat(delayRows).join('') || '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service or delayed items.</td></tr>';
   }
 
   const upcomingEl = document.getElementById('d-upcoming-schedule');
