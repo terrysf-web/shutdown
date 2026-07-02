@@ -653,6 +653,9 @@ select.msf option:checked{background:#ddeeff}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 78px}
+.system-status-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.system-status-legend{font-size:10px;font-weight:800;color:#9fb4c8;letter-spacing:.02em;white-space:nowrap}
+.system-status-legend b{color:#cce6ff}
 .huddle-table.small td{padding:7px 8px}
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
@@ -3845,7 +3848,7 @@ APPENDIX 6.5B)</div>
           <div class="kpi-lines">
             <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
             <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
-            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
+            <div class="kpi-line"><span>RTS</span><b id="d-systems-returning">—</b></div>
           </div>
           <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
           <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
@@ -3881,7 +3884,10 @@ APPENDIX 6.5B)</div>
   <!-- Executive Dashboard Middle: Systems + Return to Service -->
   <div class="huddle-middle-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Systems Status</div>
+      <div class="system-status-head">
+        <div class="huddle-panel-title">Systems Status</div>
+        <div class="system-status-legend"><b>OOS</b> = Out of Service &nbsp; | &nbsp; <b>RTS</b> = Returning to Service</div>
+      </div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
     <div class="huddle-panel tight">
@@ -6165,6 +6171,9 @@ function renderDashboard(){
       const st = executiveSystemStatus(status);
       return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
     }
+    function executiveSystemLabel(status){
+      return executiveSystemStatus(status) === 'Returning to Service' ? 'RTS' : executiveSystemStatus(status);
+    }
     const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
     const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
     const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
@@ -6178,8 +6187,8 @@ function renderDashboard(){
     systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
+      <div class="system-pill ${executiveSystemClass(s.status)}">${executiveSystemLabel(s.status)}</div>
+    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or RTS systems.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
