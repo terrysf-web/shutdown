@@ -3794,7 +3794,7 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard to SharePoint, with local download fallback">🖼 Dashboard PNG</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard plus timeline to SharePoint, with local download fallback">🖼 Dashboard + Timeline PNG</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -9465,6 +9465,214 @@ function handleDailyHuddleUrlParams(){
     if(pdf){ pdf.onclick=window.exportDailyHuddlePDF; }
     if(sum){ sum.onclick=window.downloadDailyHuddleSummary; }
     setTimeout(window.handleDailyHuddleUrlParams, 750);
+  });
+})();
+</script>
+
+<script id="dashboard-timeline-png-export">
+(function(){
+  var exportInProgress=false;
+  function isoToday(){
+    var el=document.getElementById('todayInput');
+    return (el && el.value) ? el.value : new Date().toISOString().slice(0,10);
+  }
+  function setExportStatus(msg){
+    var el=document.getElementById('huddleExportStatus');
+    if(el) el.textContent=msg || '';
+  }
+  function waitFrames(n){
+    return new Promise(function(resolve){
+      function step(){ if(--n<=0) resolve(); else requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+  }
+  async function ensureHtml2Canvas(){
+    if(window.html2canvas) return window.html2canvas;
+    return await new Promise(function(resolve,reject){
+      var existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+      if(existing){
+        existing.addEventListener('load', function(){ resolve(window.html2canvas); }, {once:true});
+        existing.addEventListener('error', function(){ reject(new Error('html2canvas load failed')); }, {once:true});
+        return;
+      }
+      var script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.async=true;
+      script.dataset.huddleHtml2canvas='1';
+      script.onload=function(){ resolve(window.html2canvas); };
+      script.onerror=function(){ reject(new Error('html2canvas load failed')); };
+      document.head.appendChild(script);
+    });
+  }
+  function canvasToBlob(canvas){
+    return new Promise(function(resolve,reject){
+      canvas.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('PNG render failed')); }, 'image/png');
+    });
+  }
+  function svgWidth(el){
+    var svg=el && el.querySelector && el.querySelector('svg');
+    if(!svg) return 0;
+    return Math.ceil(Number(svg.getAttribute('width')) || svg.scrollWidth || svg.clientWidth || 0);
+  }
+  function prepDashboardClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelCapture';
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    clone.querySelectorAll('[style]').forEach(function(el){
+      if(/overflow-y\s*:\s*auto|overflow\s*:\s*auto|min-height\s*:\s*0/i.test(el.getAttribute('style')||'')){
+        el.style.overflow='visible';
+        el.style.maxHeight='none';
+      }
+    });
+    return clone;
+  }
+  function buildTimelineClone(width){
+    var header=document.getElementById('tl-header-sticky');
+    var body=document.getElementById('tl-container');
+    var section=document.createElement('div');
+    section.style.background='#0d2137';
+    section.style.color='#fff';
+    section.style.padding='18px 22px 22px';
+    section.style.width=width+'px';
+    section.style.boxSizing='border-box';
+    section.innerHTML='<div style="background:#1a3a5c;padding:13px 18px;border-radius:8px 8px 0 0;border-bottom:3px solid #f0c040;font-size:18px;font-weight:800;letter-spacing:.10em;text-transform:uppercase">System Down / Start-Up Timeline</div>';
+    var wrap=document.createElement('div');
+    wrap.style.background='#0f2236';
+    wrap.style.borderRadius='0 0 8px 8px';
+    wrap.style.overflow='visible';
+    wrap.style.width='100%';
+    wrap.style.boxSizing='border-box';
+    var headerClone=header ? header.cloneNode(true) : document.createElement('div');
+    var bodyClone=body ? body.cloneNode(true) : document.createElement('div');
+    [headerClone, bodyClone].forEach(function(el){
+      el.removeAttribute('id');
+      el.style.overflow='visible';
+      el.style.width='100%';
+      el.style.maxWidth='none';
+      el.style.height='auto';
+      el.style.maxHeight='none';
+    });
+    wrap.appendChild(headerClone);
+    wrap.appendChild(bodyClone);
+    section.appendChild(wrap);
+    return section;
+  }
+  async function saveDashboardTimelinePng(blob, filename){
+    var key='sd26_sharepoint_email_body_url_v1';
+    var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+    var url='';
+    try{ url=localStorage.getItem(key)||''; }catch(e){}
+    function normalize(url){
+      url=String(url||'').trim();
+      if(!url) return defaultFileUrl;
+      if(url.indexOf(':f:/r/')>=0){
+        var clean=url.split('?')[0].replace('/:f:/r','');
+        return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+      }
+      if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+      return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+    }
+    url=normalize(url);
+    try{ localStorage.setItem(key,url); }catch(e){}
+    try{
+      var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'image/png'}});
+      if(res.ok || res.status===200 || res.status===201 || res.status===204){
+        setExportStatus('Dashboard + Timeline PNG saved to SharePoint');
+        setTimeout(function(){ setExportStatus(''); }, 2600);
+        return;
+      }
+      throw new Error('SharePoint save failed: HTTP '+res.status);
+    }catch(e){
+      console.warn(e);
+      setExportStatus('SharePoint save blocked; downloading PNG');
+    }
+    var dlUrl=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=dlUrl;
+    a.download=filename;
+    a.style.display='none';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function(){ URL.revokeObjectURL(dlUrl); a.remove(); }, 1500);
+    setTimeout(function(){ setExportStatus(''); }, 2600);
+  }
+  window.downloadDailyHuddleSummary=async function(ev){
+    if(ev && ev.preventDefault) ev.preventDefault();
+    if(exportInProgress) return false;
+    exportInProgress=true;
+    setExportStatus('Rendering Dashboard + Timeline PNG...');
+    try{
+      if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
+      if(typeof initTimelineFilter==='function') initTimelineFilter();
+      if(typeof renderTimeline==='function') renderTimeline();
+      await waitFrames(3);
+      var dashboard=document.getElementById('dashboardPanel');
+      var tlHeader=document.getElementById('tl-header-sticky');
+      var tlBody=document.getElementById('tl-container');
+      if(!dashboard) throw new Error('Dashboard panel not found.');
+      var width=Math.max(
+        1400,
+        Math.ceil(dashboard.scrollWidth || dashboard.clientWidth || 0),
+        Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
+        Math.ceil(tlBody ? tlBody.scrollWidth : 0),
+        svgWidth(tlHeader),
+        svgWidth(tlBody)
+      );
+      var root=document.createElement('div');
+      root.style.position='fixed';
+      root.style.left='-10000px';
+      root.style.top='0';
+      root.style.width=width+'px';
+      root.style.background='#0d2137';
+      root.style.zIndex='-1';
+      root.style.overflow='visible';
+      root.appendChild(prepDashboardClone(dashboard, width));
+      root.appendChild(buildTimelineClone(width));
+      document.body.appendChild(root);
+      try{
+        await waitFrames(2);
+        var h2c=await ensureHtml2Canvas();
+        var height=Math.max(900, Math.ceil(root.scrollHeight || root.offsetHeight || 0));
+        var canvas=await h2c(root, {
+          backgroundColor:'#0d2137',
+          scale:1,
+          useCORS:true,
+          logging:false,
+          width:width,
+          height:height,
+          windowWidth:width,
+          windowHeight:height,
+          scrollX:0,
+          scrollY:0
+        });
+        var blob=await canvasToBlob(canvas);
+        await saveDashboardTimelinePng(blob, 'Shutdown_Daily_Huddle_Dashboard_Timeline_'+isoToday()+'.png');
+      }finally{
+        root.remove();
+      }
+    }catch(e){
+      console.error('Dashboard + Timeline PNG export failed:', e);
+      alert('Could not create Dashboard + Timeline PNG: '+(e && e.message ? e.message : e));
+      setExportStatus('');
+    }finally{
+      exportInProgress=false;
+    }
+    return false;
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn=document.getElementById('btnDownloadHuddleSummary');
+    if(btn){
+      btn.textContent='🖼 Dashboard + Timeline PNG';
+      btn.title='Save a PNG screenshot of the dashboard plus timeline to SharePoint, with local download fallback';
+      btn.onclick=window.downloadDailyHuddleSummary;
+    }
   });
 })();
 </script>
