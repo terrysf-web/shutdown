@@ -9544,11 +9544,12 @@ function handleDailyHuddleUrlParams(){
     apply('.operational-detail-kpi .progress-mini-meter', {height:'9px'});
     apply('.huddle-panel', {padding:'16px', borderRadius:'8px', minHeight:'0'});
     apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
-    apply('.gowning-row', {padding:'14px', gridTemplateColumns:'220px 1fr'});
+    apply('.gowning-list.dashboard', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'12px'});
+    apply('.gowning-row', {padding:'14px', gridTemplateColumns:'160px minmax(0,1fr)'});
     apply('.gowning-area,.gowning-select', {fontSize:'17px'});
     apply('.gowning-select', {height:'36px', padding:'6px 12px'});
     apply('.huddle-middle-layout,.huddle-bottom-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px', alignItems:'start', marginBottom:'16px'});
-    apply('.system-status-grid.compact', {display:'grid', gridTemplateColumns:'1fr', gap:'10px'});
+    apply('.system-status-grid.compact', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'10px'});
     apply('.system-status-row', {fontSize:'16px', padding:'12px'});
     apply('.system-status-id,.system-status-name,.system-pill', {fontSize:'16px'});
     apply('.huddle-table', {fontSize:'16px'});
@@ -9580,11 +9581,12 @@ function handleDailyHuddleUrlParams(){
       '.email-report-dashboard .operational-detail-kpi .progress-mini-meter{height:9px!important}',
       '.email-report-dashboard .huddle-panel{padding:16px!important;border-radius:8px!important;min-height:0!important}',
       '.email-report-dashboard .huddle-panel-title{font-size:17px!important;line-height:1.15!important;margin-bottom:12px!important}',
-      '.email-report-dashboard .gowning-row{padding:14px!important;grid-template-columns:220px 1fr!important}',
+      '.email-report-dashboard .gowning-list.dashboard{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}',
+      '.email-report-dashboard .gowning-row{padding:14px!important;grid-template-columns:160px minmax(0,1fr)!important}',
       '.email-report-dashboard .gowning-select{height:36px!important;padding:6px 12px!important}',
       '.email-report-dashboard .gowning-area,.email-report-dashboard .gowning-select{font-size:17px!important}',
       '.email-report-dashboard .huddle-middle-layout,.email-report-dashboard .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;align-items:start!important;margin-bottom:16px!important}',
-      '.email-report-dashboard .system-status-grid.compact{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}',
+      '.email-report-dashboard .system-status-grid.compact{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}',
       '.email-report-dashboard .system-status-row{font-size:16px!important;padding:12px!important}',
       '.email-report-dashboard .system-status-id,.email-report-dashboard .system-status-name,.email-report-dashboard .system-pill{font-size:16px!important}',
       '.email-report-dashboard .huddle-table{font-size:16px!important}',
