@@ -9690,6 +9690,65 @@ function handleDailyHuddleUrlParams(){
     });
     return clone;
   }
+  function prepKpiClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelKpiCapture';
+    clone.classList.remove('dash-mode-huddle');
+    clone.classList.add('dash-mode-kpi');
+    clone.classList.add('email-report-kpi');
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    var title=clone.querySelector('#dashboardTitle');
+    if(title) title.textContent='Shutdown 2026 — KPI Dashboard';
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-section', {display:'none'});
+    apply('#d-delayed-alert', {display:'none'});
+    apply('.kpi-section', {display:'grid'});
+    apply('.kpi-overview-grid', {gridTemplateColumns:'.78fr 1.35fr 1.1fr 1.05fr', gap:'14px', marginBottom:'14px'});
+    apply('.kpi-detail-grid', {gridTemplateColumns:'1.25fr 1fr', gap:'14px', marginBottom:'0'});
+    apply('.kpi-card', {padding:'16px', borderRadius:'8px'});
+    apply('.kpi-card-title', {fontSize:'15px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('#d-total-num', {fontSize:'58px', lineHeight:'1'});
+    apply('#d-total-sub', {fontSize:'18px', lineHeight:'1.2'});
+    apply('#d-by-area,#d-by-resource,#d-by-type', {height:'150px'});
+    apply('#d-timeline', {height:'150px', minHeight:'150px'});
+    apply('.executive-vendor-list', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'10px'});
+    apply('.vendor-progress-row.exec', {gridTemplateColumns:'minmax(130px,1fr) repeat(4,58px)', gap:'8px', padding:'10px 12px'});
+    apply('.vendor-progress-name,.vendor-progress-total,.vendor-metric', {fontSize:'15px'});
+    apply('.vendor-metric span', {fontSize:'9px'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-kpi{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-kpi *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-kpi #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-kpi .dashboard-export-actions{display:none!important}',
+      '.email-report-kpi .huddle-section,.email-report-kpi #d-delayed-alert{display:none!important}',
+      '.email-report-kpi .kpi-overview-grid{display:grid!important;grid-template-columns:.78fr 1.35fr 1.1fr 1.05fr!important;gap:14px!important;margin-bottom:14px!important}',
+      '.email-report-kpi .kpi-detail-grid{display:grid!important;grid-template-columns:1.25fr 1fr!important;gap:14px!important;margin-bottom:0!important}',
+      '.email-report-kpi .kpi-card{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:16px!important}',
+      '.email-report-kpi .kpi-card-title{font-size:15px!important;line-height:1.15!important;margin-bottom:12px!important;color:#d5e5f5!important}',
+      '.email-report-kpi #d-total-num{font-size:58px!important;line-height:1!important}',
+      '.email-report-kpi #d-total-sub{font-size:18px!important;line-height:1.2!important}',
+      '.email-report-kpi #d-by-area,.email-report-kpi #d-by-resource,.email-report-kpi #d-by-type{height:150px!important}',
+      '.email-report-kpi #d-timeline{height:150px!important;min-height:150px!important}',
+      '.email-report-kpi .executive-vendor-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}',
+      '.email-report-kpi .vendor-progress-row.exec{grid-template-columns:minmax(130px,1fr) repeat(4,58px)!important;gap:8px!important;padding:10px 12px!important}',
+      '.email-report-kpi .vendor-progress-name,.email-report-kpi .vendor-progress-total,.email-report-kpi .vendor-metric{font-size:15px!important}',
+      '.email-report-kpi .vendor-metric span{font-size:9px!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    return clone;
+  }
   function buildTimelineClone(width){
     var header=document.getElementById('tl-header-sticky');
     var body=document.getElementById('tl-container');
@@ -9797,7 +9856,7 @@ function handleDailyHuddleUrlParams(){
     if(ev && ev.preventDefault) ev.preventDefault();
     if(exportInProgress) return false;
     exportInProgress=true;
-    setExportStatus('Rendering Dashboard and Timeline PNGs...');
+    setExportStatus('Rendering Dashboard, KPI, and Timeline PNGs...');
     try{
       if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
       if(typeof initTimelineFilter==='function') initTimelineFilter();
@@ -9816,22 +9875,26 @@ function handleDailyHuddleUrlParams(){
         svgWidth(tlBody)
       );
       var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var kpiBlob=await renderNodeToPngBlob(prepKpiClone(dashboard, dashboardWidth), dashboardWidth);
       var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
       var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
+      var kpiFile='Shutdown_Daily_Huddle_KPI.png';
       var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
       var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var kpiSaved=await savePng(kpiBlob, kpiFile);
       var timelineSaved=await savePng(timelineBlob, timelineFile);
-      if(dashSaved && timelineSaved){
-        setExportStatus('Dashboard and Timeline PNGs saved to SharePoint');
+      if(dashSaved && kpiSaved && timelineSaved){
+        setExportStatus('Dashboard, KPI, and Timeline PNGs saved to SharePoint');
       }else{
         setExportStatus('SharePoint save blocked; downloading PNGs');
         if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 0);
-        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 650);
+        if(!kpiSaved) downloadBlob(kpiBlob, kpiFile, 650);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
       }
       setTimeout(function(){ setExportStatus(''); }, 3000);
     }catch(e){
-      console.error('Dashboard and Timeline PNG export failed:', e);
-      alert('Could not create Dashboard and Timeline PNGs: '+(e && e.message ? e.message : e));
+      console.error('Dashboard, KPI, and Timeline PNG export failed:', e);
+      alert('Could not create Dashboard, KPI, and Timeline PNGs: '+(e && e.message ? e.message : e));
       setExportStatus('');
     }finally{
       exportInProgress=false;
@@ -9842,7 +9905,7 @@ function handleDailyHuddleUrlParams(){
     var btn=document.getElementById('btnDownloadHuddleSummary');
     if(btn){
       btn.textContent='🖼 Email PNGs';
-      btn.title='Save separate Dashboard and Timeline PNGs to SharePoint, with local download fallback';
+      btn.title='Save separate Dashboard, KPI, and Timeline PNGs to SharePoint, with local download fallback';
       btn.onclick=window.downloadDailyHuddleSummary;
     }
   });
