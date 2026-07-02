@@ -9028,7 +9028,6 @@ function handleDailyHuddleUrlParams(){
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
     }
-
     var overall=safe('d-progress-count','—');
     var overallSub=safe('d-progress-pct','—');
     var todayDue=safe('d-today-due','0');
@@ -9066,7 +9065,6 @@ function handleDailyHuddleUrlParams(){
       // Dashboard row: Start, Target, System ID, Event, Owner / Resource, Status
       return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
     });
-
     function emailDate(v){
       try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
       if(!v) return '';
@@ -9086,10 +9084,12 @@ function handleDailyHuddleUrlParams(){
       function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
       function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
       var allT=typeof tasks!=='undefined'?tasks:[];
-      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+      var downSource=typeof downMap!=='undefined' ? downMap : (typeof timelineDownMap!=='undefined' ? timelineDownMap : {});
+      var startupSource=typeof startupMap!=='undefined' ? startupMap : (typeof timelineStartupMap!=='undefined' ? timelineStartupMap : {});
+      var selected=allT.filter(function(t){ return !t.isParent && (downSource[t.id]!=null || startupSource[t.id]!=null); }).map(function(t){
         var parentId=String(t.id).split('.')[0];
         var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
-        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+        return {task:t,parent:parent,parentId:parentId,downD:downSource[t.id]!=null?xl(downSource[t.id]):null,upD:startupSource[t.id]!=null?xl(startupSource[t.id]):null};
       }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
         var pa=Number(a.parentId), pb=Number(b.parentId);
         if(pa!==pb) return pa-pb;
