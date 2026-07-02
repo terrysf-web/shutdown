@@ -9513,6 +9513,7 @@ function handleDailyHuddleUrlParams(){
   function prepDashboardClone(source, width){
     var clone=source.cloneNode(true);
     clone.id='dashboardPanelCapture';
+    clone.classList.add('email-report-dashboard');
     clone.style.width=width+'px';
     clone.style.maxWidth='none';
     clone.style.height='auto';
@@ -9521,6 +9522,78 @@ function handleDailyHuddleUrlParams(){
     clone.style.overflow='visible';
     clone.style.boxSizing='border-box';
     clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-top-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px'});
+    apply('.progress-brief,.huddle-top-layout>.huddle-panel', {width:'100%', maxWidth:'none'});
+    apply('.progress-brief', {padding:'18px', marginBottom:'0'});
+    apply('.progress-kpis', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'14px'});
+    apply('.progress-kpi', {minHeight:'132px', padding:'18px', borderRadius:'8px'});
+    apply('.progress-kpi-label', {fontSize:'15px', lineHeight:'1.15', marginBottom:'10px', whiteSpace:'normal'});
+    apply('.progress-kpi-value,.progress-kpi-value.compact', {fontSize:'42px', lineHeight:'1'});
+    apply('.progress-kpi-sub', {fontSize:'17px', lineHeight:'1.2'});
+    apply('.kpi-line', {fontSize:'18px', lineHeight:'1.35'});
+    apply('.progress-meter', {height:'12px'});
+    apply('.operational-detail-kpi', {maxWidth:'none', gridColumn:'1 / -1'});
+    apply('.operational-detail-kpi .progress-row', {gridTemplateColumns:'210px 58px minmax(220px,1fr) 72px', gap:'12px', fontSize:'17px', padding:'7px 0'});
+    apply('.operational-detail-kpi .progress-row-name,.operational-detail-kpi .progress-row-pct', {fontSize:'17px'});
+    apply('.operational-detail-kpi .progress-row-meta', {fontSize:'15px'});
+    apply('.operational-detail-kpi .progress-mini-meter', {height:'9px'});
+    apply('.huddle-panel', {padding:'16px', borderRadius:'8px', minHeight:'0'});
+    apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('.gowning-row', {padding:'14px', gridTemplateColumns:'220px 1fr'});
+    apply('.gowning-area,.gowning-select', {fontSize:'17px'});
+    apply('.gowning-select', {height:'36px', padding:'6px 12px'});
+    apply('.huddle-middle-layout,.huddle-bottom-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px', alignItems:'start', marginBottom:'16px'});
+    apply('.system-status-grid.compact', {display:'grid', gridTemplateColumns:'1fr', gap:'10px'});
+    apply('.system-status-row', {fontSize:'16px', padding:'12px'});
+    apply('.system-status-id,.system-status-name,.system-pill', {fontSize:'16px'});
+    apply('.huddle-table', {fontSize:'16px'});
+    apply('.huddle-table th', {fontSize:'14px', padding:'10px 12px'});
+    apply('.huddle-table td', {fontSize:'16px', lineHeight:'1.25', padding:'10px 12px'});
+    apply('#d-delayed-alert,.kpi-section', {display:'none'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-dashboard{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-dashboard *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-dashboard #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-title{font-size:26px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-date{font-size:16px!important}',
+      '.email-report-dashboard .huddle-top-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important}',
+      '.email-report-dashboard .progress-brief,.email-report-dashboard .huddle-top-layout>.huddle-panel{width:100%!important;max-width:none!important}',
+      '.email-report-dashboard .progress-brief{padding:18px!important;margin-bottom:0!important}',
+      '.email-report-dashboard .progress-kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-dashboard .progress-kpi{min-height:132px!important;padding:18px!important;border-radius:8px!important}',
+      '.email-report-dashboard .progress-kpi-label{font-size:15px!important;line-height:1.15!important;margin-bottom:10px!important;white-space:normal!important}',
+      '.email-report-dashboard .progress-kpi-value,.email-report-dashboard .progress-kpi-value.compact{font-size:42px!important;line-height:1!important}',
+      '.email-report-dashboard .progress-kpi-sub{font-size:17px!important;line-height:1.2!important}',
+      '.email-report-dashboard .kpi-line{font-size:18px!important;line-height:1.35!important}',
+      '.email-report-dashboard .progress-meter{height:12px!important}',
+      '.email-report-dashboard .operational-detail-kpi{max-width:none!important;grid-column:1 / -1!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row{grid-template-columns:210px 58px minmax(220px,1fr) 72px!important;gap:12px!important;font-size:17px!important;padding:7px 0!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-kpi-label{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-name,.email-report-dashboard .operational-detail-kpi .progress-row-pct{font-size:17px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-meta{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-mini-meter{height:9px!important}',
+      '.email-report-dashboard .huddle-panel{padding:16px!important;border-radius:8px!important;min-height:0!important}',
+      '.email-report-dashboard .huddle-panel-title{font-size:17px!important;line-height:1.15!important;margin-bottom:12px!important}',
+      '.email-report-dashboard .gowning-row{padding:14px!important;grid-template-columns:220px 1fr!important}',
+      '.email-report-dashboard .gowning-select{height:36px!important;padding:6px 12px!important}',
+      '.email-report-dashboard .gowning-area,.email-report-dashboard .gowning-select{font-size:17px!important}',
+      '.email-report-dashboard .huddle-middle-layout,.email-report-dashboard .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;align-items:start!important;margin-bottom:16px!important}',
+      '.email-report-dashboard .system-status-grid.compact{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}',
+      '.email-report-dashboard .system-status-row{font-size:16px!important;padding:12px!important}',
+      '.email-report-dashboard .system-status-id,.email-report-dashboard .system-status-name,.email-report-dashboard .system-pill{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table th{font-size:14px!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table td{font-size:16px!important;line-height:1.25!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table .status-pill,.email-report-dashboard .huddle-table .pill{font-size:14px!important}',
+      '.email-report-dashboard #d-delayed-alert,.email-report-dashboard .kpi-section{display:none!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
     clone.querySelectorAll('[style]').forEach(function(el){
       if(/overflow-y\s*:\s*auto|overflow\s*:\s*auto|min-height\s*:\s*0/i.test(el.getAttribute('style')||'')){
         el.style.overflow='visible';
@@ -9646,7 +9719,7 @@ function handleDailyHuddleUrlParams(){
       var tlHeader=document.getElementById('tl-header-sticky');
       var tlBody=document.getElementById('tl-container');
       if(!dashboard) throw new Error('Dashboard panel not found.');
-      var dashboardWidth=Math.max(1800, Math.ceil(dashboard.scrollWidth || dashboard.clientWidth || 0));
+      var dashboardWidth=1200;
       var timelineWidth=Math.max(
         1400,
         Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
