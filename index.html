@@ -5919,13 +5919,30 @@ function renderDashboard(){
   const grandPctText = displayGrandTotal ? (grandDone/displayGrandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
-  const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const todayDate = new Date(todayIso + 'T00:00:00');
   const sevenDayEndDate = new Date(todayDate);
   sevenDayEndDate.setDate(sevenDayEndDate.getDate() + 7);
   const twoWeekEndDate = new Date(todayDate);
   twoWeekEndDate.setDate(twoWeekEndDate.getDate() + 14);
+
+  function originalStartIso(t){
+    return normalizeDateValue(t && t.start);
+  }
+  function hasOriginalStartArrived(t){
+    const startIso = originalStartIso(t);
+    if(!startIso) return true;
+    return new Date(startIso + 'T00:00:00') <= todayDate;
+  }
+  function taskOverlapsCurrentWorkWindow(t){
+    const startIso = normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.end) || startIso;
+    if(!startIso && !endIso) return true;
+    const startDate = new Date((startIso || endIso) + 'T00:00:00');
+    const endDate = new Date((endIso || startIso) + 'T00:00:00');
+    return startDate <= sevenDayEndDate && endDate >= todayDate;
+  }
+  const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed' && hasOriginalStartArrived(t));
   const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -6015,7 +6032,7 @@ function renderDashboard(){
   const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
   const lateTasks = overdueTasks;
-  const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
+  const criticalTasks = activeLeaf.filter(t=>(taskStatus(t)==='Delayed' && hasOriginalStartArrived(t)) || overdueTasks.some(o=>o.id===t.id));
   const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
   const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
 
@@ -6288,10 +6305,15 @@ function renderDashboard(){
 
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
-    // Maintenance Activities shows all active work.
-    // Active tasks are excluded from Upcoming Schedule so they move left instead of duplicating.
+    // Maintenance Activities shows current-window active work only.
+    // Delayed items appear here only after their original start date has arrived.
     const maintItems = activeLeaf
-      .filter(t=>['In Progress','Delayed'].includes(statusMap[t.id]||t.status||'Pending'))
+      .filter(t=>{
+        const st = statusMap[t.id] || t.status || 'Pending';
+        if(st === 'In Progress') return taskOverlapsCurrentWorkWindow(t);
+        if(st === 'Delayed') return hasOriginalStartArrived(t) && taskOverlapsCurrentWorkWindow(t);
+        return false;
+      })
       .slice()
       .sort((a,b)=>{
         const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
@@ -6395,7 +6417,9 @@ function renderDashboard(){
 
   const focusEl = document.getElementById('d-progress-focus');
   if(focusEl){
-    const focusItems = delayedTasks.concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))); // show all delay/overdue items
+    // Delay Description only shows true delays after the original start date has arrived.
+    // Future items marked Delayed stay hidden here until their original start date.
+    const focusItems = delayedTasks.concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))); // show all due delay/overdue items
     if(focusItems.length){
       focusEl.innerHTML = `<div class="progress-list">${focusItems.map(shortTask).join('')}</div>`;
     }else if(lookaheadTasks.length){
