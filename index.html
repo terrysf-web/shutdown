@@ -486,7 +486,7 @@ tr.editing{background:#fffceb}
 .progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .operational-detail-kpi{max-width:330px;background:#1a3a5c;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
 .operational-detail-kpi .progress-kpi-label{color:#cfe1f3;margin-bottom:7px}
-.operational-detail-kpi .progress-row{grid-template-columns:minmax(94px,1fr) 34px minmax(96px,1.15fr) 40px;gap:5px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.operational-detail-kpi .progress-row{grid-template-columns:minmax(74px,1fr) 30px minmax(46px,.8fr) 34px;gap:4px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .operational-detail-kpi .progress-row-name{font-weight:900;color:#fff}
 .operational-detail-kpi .progress-row-pct{font-size:11px;color:#f0c040;text-align:right}
 .operational-detail-kpi .progress-row-meta{font-size:10px;color:#d6e7f7;text-align:right}
@@ -557,6 +557,35 @@ tr.editing{background:#fffceb}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
 .dash-mode-huddle .kpi-section{display:none!important}
 .dash-mode-kpi .huddle-section{display:none!important}
+.dash-mode-kpi #d-delayed-alert{display:none!important}
+.kpi-overview-grid{display:grid;grid-template-columns:.78fr 1.35fr 1.1fr 1.05fr;gap:10px;margin-bottom:10px}
+.kpi-detail-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;margin-bottom:10px}
+.kpi-card{background:#1a3a5c;border:1px solid rgba(255,255,255,.10);border-radius:7px;padding:10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);min-width:0}
+.kpi-card-title{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#d5e5f5;margin-bottom:7px;text-align:left}
+.dash-mode-kpi #d-total-num{font-size:44px!important;line-height:.95!important}
+.dash-mode-kpi #d-total-sub{font-size:14px!important;margin-top:6px!important}
+.dash-mode-kpi #d-delayed-badge-card{display:none!important}
+.dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:118px!important}
+.dash-mode-kpi #d-by-area [style*="bottom:20px"],.dash-mode-kpi #d-by-resource [style*="bottom:20px"],.dash-mode-kpi #d-by-type [style*="bottom:20px"]{bottom:16px!important}
+.dash-mode-kpi .bar-wrap{gap:2px!important}
+.dash-mode-kpi .bar-count{font-size:11px!important}
+.dash-mode-kpi .bar-pct{font-size:9px!important}
+.dash-mode-kpi .bar-label{font-size:10px!important;margin-top:2px!important}
+.dash-mode-kpi .bar{width:46px!important}
+.dash-mode-kpi #d-timeline{min-height:120px!important}
+.dash-mode-kpi .kpi-card svg text{font-size:10px!important}
+.dash-mode-kpi .executive-vendor-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
+.dash-mode-kpi .vendor-progress-row.exec{grid-template-columns:minmax(92px,1fr) repeat(4,44px)!important;gap:5px!important;padding:7px 8px!important;border-radius:6px!important;align-items:center}
+.dash-mode-kpi .vendor-progress-top{display:block!important;margin-bottom:0!important;min-width:0}
+.dash-mode-kpi .vendor-progress-name{font-size:11px!important;line-height:1.1!important}
+.dash-mode-kpi .vendor-progress-total{font-size:11px!important;margin-top:2px!important;color:#f0c040!important}
+.dash-mode-kpi .vendor-metric{font-size:11px!important;text-align:right!important}
+.dash-mode-kpi .vendor-metric span{font-size:7px!important;letter-spacing:.03em!important}
+@media (max-width:1100px){
+  .kpi-overview-grid,.kpi-detail-grid{grid-template-columns:1fr!important}
+  .dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:96px!important}
+  .dash-mode-kpi .executive-vendor-list{grid-template-columns:1fr!important}
+}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
 select.msf:focus{border-color:#1565c0;outline:2px solid #aac4e8}
@@ -648,15 +677,19 @@ select.msf option:checked{background:#ddeeff}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 78px}
+.system-status-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.system-status-legend{font-size:10px;font-weight:800;color:#9fb4c8;letter-spacing:.02em;white-space:nowrap}
+.system-status-legend b{color:#cce6ff}
 .huddle-table.small td{padding:7px 8px}
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -674,7 +707,9 @@ select.msf option:checked{background:#ddeeff}
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -3845,7 +3880,7 @@ APPENDIX 6.5B)</div>
           <div class="kpi-lines">
             <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
             <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
-            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
+            <div class="kpi-line"><span>RTS</span><b id="d-systems-returning">—</b></div>
           </div>
           <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
           <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
@@ -3881,14 +3916,28 @@ APPENDIX 6.5B)</div>
   <!-- Executive Dashboard Middle: Systems + Return to Service -->
   <div class="huddle-middle-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Systems Status</div>
+      <div class="system-status-head">
+        <div class="huddle-panel-title">Systems Status</div>
+        <div class="system-status-legend"><b>OOS</b> = Out of Service &nbsp; | &nbsp; <b>RTS</b> = Returning to Service</div>
+      </div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Return to Service / Delay Description</div>
+      <div class="huddle-panel-title">Return to Service</div>
       <table class="huddle-table small">
         <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead>
         <tbody id="d-rts-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Daily Huddle Delay Detail -->
+  <div class="huddle-delay-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Delay Description</div>
+      <table class="huddle-table small">
+        <thead><tr><th>System ID</th><th>Task</th><th>Target</th><th>Notes</th><th>Action</th></tr></thead>
+        <tbody id="d-delay-rows"></tbody>
       </table>
     </div>
   </div>
@@ -3924,11 +3973,11 @@ APPENDIX 6.5B)</div>
     </table>
   </div>
 
-  <!-- Row 1: Total | By Area | By Resource -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
+  <!-- KPI Overview -->
+  <div class="kpi-section kpi-overview-grid">
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;margin-bottom:10px">TOTAL WORK ORDERS</div>
+    <div class="kpi-card kpi-total-card" style="text-align:center;display:flex;flex-direction:column;justify-content:center">
+      <div class="kpi-card-title" style="text-align:center">TOTAL WORK ORDERS</div>
       <div style="font-size:72px;font-weight:800;line-height:1;color:#fff" id="d-total-num">—</div>
       <div style="font-size:22px;font-weight:700;color:#f0c040;margin-top:10px;font-style:italic" id="d-total-sub">—</div>
       <div id="d-delayed-badge-card" style="display:none;margin-top:10px">
@@ -3936,8 +3985,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY AREA</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY AREA</div>
       <div id="d-by-area" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -3952,8 +4001,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY RESOURCE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY RESOURCE</div>
       <div id="d-by-resource" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -3967,13 +4016,9 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Row 2: By Type | Timeline -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 1.8fr;gap:12px;margin-bottom:12px">
-
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY TYPE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY TYPE</div>
       <div id="d-by-type" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -3987,19 +4032,22 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">TASKS BY WEEK</div>
+  <!-- KPI Detail -->
+  <div class="kpi-section kpi-detail-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">TASKS BY WEEK</div>
       <div style="position:relative;height:150px">
         <svg id="d-timeline" style="width:100%;height:100%"></svg>
       </div>
     </div>
-  </div>
 
-  <!-- Row 3: Vendor Readiness -->
-  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:10px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">VENDOR READINESS</div>
+      <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    </div>
   </div>
 
 </div>
@@ -6198,6 +6246,9 @@ function renderDashboard(){
       const st = executiveSystemStatus(status);
       return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
     }
+    function executiveSystemLabel(status){
+      return executiveSystemStatus(status) === 'Returning to Service' ? 'RTS' : executiveSystemStatus(status);
+    }
     const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
     const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
     const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
@@ -6211,8 +6262,8 @@ function renderDashboard(){
     systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
+      <div class="system-pill ${executiveSystemClass(s.status)}">${executiveSystemLabel(s.status)}</div>
+    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or RTS systems.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -6311,6 +6362,28 @@ function renderDashboard(){
     }
     rtsEl.innerHTML = rtsItems.length ? rtsItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
   }
+  const delayEl = document.getElementById('d-delay-rows');
+  if(delayEl){
+    const delayRows = delayedTasks
+      .slice()
+      .sort((a,b)=>{
+        const ae = normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+        const be = normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+        return ae.localeCompare(be) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+      })
+      .map(t=>{
+        const note = String(notesMap[t.id] || t.notes || '').trim();
+        const action = String(t.actionComment || '').trim();
+        return `<tr>
+          <td>${huddleSystemForTask(t)}</td>
+          <td><b>${esc(t.id)}</b> ${esc(t.task)}</td>
+          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+          <td>${note ? esc(note) : '<span style="color:#9fb4c8;font-style:italic">No note</span>'}</td>
+          <td>${action ? esc(action) : '<span style="color:#9fb4c8;font-style:italic">No action</span>'}</td>
+        </tr>`;
+      });
+    delayEl.innerHTML = delayRows.join('') || '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No delayed items.</td></tr>';
+  }
 
   const upcomingEl = document.getElementById('d-upcoming-schedule');
   if(upcomingEl){
@@ -6401,15 +6474,15 @@ function renderDashboard(){
   function drawBars(elId, items, totalRef, colorFn){
     const el = document.getElementById(elId); if(!el) return;
     const maxVal = Math.max(...items.map(i=>i.v), 1);
-    const BAR_AREA_H = 110; // px height for 100%
+    const BAR_AREA_H = 58; // compact KPI chart height for 100%
     const html = items.map(i=>{
       const barH = Math.max(4, Math.round(i.v/maxVal*BAR_AREA_H));
       const pct  = totalRef ? (i.v/totalRef*100).toFixed(1) : 0;
       const color = typeof colorFn === 'function' ? colorFn(i.k) : colorFn;
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;z-index:1;margin-right:4px">
-        <span style="font-size:13px;font-weight:800;color:#fff">${i.v}</span>
-        <span style="font-size:10px;color:#f0c040;font-weight:600">${pct}%</span>
-        <div style="width:54px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
+        <span style="font-size:11px;font-weight:800;color:#fff">${i.v}</span>
+        <span style="font-size:9px;color:#f0c040;font-weight:600">${pct}%</span>
+        <div style="width:46px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
           <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 60%);border-radius:4px 4px 0 0"></div>
         </div>
         <span style="font-size:10px;color:#cde;font-weight:700;margin-top:2px;text-align:center">${i.k}</span>
@@ -6511,14 +6584,12 @@ function renderDashboard(){
     d.remaining = d.total - d.completed;
   }
   leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
-  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
+  calData.forEach((r,i)=>addVendorStatus(r.vendor || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
   pmData.forEach((r,i)=>{
-    const v=(r.mfr||'').trim()||'Internal';
-    const key = v.length>12 ? v.slice(0,11) : v;
-    addVendorStatus(key, typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
+    addVendorStatus(r.vendor || 'Internal', typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
   });
 
-  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
+  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
   const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
     acc.scheduled += d.scheduled;
     acc.inProgress += d.inProgress;
@@ -6536,10 +6607,10 @@ function renderDashboard(){
         <div class="vendor-progress-name" title="${name}">${name}</div>
         <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div class="vendor-metric">${d.scheduled}<span>Scheduled</span></div>
-      <div class="vendor-metric">${d.inProgress}<span>In Progress</span></div>
-      <div class="vendor-metric">${d.completed}<span>Completed</span></div>
-      <div class="vendor-metric">${d.remaining}<span>Remaining</span></div>
+      <div class="vendor-metric">${d.scheduled}<span>SCH</span></div>
+      <div class="vendor-metric">${d.inProgress}<span>WIP</span></div>
+      <div class="vendor-metric">${d.completed}<span>DONE</span></div>
+      <div class="vendor-metric">${d.remaining}<span>REM</span></div>
     </div>`;
   }).join('');
 }
@@ -6548,7 +6619,7 @@ function renderBars(elId, items, total){
   const max = Math.max(...items.map(i=>i.count), 1);
   const el = document.getElementById(elId);
   el.innerHTML = items.map(i=>{
-    const h = Math.max(4, Math.round(i.count/max*110));
+    const h = Math.max(4, Math.round(i.count/max*44));
     const pct = total ? Math.round(i.count/total*100) : 0;
     return `<div class="bar-wrap">
       <span class="bar-count">${i.count}</span>
@@ -8106,6 +8177,7 @@ function renderRcVendor(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -8114,7 +8186,7 @@ function renderRcVendor(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -8132,7 +8204,9 @@ function renderRcVendor(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -8272,6 +8346,7 @@ function renderRcMonthlyCalendar(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -8280,7 +8355,7 @@ function renderRcMonthlyCalendar(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -8298,7 +8373,9 @@ function renderRcMonthlyCalendar(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -8609,6 +8686,7 @@ function rcExpandedBarRows(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -8617,7 +8695,7 @@ function rcExpandedBarRows(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -8635,7 +8713,9 @@ function rcExpandedBarRows(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -9119,7 +9199,6 @@ function handleDailyHuddleUrlParams(){
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
     }
-
     var overall=safe('d-progress-count','—');
     var overallSub=safe('d-progress-pct','—');
     var todayDue=safe('d-today-due','0');
@@ -9147,6 +9226,11 @@ function handleDailyHuddleUrlParams(){
       // Dashboard row: Progress/Status, System ID, Target, Start-Up, Note
       return [c[1]||'—', c[2]||'TBD', c[0]||'—', c[4]||c[3]||'—'];
     });
+    var rawDelay=tableRows('d-delay-rows');
+    var delayRows=rawDelay.map(function(c){
+      // Dashboard row: System ID, Task, Target, Notes, Action
+      return [c[0]||'—', c[1]||'—', c[2]||'TBD', c[3]||'—', c[4]||'—'];
+    });
     var rawMaint=tableRows('d-maint-activities');
     var maintRows=rawMaint.map(function(c){
       // Dashboard row: Progress, System ID, Event, Start, Target, New, Status
@@ -9157,6 +9241,323 @@ function handleDailyHuddleUrlParams(){
       // Dashboard row: Start, Target, System ID, Event, Owner / Resource, Status
       return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
     });
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var downSource=typeof downMap!=='undefined' ? downMap : (typeof timelineDownMap!=='undefined' ? timelineDownMap : {});
+      var startupSource=typeof startupMap!=='undefined' ? startupMap : (typeof timelineStartupMap!=='undefined' ? timelineStartupMap : {});
+      var selected=allT.filter(function(t){ return !t.isParent && (downSource[t.id]!=null || startupSource[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:downSource[t.id]!=null?xl(downSource[t.id]):null,upD:startupSource[t.id]!=null?xl(startupSource[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function canvasToPngBlob(canvas){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+      });
+    }
+
+    async function renderDailyHuddleHtmlToPngBlob(html){
+      setExportStatus('Rendering dashboard PNG...');
+      const width=1400;
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html, 'text/html');
+      const wrap=document.createElement('div');
+      wrap.style.position='fixed';
+      wrap.style.left='-10000px';
+      wrap.style.top='0';
+      wrap.style.width=width+'px';
+      wrap.style.background='#eef2f6';
+      wrap.style.zIndex='-1';
+      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
+      document.body.appendChild(wrap);
+      try{
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
+        try{
+          const h2c=await ensureHtml2Canvas();
+          if(typeof h2c==='function'){
+            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
+            return await canvasToPngBlob(canvas);
+          }
+        }catch(primaryErr){
+          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
+        }
+        const clone=wrap.cloneNode(true);
+        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+        clone.style.position='static';
+        clone.style.left='auto';
+        clone.style.top='auto';
+        clone.style.zIndex='auto';
+        const xhtml=new XMLSerializer().serializeToString(clone);
+        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+        const url=URL.createObjectURL(svgBlob);
+        try{
+          const img=new Image();
+          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+          img.src=url;
+          await loaded;
+          const canvas=document.createElement('canvas');
+          canvas.width=width;
+          canvas.height=height;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#eef2f6';
+          ctx.fillRect(0,0,width,height);
+          ctx.drawImage(img,0,0);
+          return await canvasToPngBlob(canvas);
+        }finally{
+          URL.revokeObjectURL(url);
+        }
+      }finally{
+        wrap.remove();
+      }
+    }
+
+    async function saveEmailBodyToSharePointOrDownload(blob, filename){
+      var key='sd26_sharepoint_email_body_url_v1';
+      var folderLink='https://revancetherapeuticsinc.sharepoint.com/:f:/r/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown?csf=1&web=1&e=bgvyre';
+      var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+      function normalizeSharePointUrl(url){
+        url=String(url||'').trim();
+        if(!url) return '';
+        if(url.indexOf(':f:/r/')>=0){
+          var clean=url.split('?')[0].replace('/:f:/r','');
+          return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+        }
+        if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+        return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+      }
+      var url='';
+      try{ url=localStorage.getItem(key)||''; }catch(e){}
+      url=normalizeSharePointUrl(url || defaultFileUrl || folderLink);
+      try{ localStorage.setItem(key,url); }catch(e){}
+      try{
+        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'application/octet-stream'}});
+        if(res.ok || res.status===200 || res.status===201 || res.status===204){
+          setExportStatus('Dashboard PNG saved to SharePoint');
+          setTimeout(function(){setExportStatus('');}, 2600);
+          return true;
+        }
+        throw new Error('SharePoint save failed: HTTP '+res.status);
+      }catch(e){
+        console.warn(e);
+        setExportStatus('SharePoint save blocked; downloading PNG');
+      }
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl; a.download=filename; a.style.display='none';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
+      setTimeout(function(){setExportStatus('');}, 2600);
+      return false;
+    }
+
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
 
     function emailDate(v){
       try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
@@ -9556,6 +9957,366 @@ function handleDailyHuddleUrlParams(){
     if(pdf){ pdf.onclick=window.exportDailyHuddlePDF; }
     if(sum){ sum.onclick=window.downloadDailyHuddleSummary; }
     setTimeout(window.handleDailyHuddleUrlParams, 750);
+  });
+})();
+</script>
+
+<script id="dashboard-timeline-png-export">
+(function(){
+  var exportInProgress=false;
+  function setExportStatus(msg){
+    var el=document.getElementById('huddleExportStatus');
+    if(el) el.textContent=msg || '';
+  }
+  function waitFrames(n){
+    return new Promise(function(resolve){
+      function step(){ if(--n<=0) resolve(); else requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+  }
+  async function ensureHtml2Canvas(){
+    if(window.html2canvas) return window.html2canvas;
+    return await new Promise(function(resolve,reject){
+      var existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+      if(existing){
+        existing.addEventListener('load', function(){ resolve(window.html2canvas); }, {once:true});
+        existing.addEventListener('error', function(){ reject(new Error('html2canvas load failed')); }, {once:true});
+        return;
+      }
+      var script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.async=true;
+      script.dataset.huddleHtml2canvas='1';
+      script.onload=function(){ resolve(window.html2canvas); };
+      script.onerror=function(){ reject(new Error('html2canvas load failed')); };
+      document.head.appendChild(script);
+    });
+  }
+  function canvasToBlob(canvas){
+    return new Promise(function(resolve,reject){
+      canvas.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('PNG render failed')); }, 'image/png');
+    });
+  }
+  function svgWidth(el){
+    var svg=el && el.querySelector && el.querySelector('svg');
+    if(!svg) return 0;
+    return Math.ceil(Number(svg.getAttribute('width')) || svg.scrollWidth || svg.clientWidth || 0);
+  }
+  function prepDashboardClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelCapture';
+    clone.classList.add('email-report-dashboard');
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-top-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px'});
+    apply('.progress-brief,.huddle-top-layout>.huddle-panel', {width:'100%', maxWidth:'none'});
+    apply('.progress-brief', {padding:'18px', marginBottom:'0'});
+    apply('.progress-kpis', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'14px'});
+    apply('.progress-kpi', {minHeight:'132px', padding:'18px', borderRadius:'8px'});
+    apply('.progress-kpi-label', {fontSize:'15px', lineHeight:'1.15', marginBottom:'10px', whiteSpace:'normal'});
+    apply('.progress-kpi-value,.progress-kpi-value.compact', {fontSize:'42px', lineHeight:'1'});
+    apply('.progress-kpi-sub', {fontSize:'17px', lineHeight:'1.2'});
+    apply('.kpi-line', {fontSize:'18px', lineHeight:'1.35'});
+    apply('.progress-meter', {height:'12px'});
+    apply('.operational-detail-kpi', {maxWidth:'none', gridColumn:'1 / -1'});
+    apply('.operational-detail-kpi .progress-row', {gridTemplateColumns:'210px 58px minmax(220px,1fr) 72px', gap:'12px', fontSize:'17px', padding:'7px 0'});
+    apply('.operational-detail-kpi .progress-row-name,.operational-detail-kpi .progress-row-pct', {fontSize:'17px'});
+    apply('.operational-detail-kpi .progress-row-meta', {fontSize:'15px'});
+    apply('.operational-detail-kpi .progress-mini-meter', {height:'9px'});
+    apply('.huddle-panel', {padding:'16px', borderRadius:'8px', minHeight:'0'});
+    apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('.gowning-list.dashboard', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'12px'});
+    apply('.gowning-row', {padding:'14px', gridTemplateColumns:'160px minmax(0,1fr)'});
+    apply('.gowning-area,.gowning-select', {fontSize:'17px'});
+    apply('.gowning-select', {height:'36px', padding:'6px 12px'});
+    apply('.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px', alignItems:'start', marginBottom:'16px'});
+    apply('.system-status-grid.compact', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'10px'});
+    apply('.system-status-row', {fontSize:'16px', padding:'12px'});
+    apply('.system-status-id,.system-status-name,.system-pill', {fontSize:'16px'});
+    apply('.huddle-table', {fontSize:'16px'});
+    apply('.huddle-table th', {fontSize:'14px', padding:'10px 12px'});
+    apply('.huddle-table td', {fontSize:'16px', lineHeight:'1.25', padding:'10px 12px'});
+    apply('#d-delayed-alert,.kpi-section', {display:'none'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-dashboard{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-dashboard *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-dashboard #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-title{font-size:26px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-date{font-size:16px!important}',
+      '.email-report-dashboard .huddle-top-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important}',
+      '.email-report-dashboard .progress-brief,.email-report-dashboard .huddle-top-layout>.huddle-panel{width:100%!important;max-width:none!important}',
+      '.email-report-dashboard .progress-brief{padding:18px!important;margin-bottom:0!important}',
+      '.email-report-dashboard .progress-kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-dashboard .progress-kpi{min-height:132px!important;padding:18px!important;border-radius:8px!important}',
+      '.email-report-dashboard .progress-kpi-label{font-size:15px!important;line-height:1.15!important;margin-bottom:10px!important;white-space:normal!important}',
+      '.email-report-dashboard .progress-kpi-value,.email-report-dashboard .progress-kpi-value.compact{font-size:42px!important;line-height:1!important}',
+      '.email-report-dashboard .progress-kpi-sub{font-size:17px!important;line-height:1.2!important}',
+      '.email-report-dashboard .kpi-line{font-size:18px!important;line-height:1.35!important}',
+      '.email-report-dashboard .progress-meter{height:12px!important}',
+      '.email-report-dashboard .operational-detail-kpi{max-width:none!important;grid-column:1 / -1!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row{grid-template-columns:210px 58px minmax(220px,1fr) 72px!important;gap:12px!important;font-size:17px!important;padding:7px 0!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-kpi-label{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-name,.email-report-dashboard .operational-detail-kpi .progress-row-pct{font-size:17px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-meta{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-mini-meter{height:9px!important}',
+      '.email-report-dashboard .huddle-panel{padding:16px!important;border-radius:8px!important;min-height:0!important}',
+      '.email-report-dashboard .huddle-panel-title{font-size:17px!important;line-height:1.15!important;margin-bottom:12px!important}',
+      '.email-report-dashboard .gowning-list.dashboard{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}',
+      '.email-report-dashboard .gowning-row{padding:14px!important;grid-template-columns:160px minmax(0,1fr)!important}',
+      '.email-report-dashboard .gowning-select{height:36px!important;padding:6px 12px!important}',
+      '.email-report-dashboard .gowning-area,.email-report-dashboard .gowning-select{font-size:17px!important}',
+      '.email-report-dashboard .huddle-middle-layout,.email-report-dashboard .huddle-delay-layout,.email-report-dashboard .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;align-items:start!important;margin-bottom:16px!important}',
+      '.email-report-dashboard .system-status-grid.compact{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}',
+      '.email-report-dashboard .system-status-row{font-size:16px!important;padding:12px!important}',
+      '.email-report-dashboard .system-status-id,.email-report-dashboard .system-status-name,.email-report-dashboard .system-pill{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table th{font-size:14px!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table td{font-size:16px!important;line-height:1.25!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table .status-pill,.email-report-dashboard .huddle-table .pill{font-size:14px!important}',
+      '.email-report-dashboard #d-delayed-alert,.email-report-dashboard .kpi-section{display:none!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    clone.querySelectorAll('[style]').forEach(function(el){
+      if(/overflow-y\s*:\s*auto|overflow\s*:\s*auto|min-height\s*:\s*0/i.test(el.getAttribute('style')||'')){
+        el.style.overflow='visible';
+        el.style.maxHeight='none';
+      }
+    });
+    return clone;
+  }
+  function prepKpiClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelKpiCapture';
+    clone.classList.remove('dash-mode-huddle');
+    clone.classList.add('dash-mode-kpi');
+    clone.classList.add('email-report-kpi');
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    var title=clone.querySelector('#dashboardTitle');
+    if(title) title.textContent='Shutdown 2026 — KPI Dashboard';
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-section', {display:'none'});
+    apply('#d-delayed-alert', {display:'none'});
+    apply('.kpi-section', {display:'grid'});
+    apply('.kpi-overview-grid', {gridTemplateColumns:'.8fr 1.35fr 1.1fr 1.05fr', gap:'12px', marginBottom:'12px'});
+    apply('.kpi-detail-grid', {gridTemplateColumns:'1.12fr .88fr', gap:'12px', marginBottom:'0'});
+    apply('.kpi-card', {padding:'14px', borderRadius:'8px'});
+    apply('.kpi-card-title', {fontSize:'14px', lineHeight:'1.15', marginBottom:'10px'});
+    apply('#d-total-num', {fontSize:'54px', lineHeight:'1'});
+    apply('#d-total-sub', {fontSize:'17px', lineHeight:'1.2'});
+    apply('#d-by-area,#d-by-resource,#d-by-type', {height:'128px'});
+    apply('#d-timeline', {height:'150px', minHeight:'150px'});
+    apply('.executive-vendor-list', {display:'grid', gridTemplateColumns:'1fr', gap:'8px'});
+    apply('.vendor-progress-row.exec', {gridTemplateColumns:'minmax(150px,1fr) repeat(4,58px)', gap:'8px', padding:'9px 11px'});
+    apply('.vendor-progress-name,.vendor-progress-total,.vendor-metric', {fontSize:'14px'});
+    apply('.vendor-metric span', {fontSize:'8px'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-kpi{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-kpi *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-kpi #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-kpi .dashboard-export-actions{display:none!important}',
+      '.email-report-kpi .huddle-section,.email-report-kpi #d-delayed-alert{display:none!important}',
+      '.email-report-kpi .kpi-overview-grid{display:grid!important;grid-template-columns:.8fr 1.35fr 1.1fr 1.05fr!important;gap:12px!important;margin-bottom:12px!important}',
+      '.email-report-kpi .kpi-detail-grid{display:grid!important;grid-template-columns:1.12fr .88fr!important;gap:12px!important;margin-bottom:0!important}',
+      '.email-report-kpi .kpi-card{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:14px!important;overflow:hidden!important}',
+      '.email-report-kpi .kpi-card-title{font-size:14px!important;line-height:1.15!important;margin-bottom:10px!important;color:#d5e5f5!important}',
+      '.email-report-kpi #d-total-num{font-size:54px!important;line-height:1!important}',
+      '.email-report-kpi #d-total-sub{font-size:17px!important;line-height:1.2!important}',
+      '.email-report-kpi #d-by-area,.email-report-kpi #d-by-resource,.email-report-kpi #d-by-type{height:128px!important}',
+      '.email-report-kpi #d-timeline{height:150px!important;min-height:150px!important}',
+      '.email-report-kpi .executive-vendor-list{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}',
+      '.email-report-kpi .vendor-progress-row.exec{display:grid!important;grid-template-columns:minmax(150px,1fr) repeat(4,58px)!important;gap:8px!important;padding:9px 11px!important;align-items:center!important;overflow:hidden!important}',
+      '.email-report-kpi .vendor-progress-top{display:block!important;min-width:0!important;margin:0!important}',
+      '.email-report-kpi .vendor-progress-name{font-size:14px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}',
+      '.email-report-kpi .vendor-progress-total,.email-report-kpi .vendor-metric{font-size:14px!important;line-height:1.1!important;text-align:right!important;white-space:nowrap!important}',
+      '.email-report-kpi .vendor-metric span{font-size:8px!important;line-height:1.1!important;white-space:nowrap!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    return clone;
+  }
+  function buildTimelineClone(width){
+    var header=document.getElementById('tl-header-sticky');
+    var body=document.getElementById('tl-container');
+    var section=document.createElement('div');
+    section.style.background='#0d2137';
+    section.style.color='#fff';
+    section.style.padding='18px 22px 22px';
+    section.style.width=width+'px';
+    section.style.boxSizing='border-box';
+    section.innerHTML='<div style="background:#1a3a5c;padding:13px 18px;border-radius:8px 8px 0 0;border-bottom:3px solid #f0c040;font-size:18px;font-weight:800;letter-spacing:.10em;text-transform:uppercase">System Down / Start-Up Timeline</div>';
+    var wrap=document.createElement('div');
+    wrap.style.background='#0f2236';
+    wrap.style.borderRadius='0 0 8px 8px';
+    wrap.style.overflow='visible';
+    wrap.style.width='100%';
+    wrap.style.boxSizing='border-box';
+    var headerClone=header ? header.cloneNode(true) : document.createElement('div');
+    var bodyClone=body ? body.cloneNode(true) : document.createElement('div');
+    [headerClone, bodyClone].forEach(function(el){
+      el.removeAttribute('id');
+      el.style.overflow='visible';
+      el.style.width='100%';
+      el.style.maxWidth='none';
+      el.style.height='auto';
+      el.style.maxHeight='none';
+    });
+    wrap.appendChild(headerClone);
+    wrap.appendChild(bodyClone);
+    section.appendChild(wrap);
+    return section;
+  }
+  async function renderNodeToPngBlob(node, width){
+    var root=document.createElement('div');
+    root.style.position='fixed';
+    root.style.left='-10000px';
+    root.style.top='0';
+    root.style.width=width+'px';
+    root.style.background='#0d2137';
+    root.style.zIndex='-1';
+    root.style.overflow='visible';
+    root.appendChild(node);
+    document.body.appendChild(root);
+    try{
+      await waitFrames(2);
+      var h2c=await ensureHtml2Canvas();
+      var height=Math.max(500, Math.ceil(root.scrollHeight || root.offsetHeight || 0));
+      var canvas=await h2c(root, {
+        backgroundColor:'#0d2137',
+        scale:1,
+        useCORS:true,
+        logging:false,
+        width:width,
+        height:height,
+        windowWidth:width,
+        windowHeight:height,
+        scrollX:0,
+        scrollY:0
+      });
+      return await canvasToBlob(canvas);
+    }finally{
+      root.remove();
+    }
+  }
+  function downloadBlob(blob, filename, delayMs){
+    setTimeout(function(){
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl;
+      a.download=filename;
+      a.style.display='none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(dlUrl); a.remove(); }, 1500);
+    }, delayMs || 0);
+  }
+  async function savePng(blob, filename){
+    var key='sd26_sharepoint_email_body_url_v1';
+    var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+    var url='';
+    try{ url=localStorage.getItem(key)||''; }catch(e){}
+    function normalize(url){
+      url=String(url||'').trim();
+      if(!url) return defaultFileUrl;
+      if(url.indexOf(':f:/r/')>=0){
+        var clean=url.split('?')[0].replace('/:f:/r','');
+        return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+      }
+      if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+      return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+    }
+    url=normalize(url);
+    try{ localStorage.setItem(key,url); }catch(e){}
+    try{
+      var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'image/png'}});
+      if(res.ok || res.status===200 || res.status===201 || res.status===204){
+        return true;
+      }
+      throw new Error('SharePoint save failed: HTTP '+res.status);
+    }catch(e){
+      console.warn(e);
+      return false;
+    }
+  }
+  window.downloadDailyHuddleSummary=async function(ev){
+    if(ev && ev.preventDefault) ev.preventDefault();
+    if(exportInProgress) return false;
+    exportInProgress=true;
+    setExportStatus('Rendering Dashboard, KPI, and Timeline PNGs...');
+    try{
+      if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
+      if(typeof initTimelineFilter==='function') initTimelineFilter();
+      if(typeof renderTimeline==='function') renderTimeline();
+      await waitFrames(3);
+      var dashboard=document.getElementById('dashboardPanel');
+      var tlHeader=document.getElementById('tl-header-sticky');
+      var tlBody=document.getElementById('tl-container');
+      if(!dashboard) throw new Error('Dashboard panel not found.');
+      var dashboardWidth=1200;
+      var timelineWidth=Math.max(
+        1400,
+        Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
+        Math.ceil(tlBody ? tlBody.scrollWidth : 0),
+        svgWidth(tlHeader),
+        svgWidth(tlBody)
+      );
+      var kpiWidth=1600;
+      var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var kpiBlob=await renderNodeToPngBlob(prepKpiClone(dashboard, kpiWidth), kpiWidth);
+      var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
+      var kpiFile='Shutdown_Daily_Huddle_KPI.png';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
+      var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var kpiSaved=await savePng(kpiBlob, kpiFile);
+      var timelineSaved=await savePng(timelineBlob, timelineFile);
+      if(dashSaved && kpiSaved && timelineSaved){
+        setExportStatus('Dashboard, KPI, and Timeline PNGs saved to SharePoint');
+      }else{
+        setExportStatus('SharePoint save blocked; downloading PNGs');
+        if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 0);
+        if(!kpiSaved) downloadBlob(kpiBlob, kpiFile, 650);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
+      }
+      setTimeout(function(){ setExportStatus(''); }, 3000);
+    }catch(e){
+      console.error('Dashboard, KPI, and Timeline PNG export failed:', e);
+      alert('Could not create Dashboard, KPI, and Timeline PNGs: '+(e && e.message ? e.message : e));
+      setExportStatus('');
+    }finally{
+      exportInProgress=false;
+    }
+    return false;
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn=document.getElementById('btnDownloadHuddleSummary');
+    if(btn){
+      btn.textContent='🖼 Email PNGs';
+      btn.title='Save separate Dashboard, KPI, and Timeline PNGs to SharePoint, with local download fallback';
+      btn.onclick=window.downloadDailyHuddleSummary;
+    }
   });
 })();
 </script>
