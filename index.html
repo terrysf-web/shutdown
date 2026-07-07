@@ -875,7 +875,7 @@ select.msf option:checked{background:#ddeeff}
     <table>
       <colgroup>
         <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor">
-        <col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
+        <col class="col-date"><col class="col-date"><col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
       </colgroup>
       <thead>
         <tr>
@@ -887,6 +887,8 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('vendor'," event)\"="">Vendor <span class="sort-indicator" id="sort-vendor" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('start'," event)\"="">Start <span class="sort-indicator" id="sort-start" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('end'," event)\"="">End <span class="sort-indicator" id="sort-end" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('newStart'," event)\"="">New Start <span class="sort-indicator" id="sort-newStart" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('newEnd'," event)\"="">New End <span class="sort-indicator" id="sort-newEnd" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th style="white-space:nowrap;text-align:center;font-size:11px" title="Check if this task's end date is impacted">End Impact</th>
           <th class="sortable" onclick="\&quot;setSort('days'," event)\"="">Days <span class="sort-indicator" id="sort-days" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('wk'," event)\"="" style="white-space:nowrap">WK <span class="sort-indicator" id="sort-wk" title="Click to sort · Shift+click for secondary sort"></span></th>
@@ -895,8 +897,8 @@ select.msf option:checked{background:#ddeeff}
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="14">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="14">
+      <tbody id="tbody"><tr class="section-row"><td colspan="16">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1111,7 +1113,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1292,7 +1294,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1405,7 +1407,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1501,7 +1503,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
@@ -1835,7 +1837,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -1931,7 +1933,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2078,7 +2080,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2140,7 +2142,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2184,8 +2186,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="16">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2383,7 +2385,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2530,7 +2532,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2557,8 +2559,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="16">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2704,8 +2706,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="16">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
@@ -4385,6 +4387,8 @@ function updateDerivedFields(){
     t.actionComment = t.actionComment || '';
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
+    t.newStart = normalizeDateValue(t.newStart);
+    t.newEnd = normalizeDateValue(t.newEnd);
     const d = diffDaysInclusive(t.start, t.end);
     t.days = d;
   });
@@ -4641,7 +4645,7 @@ function getSortableValue(task, field){
   if(field === 'status') return statusMap[task.id] || '';
   if(field === 'notes') return notesMap[task.id] || '';
   if(field === 'actionComment') return task.actionComment || '';
-  if(field === 'start' || field === 'end'){
+  if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     return normalizeDateValue(task[field]) || '';
   }
   if(field === 'days'){
@@ -4661,7 +4665,7 @@ function compareByField(a, b, field, dir){
     result = wa - wb;
   } else if(field === 'days'){
     result = av - bv;
-  } else if(field === 'start' || field === 'end'){
+  } else if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     result = String(av).localeCompare(String(bv));
   } else {
     result = String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
@@ -4709,7 +4713,7 @@ function setSort(field, event){
   render();
 }
 function updateSortIndicators(){
-  ['id','task','category','assigned','vendor','start','end','days','wk','status','notes','actionComment'].forEach(field=>{
+  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','status','notes','actionComment'].forEach(field=>{
     const el = document.getElementById(`sort-${field}`);
     if(!el) return;
     if(sortField === field){
@@ -5088,7 +5092,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="14">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="16">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5105,7 +5109,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="14">
+        <td colspan="16">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5151,6 +5155,12 @@ function render(){
     const impactCell = `<td style="text-align:center">
       <input type="checkbox" ${isImpacted?'checked':''} onchange="toggleEndImpact('${t.id}',this.checked)" title="Mark end date as impacted" style="cursor:pointer;width:15px;height:15px;accent-color:#e65100">
     </td>`;
+    const newStartCell = editMode
+      ? `<td class="edit-cell"><input type="date" data-field="newStart" value="${esc(toDateInputValue(t.newStart)||'')}" title="New start date for delayed/rescheduled work"></td>`
+      : `<td style="white-space:nowrap;color:${t.newStart?'#ffcc80':'#8aa4bd'};font-weight:${t.newStart?'700':'400'}">${displayDate(t.newStart)||'—'}</td>`;
+    const newEndCell = editMode
+      ? `<td class="edit-cell"><input type="date" data-field="newEnd" value="${esc(toDateInputValue(t.newEnd)||'')}" title="New end/target date for delayed/rescheduled work"></td>`
+      : `<td style="white-space:nowrap;color:${t.newEnd?'#ffcc80':'#8aa4bd'};font-weight:${t.newEnd?'700':'400'}">${displayDate(t.newEnd)||'—'}</td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5161,6 +5171,8 @@ function render(){
       ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
       ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
       ${endCellHtml}
+      ${newStartCell}
+      ${newEndCell}
       ${impactCell}
       ${editMode ? `<td class="edit-cell"><span class="days-readonly">${diffDaysInclusive(t.start, t.end) ?? '—'}</span></td>` : `<td style="text-align:center">${diffDaysInclusive(t.start, t.end) ?? '—'}</td>`}
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">${getShutdownWeek(t.start)}</td>
@@ -5169,7 +5181,7 @@ function render(){
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="14" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="16" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
@@ -5207,7 +5219,7 @@ function collectEditedRows(){
     tr.querySelectorAll('[data-field]').forEach(el=>{
       const field = el.dataset.field;
       let val = el.value;
-      if(['start','end'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
+      if(['start','end','newStart','newEnd'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
       if(field==='status') statusMap[id] = val || 'Pending';
       else if(field==='notes') notesMap[id] = val || '';
       else if(field==='actionComment') task.actionComment = val || '';
@@ -5251,6 +5263,8 @@ function insertRow(afterId){
     vendor: '',
     start: normalizeDateValue(current.start),
     end: normalizeDateValue(current.end),
+    newStart: null,
+    newEnd: null,
     days: diffDaysInclusive(current.start, current.end) || current.days || null,
     section: current.section,
     isParent:false,
@@ -6243,7 +6257,11 @@ function renderDashboard(){
     return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
   }
   function delayedNewDate(t){
-    const direct = t.newDate || t.newTarget || t.newEnd || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd;
+    const newStartIso = normalizeDateValue(t.newStart || t.newStartDate || t.revisedStart || t.rescheduledStart);
+    const newEndIso = normalizeDateValue(t.newEnd || t.newEndDate || t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd);
+    if(newStartIso && newEndIso) return `${displayDate(newStartIso)} – ${displayDate(newEndIso)}`;
+    if(newStartIso || newEndIso) return displayDate(newStartIso || newEndIso);
+    const direct = t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd;
     const directIso = normalizeDateValue(direct);
     if(directIso) return displayDate(directIso);
     const text = String([t.actionComment, notesMap[t.id], t.notes].filter(Boolean).join(' '));
@@ -6282,13 +6300,15 @@ function renderDashboard(){
       });
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${taskProgressPct(t)}%`;
       return `<tr>
-        <td>${taskProgressPct(t)}%</td>
+        <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
-        <td>${st==='Delayed' ? delayedNewDate(t) : '—'}</td>
+        <td>${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
@@ -9390,6 +9410,176 @@ function handleDailyHuddleUrlParams(){
       setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
       setTimeout(function(){setExportStatus('');}, 2600);
       return false;
+    }
+
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function canvasToPngBlob(canvas){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+      });
+    }
+
+    async function renderDailyHuddleHtmlToPngBlob(html){
+      setExportStatus('Rendering dashboard PNG...');
+      const width=1400;
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html, 'text/html');
+      const wrap=document.createElement('div');
+      wrap.style.position='fixed';
+      wrap.style.left='-10000px';
+      wrap.style.top='0';
+      wrap.style.width=width+'px';
+      wrap.style.background='#eef2f6';
+      wrap.style.zIndex='-1';
+      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
+      document.body.appendChild(wrap);
+      try{
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
+        try{
+          const h2c=await ensureHtml2Canvas();
+          if(typeof h2c==='function'){
+            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
+            return await canvasToPngBlob(canvas);
+          }
+        }catch(primaryErr){
+          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
+        }
+        const clone=wrap.cloneNode(true);
+        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+        clone.style.position='static';
+        clone.style.left='auto';
+        clone.style.top='auto';
+        clone.style.zIndex='auto';
+        const xhtml=new XMLSerializer().serializeToString(clone);
+        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+        const url=URL.createObjectURL(svgBlob);
+        try{
+          const img=new Image();
+          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+          img.src=url;
+          await loaded;
+          const canvas=document.createElement('canvas');
+          canvas.width=width;
+          canvas.height=height;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#eef2f6';
+          ctx.fillRect(0,0,width,height);
+          ctx.drawImage(img,0,0);
+          return await canvasToPngBlob(canvas);
+        }finally{
+          URL.revokeObjectURL(url);
+        }
+      }finally{
+        wrap.remove();
+      }
     }
 
     function emailDate(v){
