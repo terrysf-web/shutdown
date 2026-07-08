@@ -5973,11 +5973,10 @@ async function downloadMorningBriefPng(ev){
     setDashboardMode('morning');
     const panel=document.getElementById('morningBriefPanel');
     if(!panel) throw new Error('Morning Brief panel not found.');
-    const todayIso=(document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
     const blob=await renderMorningBriefPanelToPng(panel);
     const a=document.createElement('a');
     a.href=URL.createObjectURL(blob);
-    a.download='Shutdown_Morning_Brief_' + todayIso + '.png';
+    a.download='Shutdown_Morning_Brief.png';
     document.body.appendChild(a);
     a.click();
     setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1000);
