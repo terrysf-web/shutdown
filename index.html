@@ -522,10 +522,10 @@ tr.editing{background:#fffceb}
 .system-pill.down{background:#3b2f55;color:#ddd7ff}
 .system-pill.breakdown{background:#3b2f55;color:#ddd7ff}
 .system-pill.complete{background:#1f6b42;color:#d7ffe5}
-.system-pill.progress{background:#80520e;color:#ffe6ae}
+.system-pill.progress{background:#1f6b42;color:#d7ffe5}
 .system-pill.planned{background:#174a7a;color:#cce6ff}
 .system-pill.scheduled{background:#174a7a;color:#cce6ff}
-.system-pill.delayed{background:#7a1a1a;color:#ffb4ac}
+.system-pill.delayed{background:#8a5a08;color:#fff0bd}
 .system-pill.na{background:rgba(255,255,255,.12);color:#cde}
 .huddle-rollup-table{width:100%;border-collapse:collapse;font-size:12px}
 .huddle-rollup-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
@@ -542,6 +542,17 @@ tr.editing{background:#fffceb}
 .huddle-table{width:100%;border-collapse:collapse;font-size:12px}
 .huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
 .huddle-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;vertical-align:top}
+.vendor-onsite{color:#f0c040!important;font-weight:900}
+.huddle-table-legend{margin-top:8px;font-size:10px;color:#cde;text-align:right;letter-spacing:.03em}
+.huddle-panel-title.with-legend{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.huddle-panel-title.with-legend .huddle-table-legend{margin-top:0;text-transform:none;letter-spacing:.03em;font-size:10px;font-weight:800;white-space:nowrap}
+.morning-hero{background:#102943;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px;margin-bottom:14px}
+.morning-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:.08em;text-transform:uppercase}
+.morning-sub{font-size:12px;color:#cde;font-weight:800;margin-top:3px}
+.morning-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.morning-kpi{background:#1a3a5c;border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:10px}
+.morning-kpi-title{font-size:10px;color:#f0c040;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.morning-kpi-lines{font-size:12px;color:#fff;line-height:1.45;font-weight:800}
 .huddle-status{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;display:inline-block;white-space:nowrap}
 .huddle-status.normal{background:#1f6b42;color:#d7ffe5}
 .huddle-status.oos{background:#7a1a1a;color:#ffb4ac}
@@ -550,13 +561,16 @@ tr.editing{background:#fffceb}
 .huddle-status.down{background:#3b2f55;color:#ddd7ff}
 .huddle-status.breakdown{background:#3b2f55;color:#ddd7ff}
 .huddle-status.complete{background:#1f6b42;color:#d7ffe5}
-.huddle-status.progress{background:#80520e;color:#ffe6ae}
+.huddle-status.progress{background:#1f6b42;color:#d7ffe5}
 .huddle-status.planned{background:#174a7a;color:#cce6ff}
 .huddle-status.scheduled{background:#174a7a;color:#cce6ff}
-.huddle-status.delayed{background:#7a1a1a;color:#ffb4ac}
+.huddle-status.delayed{background:#8a5a08;color:#fff0bd}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
-.dash-mode-huddle .kpi-section{display:none!important}
-.dash-mode-kpi .huddle-section{display:none!important}
+.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section{display:none!important}
+.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section{display:none!important}
+.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section{display:none!important}
+.morning-section{display:none}
+.dash-mode-morning .morning-section{display:block!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
 select.msf:focus{border-color:#1565c0;outline:2px solid #aac4e8}
@@ -840,7 +854,7 @@ select.msf option:checked{background:#ddeeff}
     <table>
       <colgroup>
         <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor">
-        <col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
+        <col class="col-date"><col class="col-date"><col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col style="width:58px"><col style="width:78px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
       </colgroup>
       <thead>
         <tr>
@@ -852,16 +866,20 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('vendor'," event)\"="">Vendor <span class="sort-indicator" id="sort-vendor" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('start'," event)\"="">Start <span class="sort-indicator" id="sort-start" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('end'," event)\"="">End <span class="sort-indicator" id="sort-end" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('newStart'," event)\"="">New Start <span class="sort-indicator" id="sort-newStart" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('newEnd'," event)\"="">New End <span class="sort-indicator" id="sort-newEnd" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th style="white-space:nowrap;text-align:center;font-size:11px" title="Check if this task's end date is impacted">End Impact</th>
           <th class="sortable" onclick="\&quot;setSort('days'," event)\"="">Days <span class="sort-indicator" id="sort-days" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('wk'," event)\"="" style="white-space:nowrap">WK <span class="sort-indicator" id="sort-wk" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('critical'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Manually mark this item as critical">Critical <span class="sort-indicator" id="sort-critical" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('notification'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Check if notification is needed for this task">Notification <span class="sort-indicator" id="sort-notification" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('status'," event)\"="">Status <span class="sort-indicator" id="sort-status" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('notes'," event)\"="">Notes <span class="sort-indicator" id="sort-notes" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="14">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="14">
+      <tbody id="tbody"><tr class="section-row"><td colspan="18">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1076,7 +1094,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1257,7 +1275,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1370,7 +1388,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1466,15 +1484,15 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
           <span class="cat-badge">0/19 complete</span>
           <span class="cat-badge">7/7/2026 – 7/31/2026</span>
-          
-          
-          
+
+
+
         </td>
       </tr><tr class="" data-id="5.01">
       <td class="id-col">5.01</td>
@@ -1800,7 +1818,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -1896,7 +1914,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2043,7 +2061,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2105,7 +2123,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2149,8 +2167,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="18">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2348,7 +2366,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2495,7 +2513,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2522,8 +2540,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="18">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2669,16 +2687,16 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="14">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="14">
+    </tr><tr class="section-row"><td colspan="18">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
           <span class="cat-badge">0/4 complete</span>
-          
-          
-          
-          
+
+
+
+
         </td>
       </tr><tr class="" data-id="14.01">
       <td class="id-col">14.01</td>
@@ -2795,12 +2813,12 @@ SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope1',0,'startDate',null,this)">7/06</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',0,'facBoxes',0)">1.Invasive PM<br>2.Chemical Sani.<br>3.Filters change</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',0,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -2808,10 +2826,10 @@ SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',0,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',0,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope1',0,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -2840,7 +2858,7 @@ SYSTEM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope1',0,'condDate',null,this)">7/24</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope1',0,'condLabel',null,this)">Conditional<br>Release w/<br>Day 1 Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope1',0,'fullDate',null,this)">8/04</div>
@@ -2857,12 +2875,12 @@ SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope1',1,'startDate',null,this)">7/06</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',1,'facBoxes',0)">1.Invasive PM<br>2.Filter change</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',1,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -2870,10 +2888,10 @@ SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',1,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',1,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope1',1,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -2902,7 +2920,7 @@ SYSTEM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope1',1,'condDate',null,this)">7/25</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope1',1,'condLabel',null,this)">Conditional<br>Release w/<br>Day 1 Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope1',1,'fullDate',null,this)">8/04</div>
@@ -2919,12 +2937,12 @@ STEAM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope1',2,'startDate',null,this)">7/06</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',2,'facBoxes',0)">1.Invasive PM<br>2.Filters change</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',2,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -2932,10 +2950,10 @@ STEAM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',2,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',2,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope1',2,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -2964,7 +2982,7 @@ STEAM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope1',2,'condDate',null,this)">7/25</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope1',2,'condLabel',null,this)">Conditional<br>Release w/<br>Day 1 results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope1',2,'fullDate',null,this)">7/28</div>
@@ -2981,12 +2999,12 @@ AIR SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope1',3,'startDate',null,this)">7/15</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',3,'facBoxes',0)">1.Invasive PM<br>2.Filters change</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',3,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -2994,10 +3012,10 @@ AIR SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope1',3,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope1',3,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope1',3,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -3014,7 +3032,7 @@ AIR SYSTEM
         <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope1',3,'condDate',null,this)">7/18</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope1',3,'condLabel',null,this)">Full Release w/<br>Required<br>Results</div>
       </div>
-      
+
     </div></td>
     <td><div class="sow-impact" onclick="if(sowEditMode)editScopeField('scope1',3,'impact',null,this)">All equipment and all point of use drops</div></td>
   </tr><tr><td colspan="5" style="padding:10px;text-align:center;background:#f7f9fc">
@@ -3050,12 +3068,12 @@ SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope2',0,'startDate',null,this)">7/23</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',0,'facBoxes',0)">1.Invasive PM<br>2.Filters change</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',0,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3063,10 +3081,10 @@ SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',0,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',0,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope2',0,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -3083,7 +3101,7 @@ SYSTEM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope2',0,'condDate',null,this)">7/28</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope2',0,'condLabel',null,this)">Conditional<br>Release w/<br>1day Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope2',0,'fullDate',null,this)">8/04</div>
@@ -3100,12 +3118,12 @@ SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope2',1,'startDate',null,this)">7/06</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',1,'facBoxes',0)">1.Annual PMs<br>2.HEPA CERTs<br>3.AIR Balancing<br>4.BIBO PMs</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',1,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3113,7 +3131,7 @@ SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',1,'facBoxes',1)">Functional<br>Test /<br>Verification</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',1,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3121,10 +3139,10 @@ SYSTEM
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',1,'facBoxes',2)">Area 3x<br>Cleaning</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',1,'facBoxes',2)">✕</button>
-        
+
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope2',1,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -3159,7 +3177,7 @@ SYSTEM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope2',1,'condDate',null,this)">8/04</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope2',1,'condLabel',null,this)">Conditional<br>Release w/<br>1day Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope2',1,'fullDate',null,this)">8/11</div>
@@ -3179,12 +3197,12 @@ SYSTEM
       <div class="sow-flow">
         <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope2',2,'startDate',null,this)">7/17</div>
         <span class="sow-arrow">→</span>
-        
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope2',2,'facBoxes',0)">1.Boiler Annual PM<br>2.Boiler Annual Permit</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope2',2,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3195,7 +3213,7 @@ SYSTEM
         <button class="sow-row-btn sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:2px;border-color:#7b1fa2;color:#7b1fa2" onclick="splitBoxToCircle('scope2',2,'facBoxes',1)">⊕ 분리</button>
       </div>
     </div>
-    
+
         <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope2',2,'facBoxes')" title="Add box">+ Box</button>
       </div>
     </td>
@@ -3218,7 +3236,7 @@ SYSTEM
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope2',2,'condDate',null,this)"></div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope2',2,'condLabel',null,this)"></div>
       </div>
-      
+
     </div></td>
     <td><div class="sow-impact" onclick="if(sowEditMode)editScopeField('scope2',2,'impact',null,this)">Utility Systems, Part washers, Fermenter and room temperature</div></td>
   </tr><tr><td colspan="5" style="padding:10px;text-align:center;background:#f7f9fc">
@@ -3251,19 +3269,19 @@ FILLER
       <td><div class="sow-flow">
       <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope3',0,'startDate',null,this)">7/06</div>
       <span class="sow-arrow">→</span>
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',0,'facBoxes',0)">1.SEMI-ANNUAL PM<br>2.REPLACEMENT PARTS</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',0,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',0,'facBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td colspan="2"><div class="sow-flow">
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',0,'rtBoxes',0)" title="Click to edit">Pre-run check</div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',0,'rtBoxes',0)">✕</button>
@@ -3278,7 +3296,7 @@ FILLER
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',0,'rtBoxes',2)" title="Click to edit">1x Full<br>Cleaning</div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',0,'rtBoxes',2)">✕</button>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',0,'rtBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td>
@@ -3293,19 +3311,19 @@ FILLER
       <td><div class="sow-flow">
       <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope3',1,'startDate',null,this)">7/06</div>
       <span class="sow-arrow">→</span>
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',1,'facBoxes',0)">1.SEMI-ANNUAL PM<br>2.ANNUAL PM<br>3.CALIBRATION</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',1,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',1,'facBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td colspan="2"><div class="sow-flow">
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',1,'rtBoxes',0)" title="Click to edit">TEST CYCLE<br>CIP CYCLE</div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',1,'rtBoxes',0)">✕</button>
@@ -3320,7 +3338,7 @@ FILLER
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',1,'rtBoxes',2)" title="Click to edit">LEAK TEST<br>BELLOW TEST</div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',1,'rtBoxes',2)">✕</button>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',1,'rtBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td>
@@ -3335,12 +3353,12 @@ FILLER
       <td><div class="sow-flow">
       <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope3',2,'startDate',null,this)">7/27</div>
       <span class="sow-arrow">→</span>
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',2,'facBoxes',0)">ANNUAL PM<br>(Modify PM tasks<br>through CR)</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',2,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3351,16 +3369,16 @@ FILLER
         <button class="sow-row-btn sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:2px;border-color:#7b1fa2;color:#7b1fa2" onclick="splitBoxToCircle('scope3',2,'facBoxes',1)">⊕ 분리</button>
       </div>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',2,'facBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td colspan="2"><div class="sow-flow">
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',2,'rtBoxes',0)" title="Click to edit"></div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',2,'rtBoxes',0)">✕</button>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',2,'rtBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td>
@@ -3375,12 +3393,12 @@ FILLER
       <td><div class="sow-flow">
       <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope3',3,'startDate',null,this)">8/10</div>
       <span class="sow-arrow">→</span>
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',3,'facBoxes',0)">ANNUAL PM<br>(Modify PM tasks<br>through CR)</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',3,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3391,16 +3409,16 @@ FILLER
         <button class="sow-row-btn sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:2px;border-color:#7b1fa2;color:#7b1fa2" onclick="splitBoxToCircle('scope3',3,'facBoxes',1)">⊕ 분리</button>
       </div>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',3,'facBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td colspan="2"><div class="sow-flow">
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',3,'rtBoxes',0)" title="Click to edit"></div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',3,'rtBoxes',0)">✕</button>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',3,'rtBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td>
@@ -3416,12 +3434,12 @@ EQUIPMENT
       <td><div class="sow-flow">
       <div class="sow-node-date red" onclick="if(sowEditMode)editScopeField('scope3',4,'startDate',null,this)">7/06</div>
       <span class="sow-arrow">→</span>
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',4,'facBoxes',0)">1.ANNUAL PM</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',4,'facBoxes',0)">✕</button>
-        
+
       </div>
     </div>
     <span class="sow-arrow">→</span>
@@ -3429,14 +3447,14 @@ EQUIPMENT
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',4,'facBoxes',1)">FUNCTIONAL TEST</div>
       <div class="sow-edit-ctrl" style="display:flex;gap:4px;margin-top:4px">
         <button class="sow-row-btn del" style="padding:1px 8px;font-size:10px" onclick="deleteScopeBox('scope3',4,'facBoxes',1)">✕</button>
-        
+
       </div>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',4,'facBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td colspan="2"><div class="sow-flow">
-      
+
     <div style="display:flex;flex-direction:column;align-items:center">
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',4,'rtBoxes',0)" title="Click to edit">EQ Down time:</div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',4,'rtBoxes',0)">✕</button>
@@ -3466,7 +3484,7 @@ EQUIPMENT
       <div class="sow-node-rect" onclick="if(sowEditMode)editScopeBox('scope3',4,'rtBoxes',5)" title="Click to edit">ACLE-003 7/15-16<br></div>
       <button class="sow-row-btn del sow-edit-ctrl" style="padding:1px 8px;font-size:10px;margin-top:4px" onclick="deleteScopeBox('scope3',4,'rtBoxes',5)">✕</button>
     </div>
-    
+
       <button class="sow-row-btn add sow-edit-ctrl" style="padding:4px 10px;font-size:11px" onclick="addScopeBox('scope3',4,'rtBoxes')" title="Add box">+ Box</button>
     </div></td>
       <td>
@@ -3586,7 +3604,7 @@ APPENDIX 7.5)</div>
   </td>
     <td>
       <div class="sow-flow">
-        
+
         <div style="display:flex;align-items:center;gap:10px"><div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date red sow-qc-date" onclick="if(sowEditMode)editFacCircleDate('scope5',0,0)">7/07</div>
       <div class="sow-node-rect" style="min-width:90px;min-height:50px" onclick="if(sowEditMode)startFacCircleLabelEdit(this,'scope5',0,0)">3x room<br>cleaning</div>
@@ -3617,7 +3635,7 @@ APPENDIX 7.5)</div>
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope5',0,'condDate',null,this)">8/04</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope5',0,'condLabel',null,this)">Conditional<br>Release w/<br>1day Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope5',0,'fullDate',null,this)">8/11</div>
@@ -3638,7 +3656,7 @@ APPENDIX 6.5B)</div>
   </td>
     <td>
       <div class="sow-flow">
-        
+
         <div style="display:flex;align-items:center;gap:10px"><div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date red sow-qc-date" onclick="if(sowEditMode)editFacCircleDate('scope5',1,0)">8/04</div>
       <div class="sow-node-rect" style="min-width:90px;min-height:50px" onclick="if(sowEditMode)startFacCircleLabelEdit(this,'scope5',1,0)">3x rooms<br>cleaning</div>
@@ -3669,7 +3687,7 @@ APPENDIX 6.5B)</div>
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope5',1,'condDate',null,this)">8/12</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope5',1,'condLabel',null,this)">Conditional<br>Release w/<br>1day Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope5',1,'fullDate',null,this)">8/18</div>
@@ -3691,7 +3709,7 @@ APPENDIX 6.5B)</div>
   </td>
     <td>
       <div class="sow-flow">
-        
+
         <div style="display:flex;align-items:center;gap:10px"><div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date red sow-qc-date" onclick="if(sowEditMode)editFacCircleDate('scope5',2,0)">8/04</div>
       <div class="sow-node-rect" style="min-width:90px;min-height:50px" onclick="if(sowEditMode)startFacCircleLabelEdit(this,'scope5',2,0)">3x rooms<br>cleaning</div>
@@ -3722,7 +3740,7 @@ APPENDIX 6.5B)</div>
         <div class="sow-node-date teal" onclick="if(sowEditMode)editScopeField('scope5',2,'condDate',null,this)">8/12</div>
         <div class="sow-node-release" onclick="if(sowEditMode)editScopeField('scope5',2,'condLabel',null,this)">Conditional<br>Release w/<br>1day Results</div>
       </div>
-      
+
     <span class="sow-arrow">→</span>
     <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
       <div class="sow-node-date blue" onclick="if(sowEditMode)editScopeField('scope5',2,'fullDate',null,this)">8/18</div>
@@ -3794,8 +3812,43 @@ APPENDIX 6.5B)</div>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v9</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard to SharePoint, with local download fallback">🖼 Dashboard PNG</button>
+      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">🌅 Morning Brief</button>
+      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">📊 Full Dashboard</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
+    </div>
+  </div>
+
+
+  <!-- Morning Brief: Today-focused communication, no Upcoming Next 7 Days -->
+  <div class="morning-section" id="morningBriefPanel">
+    <div class="morning-hero">
+      <div class="morning-title">Daily Shutdown Morning Brief</div>
+      <div class="morning-sub" id="morningBriefMeta">Date: — | Time: —</div>
+      <div class="morning-kpis">
+        <div class="morning-kpi"><div class="morning-kpi-title">Today's Work</div><div class="morning-kpi-lines" id="mb-todays-work">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">System Status</div><div class="morning-kpi-lines" id="mb-system-summary">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Schedule Risk</div><div class="morning-kpi-lines" id="mb-risk-summary">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Communication</div><div class="morning-kpi-lines" id="mb-comm-summary">—</div></div>
+      </div>
+    </div>
+    <div class="huddle-middle-layout">
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">System Status</div>
+        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Note</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
+      </div>
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Critical / Notification Items</div>
+        <table class="huddle-table small"><thead><tr><th>Type</th><th>System ID</th><th>Task</th><th>Action Needed</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+      </div>
+    </div>
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title with-legend"><span>Today's Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
+      <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
+    </div>
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Delay / New Date / Special Notes</div>
+      <table class="huddle-table small"><thead><tr><th>System ID</th><th>Event</th><th>New Date</th><th>Note</th></tr></thead><tbody id="mb-note-rows"></tbody></table>
     </div>
   </div>
 
@@ -3893,16 +3946,16 @@ APPENDIX 6.5B)</div>
   <!-- Daily Huddle Bottom: Active Work + Next 7 Days -->
   <div class="huddle-bottom-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Maintenance Activities</div>
+      <div class="huddle-panel-title with-legend"><span>Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
       <table class="huddle-table small">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
     </div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
       <table class="huddle-table small">
-        <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Owner / Resource</th><th>Status</th></tr></thead>
+        <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Owner / Resource</th><th>Status</th></tr></thead>
         <tbody id="d-upcoming-schedule"></tbody>
       </table>
     </div>
@@ -4245,24 +4298,45 @@ function loadEndImpact(){ try{ const s=localStorage.getItem('sd26_endImpact'); i
 // ── Down/Up maps: childTaskId → date value (excel serial) ──
 let downMap = {};
 let startupMap = {};
+let timelineDownMap = {};
+let timelineStartupMap = {};
+let taskTrackerDownOosMap = {};
+let taskTrackerStartupOosMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_startup_v2'); if(u) startupMap=JSON.parse(u); }catch(e){}
+  try{ const d=localStorage.getItem('sd26_timeline_down_v1'); if(d) timelineDownMap=JSON.parse(d); }catch(e){}
+  try{ const u=localStorage.getItem('sd26_timeline_startup_v1'); if(u) timelineStartupMap=JSON.parse(u); }catch(e){}
+  try{ const d=localStorage.getItem('sd26_task_tracker_down_oos_v1'); if(d) taskTrackerDownOosMap=JSON.parse(d); }catch(e){}
+  try{ const u=localStorage.getItem('sd26_task_tracker_startup_oos_v1'); if(u) taskTrackerStartupOosMap=JSON.parse(u); }catch(e){}
+}
+function saveTimelineMarkMaps(){
+  try{
+    localStorage.setItem('sd26_timeline_down_v1',JSON.stringify(timelineDownMap));
+    localStorage.setItem('sd26_timeline_startup_v1',JSON.stringify(timelineStartupMap));
+  }catch(e){}
 }
 function saveDownMaps(){
   try{
     localStorage.setItem('sd26_down_v2',JSON.stringify(downMap));
     localStorage.setItem('sd26_startup_v2',JSON.stringify(startupMap));
+    localStorage.setItem('sd26_task_tracker_down_oos_v1',JSON.stringify(taskTrackerDownOosMap));
+    localStorage.setItem('sd26_task_tracker_startup_oos_v1',JSON.stringify(taskTrackerStartupOosMap));
+    saveTimelineMarkMaps();
   }catch(e){}
 }
 function toggleDown(taskId, dateVal, checked){
-  if(checked) downMap[taskId]=dateVal; else delete downMap[taskId];
+  if(checked){ downMap[taskId]=dateVal; taskTrackerDownOosMap[taskId]=dateVal; }
+  else { delete downMap[taskId]; delete taskTrackerDownOosMap[taskId]; }
   saveDownMaps(); if(typeof renderTimeline==='function') renderTimeline();
+  if(typeof renderDashboard==='function') renderDashboard();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 function toggleStartup(taskId, dateVal, checked){
-  if(checked) startupMap[taskId]=dateVal; else delete startupMap[taskId];
+  if(checked){ startupMap[taskId]=dateVal; taskTrackerStartupOosMap[taskId]=dateVal; }
+  else { delete startupMap[taskId]; delete taskTrackerStartupOosMap[taskId]; }
   saveDownMaps(); if(typeof renderTimeline==='function') renderTimeline();
+  if(typeof renderDashboard==='function') renderDashboard();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 // Returns earliest start date among all checked ▼ children of this parent
@@ -4314,8 +4388,12 @@ function updateDerivedFields(){
     t.category = (t.category || inferCategory(t.task)).toUpperCase();
     t.notes = notesMap[t.id] || '';
     t.actionComment = t.actionComment || '';
+    t.critical = t.critical === true || t.critical === 'true' || t.critical === 'Y' || t.critical === 'Yes';
+    t.notification = t.notification === true || t.notification === 'true' || t.notification === 'Y' || t.notification === 'Yes';
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
+    t.newStart = normalizeDateValue(t.newStart);
+    t.newEnd = normalizeDateValue(t.newEnd);
     const d = diffDaysInclusive(t.start, t.end);
     t.days = d;
   });
@@ -4572,7 +4650,9 @@ function getSortableValue(task, field){
   if(field === 'status') return statusMap[task.id] || '';
   if(field === 'notes') return notesMap[task.id] || '';
   if(field === 'actionComment') return task.actionComment || '';
-  if(field === 'start' || field === 'end'){
+  if(field === 'critical') return task.critical ? 1 : 0;
+  if(field === 'notification') return task.notification ? 1 : 0;
+  if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     return normalizeDateValue(task[field]) || '';
   }
   if(field === 'days'){
@@ -4590,9 +4670,9 @@ function compareByField(a, b, field, dir){
     const wa = (()=>{ const w=getShutdownWeek(a.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     const wb = (()=>{ const w=getShutdownWeek(b.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     result = wa - wb;
-  } else if(field === 'days'){
+  } else if(field === 'days' || field === 'critical' || field === 'notification'){
     result = av - bv;
-  } else if(field === 'start' || field === 'end'){
+  } else if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     result = String(av).localeCompare(String(bv));
   } else {
     result = String(av).localeCompare(String(bv), undefined, {numeric:true, sensitivity:'base'});
@@ -4640,7 +4720,7 @@ function setSort(field, event){
   render();
 }
 function updateSortIndicators(){
-  ['id','task','category','assigned','vendor','start','end','days','wk','status','notes','actionComment'].forEach(field=>{
+  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','critical','notification','status','notes','actionComment'].forEach(field=>{
     const el = document.getElementById(`sort-${field}`);
     if(!el) return;
     if(sortField === field){
@@ -5019,7 +5099,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="14">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="18">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5036,7 +5116,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="14">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5082,6 +5162,14 @@ function render(){
     const impactCell = `<td style="text-align:center">
       <input type="checkbox" ${isImpacted?'checked':''} onchange="toggleEndImpact('${t.id}',this.checked)" title="Mark end date as impacted" style="cursor:pointer;width:15px;height:15px;accent-color:#e65100">
     </td>`;
+    const newStartCell = editMode
+      ? `<td class="edit-cell"><input type="date" data-field="newStart" value="${esc(toDateInputValue(t.newStart)||'')}" title="New start date for delayed/rescheduled work"></td>`
+      : `<td style="white-space:nowrap;color:${t.newStart?'#ffcc80':'#8aa4bd'};font-weight:${t.newStart?'700':'400'}">${displayDate(t.newStart)||'—'}</td>`;
+    const newEndCell = editMode
+      ? `<td class="edit-cell"><input type="date" data-field="newEnd" value="${esc(toDateInputValue(t.newEnd)||'')}" title="New end/target date for delayed/rescheduled work"></td>`
+      : `<td style="white-space:nowrap;color:${t.newEnd?'#ffcc80':'#8aa4bd'};font-weight:${t.newEnd?'700':'400'}">${displayDate(t.newEnd)||'—'}</td>`;
+    const criticalCell = `<td style="text-align:center"><input type="checkbox" ${t.critical?'checked':''} onchange="toggleCritical('${t.id}',this.checked)" title="Mark this task as Critical for the dashboard" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828"></td>`;
+    const notificationCell = `<td style="text-align:center"><input type="checkbox" ${t.notification?'checked':''} onchange="toggleNotification('${t.id}',this.checked)" title="Mark this task as requiring notification" style="cursor:pointer;width:15px;height:15px;accent-color:#1565c0"></td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5092,15 +5180,19 @@ function render(){
       ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
       ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
       ${endCellHtml}
+      ${newStartCell}
+      ${newEndCell}
       ${impactCell}
       ${editMode ? `<td class="edit-cell"><span class="days-readonly">${diffDaysInclusive(t.start, t.end) ?? '—'}</span></td>` : `<td style="text-align:center">${diffDaysInclusive(t.start, t.end) ?? '—'}</td>`}
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">${getShutdownWeek(t.start)}</td>
+      ${criticalCell}
+      ${notificationCell}
       ${editableStatusCell(t.id)}
       ${editableNotesCell(t.id)}
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="14" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="18" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
@@ -5109,6 +5201,21 @@ function render(){
 
 function changeStatus(sel){statusMap[sel.dataset.id]=sel.value; updateDerivedFields(); saveLocal(); updateStats();}
 function changeNote(inp){notesMap[inp.dataset.id]=inp.value; updateDerivedFields(); saveLocal();}
+function toggleCritical(id, checked){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  task.critical = !!checked;
+  updateDerivedFields();
+  saveLocal();
+  renderDashboard();
+}
+function toggleNotification(id, checked){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  task.notification = !!checked;
+  updateDerivedFields();
+  saveLocal();
+}
 function updateSaveButton(){ document.getElementById('saveBtn').disabled = !editMode || !dirty; }
 function toggleEditMode(){
   editMode = !editMode;
@@ -5138,7 +5245,7 @@ function collectEditedRows(){
     tr.querySelectorAll('[data-field]').forEach(el=>{
       const field = el.dataset.field;
       let val = el.value;
-      if(['start','end'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
+      if(['start','end','newStart','newEnd'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
       if(field==='status') statusMap[id] = val || 'Pending';
       else if(field==='notes') notesMap[id] = val || '';
       else if(field==='actionComment') task.actionComment = val || '';
@@ -5182,6 +5289,10 @@ function insertRow(afterId){
     vendor: '',
     start: normalizeDateValue(current.start),
     end: normalizeDateValue(current.end),
+    newStart: null,
+    newEnd: null,
+    critical: false,
+    notification: false,
     days: diffDaysInclusive(current.start, current.end) || current.days || null,
     section: current.section,
     isParent:false,
@@ -5769,9 +5880,10 @@ function setDashboardMode(mode){
   const panel = document.getElementById('dashboardPanel');
   if(!panel) return;
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
-  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi');
+  panel.classList.toggle('dash-mode-morning', mode === 'morning');
+  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : 'Shutdown Executive Dashboard';
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : 'Shutdown Executive Dashboard');
 }
 
 function getGowningStatus(){
@@ -5836,13 +5948,30 @@ function renderDashboard(){
   const grandPctText = displayGrandTotal ? (grandDone/displayGrandTotal*100).toFixed(1).replace(/\.0$/,'') + '%' : '0%';
   const today = new Date();
   const daysLeft = Math.ceil((new Date('2026-07-06') - today) / 86400000);
-  const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed');
   const todayIso = (document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10));
   const todayDate = new Date(todayIso + 'T00:00:00');
   const sevenDayEndDate = new Date(todayDate);
   sevenDayEndDate.setDate(sevenDayEndDate.getDate() + 7);
   const twoWeekEndDate = new Date(todayDate);
   twoWeekEndDate.setDate(twoWeekEndDate.getDate() + 14);
+
+  function originalStartIso(t){
+    return normalizeDateValue(t && t.start);
+  }
+  function hasOriginalStartArrived(t){
+    const startIso = originalStartIso(t);
+    if(!startIso) return true;
+    return new Date(startIso + 'T00:00:00') <= todayDate;
+  }
+  function taskOverlapsCurrentWorkWindow(t){
+    const startIso = normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.end) || startIso;
+    if(!startIso && !endIso) return true;
+    const startDate = new Date((startIso || endIso) + 'T00:00:00');
+    const endDate = new Date((endIso || startIso) + 'T00:00:00');
+    return startDate <= sevenDayEndDate && endDate >= todayDate;
+  }
+  const delayedTasks = leaf.filter(t=>statusMap[t.id]==='Delayed' && hasOriginalStartArrived(t));
   const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -5853,8 +5982,50 @@ function renderDashboard(){
   // Dashboard progress rule:
   // - Complete = 100%
   // - Pending / Scheduled / N/A = 0%
-  // - In Progress / Delayed = schedule-based progress from Start to Target
-  //   capped below 100% until the task is marked Complete.
+  // - In Progress / Delayed = schedule-based progress using working hours
+  //   (7:00 AM to 4:00 PM) from Start to Target, capped below 100% until Complete.
+  function localDateIso(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function dashboardTodayIso(){
+    return localDateIso(new Date());
+  }
+  function progressNowDate(){
+    const now = new Date();
+    if(todayIso === dashboardTodayIso()) return now;
+    const d = new Date(todayIso + 'T00:00:00');
+    d.setHours(16,0,0,0);
+    return d;
+  }
+  function workPoint(iso, hour){
+    const d = new Date(iso + 'T00:00:00');
+    d.setHours(hour,0,0,0);
+    return d;
+  }
+  function scheduledWorkMs(startIso, endIso, upTo){
+    const start = normalizeDateValue(startIso);
+    const end = normalizeDateValue(endIso) || start;
+    if(!start) return 0;
+    const startDay = new Date(start + 'T00:00:00');
+    const endDay = new Date(end + 'T00:00:00');
+    if(endDay < startDay) endDay.setTime(startDay.getTime());
+    let total = 0;
+    for(let d = new Date(startDay); d <= endDay; d.setDate(d.getDate()+1)){
+      const iso = localDateIso(d);
+      const dayStart = workPoint(iso, 7);
+      const dayEnd = workPoint(iso, 16);
+      if(upTo){
+        const cappedEnd = new Date(Math.min(dayEnd.getTime(), upTo.getTime()));
+        if(cappedEnd > dayStart) total += cappedEnd - dayStart;
+      }else{
+        total += dayEnd - dayStart;
+      }
+    }
+    return total;
+  }
   function taskProgressPct(t){
     const st = statusMap[t.id] || t.status || 'Pending';
     if(st === 'Complete') return 100;
@@ -5862,17 +6033,16 @@ function renderDashboard(){
 
     const startIso = normalizeDateValue(t.start);
     const endIso = normalizeDateValue(t.end) || startIso;
-    if(!startIso) return st === 'In Progress' ? 10 : 0;
+    if(!startIso) return st === 'In Progress' ? 5 : 0;
 
-    const startDate = new Date(startIso + 'T00:00:00');
-    const endDate = new Date(endIso + 'T00:00:00');
-    if(todayDate < startDate) return 0;
+    const now = progressNowDate();
+    if(now < workPoint(startIso, 7)) return 0;
 
-    const totalDays = Math.max(1, Math.floor((endDate - startDate) / 86400000) + 1);
-    const elapsedDays = Math.max(1, Math.floor((todayDate - startDate) / 86400000) + 1);
-    let pct = Math.round((elapsedDays / totalDays) * 100);
+    const totalMs = Math.max(1, scheduledWorkMs(startIso, endIso));
+    const elapsedMs = Math.max(0, Math.min(totalMs, scheduledWorkMs(startIso, endIso, now)));
+    let pct = Math.round((elapsedMs / totalMs) * 100);
 
-    if(st === 'In Progress') pct = Math.min(95, Math.max(5, pct));
+    if(st === 'In Progress') pct = Math.min(95, Math.max(1, pct));
     if(st === 'Delayed') pct = Math.min(95, Math.max(0, pct));
     return pct;
   }
@@ -5912,9 +6082,10 @@ function renderDashboard(){
     if(!startIso) return false;
     const startDate = new Date(startIso+'T00:00:00');
     const st = statusMap[t.id] || t.status || 'Pending';
-    // Upcoming Schedule is for future work only.
-    // In Progress work belongs only in Maintenance Activities, not Upcoming.
-    return startDate > todayDate && startDate <= sevenDayEndDate && (st === 'Pending' || st === 'Scheduled');
+    // Upcoming Schedule shows tracker items scheduled in the next 7 days.
+    // Once a task is active, it moves to Maintenance Activities instead of
+    // staying duplicated in Upcoming Schedule. Completed/N/A work is hidden.
+    return startDate >= todayDate && startDate <= sevenDayEndDate && !['N/A','Complete','In Progress','Delayed'].includes(st);
   }
   function taskTouchesToday(t){
     const startIso = normalizeDateValue(t.start);
@@ -5931,7 +6102,9 @@ function renderDashboard(){
   const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
   const lateTasks = overdueTasks;
-  const criticalTasks = activeLeaf.filter(t=>taskStatus(t)==='Delayed' || overdueTasks.some(o=>o.id===t.id));
+  // Critical is manually marked in the Task Tracker Critical column.
+  // It no longer comes automatically from Delayed/overdue status because that was not accurate enough.
+  const criticalTasks = activeLeaf.filter(t=>t.critical === true);
   const projectStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || '2026-07-06');
   const daysToStart = projectStartIso ? Math.ceil((new Date(projectStartIso+'T00:00:00') - todayDate) / 86400000) : null;
 
@@ -6032,21 +6205,38 @@ function renderDashboard(){
   function isFullRelTask(t){ return /full\s*rel|ful\s*rel|full release/i.test(t.task||''); }
   function isCondRelTask(t){ return /cond\s*rel|conditional release/i.test(t.task||''); }
   function isBreakdownTask(t){ return /break\s*down|breakdown|unplanned\s*down|failure/i.test(t.task||''); }
+  function taskTrackerOosWindow(items){
+    const downs = items.map(function(t){
+      const iso = normalizeDateValue(taskTrackerDownOosMap[t.id] != null ? taskTrackerDownOosMap[t.id] : downMap[t.id]);
+      return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
+    }).filter(Boolean).sort(function(a,b){ return b.date - a.date; });
+    const startups = items.map(function(t){
+      const iso = normalizeDateValue(taskTrackerStartupOosMap[t.id] != null ? taskTrackerStartupOosMap[t.id] : startupMap[t.id]);
+      return iso ? {task:t, iso:iso, date:new Date(iso + 'T00:00:00')} : null;
+    }).filter(Boolean).sort(function(a,b){ return a.date - b.date; });
+    for(const down of downs){
+      if(todayDate < down.date) continue;
+      const startup = startups.find(function(up){ return up.date >= down.date; });
+      if(!startup || todayDate < startup.date){
+        return {downTask:down.task, downIso:down.iso, startupTask:startup&&startup.task, startupIso:startup&&startup.iso};
+      }
+    }
+    return null;
+  }
+
   function huddleStatus(items){
     if(!items.length) return 'Normal';
     const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
     const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
     const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const downStarted = items.find(t=>downMap[t.id]!=null);
-    const startupCompleted = items.find(t=>startupMap[t.id]!=null && isComplete(t));
+    const trackerOosActive = taskTrackerOosWindow(items);
     const oosActive = items.find(t=>isInProgress(t));
 
-    // OOS latch rule:
-    // Once any task in the system is marked as Down Start, the system is OOS.
-    // It must remain OOS even if that task becomes Complete.
-    // Only a marked Start-Up task with status Complete releases the system from OOS.
+    // Task Tracker Mark Down / Start-Up controls drive date-based OOS.
+    // OOS starts on the checked Down date and clears on the checked Start-Up date.
+    // Timeline edit-list selections only drive timeline display and do not set these maps.
     if(breakdownActive) return 'Breakdown';
-    if(downStarted && !startupCompleted) return 'OOS';
+    if(trackerOosActive) return 'OOS';
     if(fullRelComplete) return 'FUL REL';
     if(condRelComplete) return 'Cond. REL';
     if(oosActive) return 'OOS';
@@ -6067,10 +6257,9 @@ function renderDashboard(){
       return t ? 'Breakdown: '+t.id : 'Breakdown';
     }
     if(status==='OOS'){
-      const downStarted = items.find(t=>downMap[t.id]!=null);
-      const startupChecked = items.find(t=>startupMap[t.id]!=null && !isComplete(t));
-      if(downStarted){
-        return 'OOS since Down Start: '+downStarted.id + (startupChecked ? ' / waiting Start-Up Complete: '+startupChecked.id : '');
+      const trackerActive = taskTrackerOosWindow(items);
+      if(trackerActive){
+        return 'OOS by Task Tracker Down: '+trackerActive.downTask.id+' since '+displayDate(trackerActive.downIso)+(trackerActive.startupIso ? ' / clears '+displayDate(trackerActive.startupIso)+' by '+trackerActive.startupTask.id : '');
       }
       const active = items.filter(isInProgress);
       const cats = [...new Set(active.map(t=>(t.category||inferCategory(t.task)||'PROJ').toUpperCase()))].filter(Boolean).slice(0,3);
@@ -6079,7 +6268,7 @@ function renderDashboard(){
     return status==='Normal' ? 'No active outage' : status==='OOS' ? 'In Progress / out of service' : status==='Cond. REL' ? 'Conditional release' : status==='FUL REL' ? 'Full release' : status==='Breakdown' ? 'Unplanned failure' : 'No active outage';
   }
   function pillClass(status){
-    return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':'na';
+    return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':status==='In Progress'?'progress':status==='Delayed'?'delayed':status==='Complete'?'complete':status==='Scheduled'?'scheduled':status==='Pending'?'planned':'na';
   }
   function huddleStartISO(v){
     if(!v) return null;
@@ -6153,31 +6342,75 @@ function renderDashboard(){
   function huddleStatusHtml(st){
     return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
   }
+  function huddleVendor(t){
+    return String(t.vendor || '').trim() || '—';
+  }
+  function delayedNewDate(t){
+    const newStartIso = normalizeDateValue(t.newStart || t.newStartDate || t.revisedStart || t.rescheduledStart);
+    const newEndIso = normalizeDateValue(t.newEnd || t.newEndDate || t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd);
+    if(newStartIso && newEndIso) return `${displayDate(newStartIso)} – ${displayDate(newEndIso)}`;
+    if(newStartIso || newEndIso) return displayDate(newStartIso || newEndIso);
+    const direct = t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd;
+    const directIso = normalizeDateValue(direct);
+    if(directIso) return displayDate(directIso);
+    const text = String([t.actionComment, notesMap[t.id], t.notes].filter(Boolean).join(' '));
+    if(!text.trim()) return '—';
+    let m = text.match(/\b(20\d{2})-(\d{1,2})-(\d{1,2})\b/);
+    if(m) return displayDate(`${m[1]}-${String(m[2]).padStart(2,'0')}-${String(m[3]).padStart(2,'0')}`);
+    m = text.match(/\b(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?\b/);
+    if(m){
+      const baseIso = normalizeDateValue(t.start) || normalizeDateValue(t.end) || todayIso;
+      const baseYear = Number((baseIso||todayIso).slice(0,4));
+      let year = m[3] ? Number(m[3]) : baseYear;
+      if(year < 100) year += 2000;
+      return displayDate(`${year}-${String(m[1]).padStart(2,'0')}-${String(m[2]).padStart(2,'0')}`);
+    }
+    m = text.match(/\b(?:new|revised|rescheduled)[^\d]{0,40}(\d{1,2})(?:st|nd|rd|th)?\b/i);
+    if(m){
+      const baseIso = normalizeDateValue(t.start) || normalizeDateValue(t.end) || todayIso;
+      const year = Number(baseIso.slice(0,4));
+      const month = Number(baseIso.slice(5,7));
+      return displayDate(`${year}-${String(month).padStart(2,'0')}-${String(m[1]).padStart(2,'0')}`);
+    }
+    return '—';
+  }
+
+  let maintItems = [];
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
-    // Maintenance Activities shows active work only.
-    // Upcoming Schedule shows Pending/Scheduled future starts only, so no duplicates.
-    const maintItems = activeLeaf
-      .filter(t=>['In Progress','Delayed'].includes(statusMap[t.id]||t.status||'Pending'))
+    // Maintenance Activities shows current-window active work only.
+    // Delayed items appear here only after their original start date has arrived.
+    maintItems = activeLeaf
+      .filter(t=>{
+        const st = statusMap[t.id] || t.status || 'Pending';
+        if(st === 'In Progress') return taskOverlapsCurrentWorkWindow(t);
+        if(st === 'Delayed') return hasOriginalStartArrived(t) && taskOverlapsCurrentWorkWindow(t);
+        return false;
+      })
       .slice()
       .sort((a,b)=>{
         const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
         const bs = normalizeDateValue(b.start) || normalizeDateValue(b.end) || '';
         return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
-      })
-      .slice(0,6);
+      });
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
       return `<tr>
-        <td>${taskProgressPct(t)}%</td>
+        <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td class="${vendorOnsite?'vendor-onsite':''}">${vendor}</td>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
-        <td>—</td>
+        <td>${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
@@ -6199,21 +6432,68 @@ function renderDashboard(){
         const as = normalizeDateValue(a.start) || '';
         const bs = normalizeDateValue(b.start) || '';
         return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
-      })
-      .slice(0,12);
+      });
     upcomingEl.innerHTML = upcomingItems.length ? upcomingItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
-      const owner = t.assignedTo || t.resource || t.vendor || t.owner || '—';
+      const owner = t.assigned || t.assignedTo || t.resource || t.owner || '—';
       return `<tr>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td>${huddleVendor(t)}</td>
         <td>${owner}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
+
+
+  function renderMorningBrief(){
+    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
+    const vendorOnsiteTasks = maintItems.filter(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      return st === 'In Progress' && taskProgressPct(t) > 0 && huddleVendor(t) !== '—';
+    });
+    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
+    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
+    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
+
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Gowning</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Gowning</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
+    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+
+    setHtml('mb-maint-rows', maintItems.length ? maintItems.map(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities for today.</td></tr>');
+
+    const commItems = [];
+    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notify', task:t}));
+    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
+      const t=item.task;
+      const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
+      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(action)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+
+    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
+    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
+      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
+  }
+  renderMorningBrief();
 
   const systemEl = document.getElementById('d-progress-system');
   if(systemEl){
@@ -6221,7 +6501,9 @@ function renderDashboard(){
     systemEl.innerHTML = systemOrder.map(sec=>{
       const items = activeLeaf.filter(t=>t.section===sec);
       const done = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
-      const delayed = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
+      // Only show delayed section counts after the task's original start date has arrived.
+      // Future items marked Delayed should not appear as delayed in Operational Detail yet.
+      const delayed = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed' && hasOriginalStartArrived(t)).length;
       const label = sec.replace(' SYSTEM','').replace('PROCESS EQUIPMENT','PROCESS EQ');
       return pctRowHtml(label, done, items.length, delayed ? delayed+' delayed' : done+'/'+items.length, delayed ? '#c62828' : '#4a90d9');
     }).join('');
@@ -6240,11 +6522,13 @@ function renderDashboard(){
 
   const focusEl = document.getElementById('d-progress-focus');
   if(focusEl){
-    const focusItems = delayedTasks.concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))).slice(0,5);
+    // Delay Description only shows true delays after the original start date has arrived.
+    // Future items marked Delayed stay hidden here until their original start date.
+    const focusItems = delayedTasks.concat(overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))); // show all due delay/overdue items
     if(focusItems.length){
       focusEl.innerHTML = `<div class="progress-list">${focusItems.map(shortTask).join('')}</div>`;
     }else if(lookaheadTasks.length){
-      focusEl.innerHTML = `<div class="progress-list">${lookaheadTasks.slice(0,5).map(shortTask).join('')}</div>`;
+      focusEl.innerHTML = `<div class="progress-list">${lookaheadTasks.map(shortTask).join('')}</div>`;
     }else{
       focusEl.innerHTML = '<div class="progress-empty">No delayed, overdue, or 14-day lookahead items.</div>';
     }
@@ -6492,8 +6776,8 @@ function renderTlEditTable(){
     const parentId=String(t.id).split('.')[0];
     const parent=tasks.find(p=>p.isParent&&String(p.id)===parentId);
     const noteData=tlData[t.id]||{};
-    const downDate=toDateInputValue(downMap[t.id]||t.start)||'';
-    const startupDate=toDateInputValue(startupMap[t.id]||t.end)||'';
+    const downDate=toDateInputValue(timelineDownMap[t.id]||t.start)||'';
+    const startupDate=toDateInputValue(timelineStartupMap[t.id]||t.end)||'';
     const taskLabel=t.task.length>34?t.task.slice(0,32)+'…':t.task;
     const parentLabel=parent ? (parent.task.length>22?parent.task.slice(0,20)+'…':parent.task) : (t.section||'System');
     return `<tr style="background:${i%2===0?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.07)'}">
@@ -6503,13 +6787,13 @@ function renderTlEditTable(){
         <span title="${esc(t.task)}">${esc(taskLabel)}</span>
       </td>
       <td style="text-align:center;padding:6px">
-        <input type="checkbox" ${downMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#e53935;cursor:pointer" onchange="tlSet('${t.id}','down',this.checked)" title="Mark as Down start">
+        <input type="checkbox" ${timelineDownMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#e53935;cursor:pointer" onchange="tlSet('${t.id}','down',this.checked)" title="Mark as Down start">
       </td>
       <td style="text-align:center;padding:6px">
         <input type="date" value="${downDate}" style="font-size:11px;padding:2px 5px;border-radius:4px;border:1px solid rgba(255,255,255,0.4);background:#1a3a5c;color:#fff;" onchange="tlSet('${t.id}','downDate',this.value)">
       </td>
       <td style="text-align:center;padding:6px">
-        <input type="checkbox" ${startupMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#43a047;cursor:pointer" onchange="tlSet('${t.id}','startup',this.checked)" title="Mark as Start-Up">
+        <input type="checkbox" ${timelineStartupMap[t.id]!=null?'checked':''} style="width:15px;height:15px;accent-color:#43a047;cursor:pointer" onchange="tlSet('${t.id}','startup',this.checked)" title="Mark as Start-Up">
       </td>
       <td style="text-align:center;padding:6px">
         <input type="date" value="${startupDate}" style="font-size:11px;padding:2px 5px;border-radius:4px;border:1px solid rgba(255,255,255,0.4);background:#1a3a5c;color:#fff;" onchange="tlSet('${t.id}','startupDate',this.value)">
@@ -6524,25 +6808,25 @@ function renderTlEditTable(){
 function tlSet(id,field,val){
   const task=tasks.find(t=>t.id===id);
   if(field==='down'){
-    if(val) downMap[id]=downMap[id]||toDateInputValue(task?.start)||task?.start||new Date().toISOString().slice(0,10);
-    else delete downMap[id];
-    saveDownMaps();
+    if(val) timelineDownMap[id]=timelineDownMap[id]||toDateInputValue(task?.start)||task?.start||new Date().toISOString().slice(0,10);
+    else delete timelineDownMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='startup'){
-    if(val) startupMap[id]=startupMap[id]||toDateInputValue(task?.end)||task?.end||new Date().toISOString().slice(0,10);
-    else delete startupMap[id];
-    saveDownMaps();
+    if(val) timelineStartupMap[id]=timelineStartupMap[id]||toDateInputValue(task?.end)||task?.end||new Date().toISOString().slice(0,10);
+    else delete timelineStartupMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='downDate'){
-    if(val) downMap[id]=val; else delete downMap[id];
-    saveDownMaps();
+    if(val) timelineDownMap[id]=val; else delete timelineDownMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else if(field==='startupDate'){
-    if(val) startupMap[id]=val; else delete startupMap[id];
-    saveDownMaps();
+    if(val) timelineStartupMap[id]=val; else delete timelineStartupMap[id];
+    saveTimelineMarkMaps();
     renderTlEditTable();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }else{
@@ -6579,79 +6863,70 @@ function renderTimeline(){
     function md(d){ const M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
 
     const allT=typeof tasks!=='undefined'?tasks:[];
-    const sMap=typeof statusMap!=='undefined'?statusMap:{};
+    const selected=allT.filter(t=>!t.isParent&&(!filterSec||t.section===filterSec)&&(timelineDownMap[t.id]!=null||timelineStartupMap[t.id]!=null))
+      .map(t=>{
+        const parentId=String(t.id).split('.')[0];
+        const parent=allT.find(p=>p.isParent&&String(p.id)===parentId);
+        const downD=timelineDownMap[t.id]!=null ? xl(timelineDownMap[t.id]) : null;
+        const upD=timelineStartupMap[t.id]!=null ? xl(timelineStartupMap[t.id]) : null;
+        const newStartD=normalizeDateValue(t.newStart) ? new Date(normalizeDateValue(t.newStart)+'T00:00:00') : null;
+        const newEndD=normalizeDateValue(t.newEnd) ? new Date(normalizeDateValue(t.newEnd)+'T00:00:00') : null;
+        return {task:t,parent,parentId,downD,upD,newStartD,newEndD};
+      })
+      .filter(r=>r.downD||r.upD||r.newStartD||r.newEndD)
+      .sort((a,b)=>{
+        const pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        const da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
 
-    const parents=allT.filter(t=>t.isParent&&xl(t.start)&&xl(t.end)&&(!filterSec||t.section===filterSec))
-      .sort((a,b)=>Number(a.id)-Number(b.id));
-    if(!parents.length){ container.innerHTML='<p style="color:#cde;padding:20px">데이터 없음</p>'; return; }
-
-    // ── Build per-parent child item lists (checked ▼/▲) ─────────────────────
-    function getChildItems(parentId){
-      return allT.filter(t=>!t.isParent&&String(t.id).startsWith(parentId+'.')&&
-        (downMap[t.id]!=null||startupMap[t.id]!=null));
+    if(!selected.length){
+      const stickyEl=document.getElementById('tl-header-sticky');
+      if(stickyEl) stickyEl.innerHTML='';
+      container.innerHTML='<p style="color:#cde;padding:20px">Mark Down / Start-Up에서 선택된 항목이 없습니다.</p>';
+      return;
     }
 
-    // Fixed sub-bar label per parent system
-    const FIXED_SUB_LABELS = {
-      '1':'PW','2':'WFI/CSTG','3':'PMES','4':'PLANT STEAM',
-      '5':'HVAC','6':'CDA','7':'N2','8':'GENERATOR','9':'VACUUM',
-      '10':'DP MFG  (13.01.01/13.01.03)','11':'DS MFG  (13.02.01/13.02.03)',
-      '12':'QC','13':'AREA RELEASE'
-    };
-
-    // ── Timeline range: use max of all task.end AND all Up dates ─────────────
     let minD=null, maxD=null;
-    parents.forEach(t=>{
-      const s=xl(t.start), e=xl(t.end);
-      if(s&&(!minD||s<minD)) minD=new Date(s);
-      if(e&&(!maxD||e>maxD)) maxD=new Date(e);
-      // Also check Up dates of children
-      getChildItems(t.id).forEach(child=>{
-        const upD = startupMap[child.id] ? xl(startupMap[child.id]) : null;
-        if(upD&&(!maxD||upD>maxD)) maxD=new Date(upD);
+    selected.forEach(r=>{
+      [r.downD,r.upD,r.newStartD,r.newEndD].forEach(d=>{
+        if(!d) return;
+        if(!minD||d<minD) minD=new Date(d);
+        if(!maxD||d>maxD) maxD=new Date(d);
       });
     });
-    const rS=new Date(minD); rS.setDate(rS.getDate()-1);
+    const rS=new Date(minD); rS.setDate(rS.getDate()-3);
     const rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+    const rangeToday=new Date(); rangeToday.setHours(0,0,0,0);
+    const currentMonthStart=new Date(rangeToday.getFullYear(), rangeToday.getMonth(), 1);
+    if(rE>=currentMonthStart && rS<currentMonthStart) rS.setTime(currentMonthStart.getTime());
 
     // ── Layout constants ─────────────────────────────────────────────────────
-    const DW=26, LW=230, MH=24, DH=22, HDR=MH+DH, PAD=8;
-    const MAIN_H=26, SUB_H=18, SUB_GAP=4, LBL_H=14;
-    const days=Math.ceil((rE-rS)/86400000);
+    const DW=26, LW=430, MH=24, DH=22, HDR=MH+DH, PAD=8;
+    const ROW_H=58, GROUP_GAP=8, BAR_H=22, NEW_BAR_H=14;
+    const days=Math.ceil((rE-rS)/86400000)+1;
     const TW=LW+days*DW;
-
     function off(d){ return Math.floor((d-rS)/86400000); }
-
+    function rangeStartX(d){ return LW + Math.max(0, off(d)) * DW; }
+    function rangeEndX(d){ return LW + Math.min(days, off(d)+1) * DW; }
+    function markerX(d){ return LW + Math.min(days-0.5, Math.max(0.5, off(d)+0.5)) * DW; }
     const secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
-    function bc(t){
-      const kids=allT.filter(c=>!c.isParent&&String(c.id).startsWith(t.id+'.'));
-      if(!kids.length) return secC[t.section]||'#1565c0';
-      const sts=kids.map(c=>sMap[c.id]||'Pending');
-      if(sts.every(s=>s==='Complete')) return '#2e7d32';
-      if(sts.some(s=>s==='Delayed')) return '#c62828';
-      if(sts.some(s=>s==='In Progress')) return '#f57f17';
-      return secC[t.section]||'#1565c0';
-    }
 
-    // ── Pre-calculate row heights ─────────────────────────────────────────────
-    // Each parent row: MAIN_H + (N sub-items * (SUB_H + SUB_GAP)) + padding
-    const rowHeights = parents.map(t=>{
-      const items = getChildItems(t.id);
-      let nSubs = 0;
-      if(items.length > 0){
-        if(t.id==='10')      nSubs = 5;
-        else if(t.id==='11') nSubs = allT.filter(k=>!k.isParent&&String(k.id).startsWith('11.')).length;
-        else if(t.id==='13') nSubs = 2;
-        else                 nSubs = 1;
+    const grouped=[];
+    selected.forEach(r=>{
+      let g=grouped[grouped.length-1];
+      if(!g||g.parentId!==r.parentId){
+        g={parentId:r.parentId,parent:r.parent,section:r.task.section,items:[]};
+        grouped.push(g);
       }
-      return PAD + MAIN_H + (nSubs > 0 ? nSubs*(SUB_H+SUB_GAP)+PAD : 0) + PAD;
+      g.items.push(r);
     });
-    const rowYs = [];
-    let curY = HDR+PAD;
-    parents.forEach((t,i)=>{ rowYs.push(curY); curY+=rowHeights[i]; });
-    const SH = curY + PAD;
 
-    // ── Dates array & month groups ────────────────────────────────────────────
+    let bodyH=PAD;
+    grouped.forEach(g=>{ bodyH += g.items.length*ROW_H + GROUP_GAP; });
+    bodyH += PAD;
+
     const dArr=[];
     for(let d=new Date(rS);d<=rE;d.setDate(d.getDate()+1)) dArr.push(new Date(d));
     const months={};
@@ -6661,7 +6936,6 @@ function renderTimeline(){
       months[k].count++;
     });
 
-    // ── Build SVG header (separate for sticky) ────────────────────────────────
     let hdr=`<svg width="${TW}" height="${HDR}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;display:block">`;
     hdr+=`<rect width="${TW}" height="${HDR}" fill="#0f2236"/>`;
     hdr+=`<rect x="0" y="0" width="${TW}" height="${MH}" fill="#1a3a5c"/>`;
@@ -6679,160 +6953,113 @@ function renderTimeline(){
     hdr+=`<rect x="${LW}" y="0" width="2" height="${HDR}" fill="rgba(255,255,255,0.2)"/>`;
     hdr+=`</svg>`;
 
-    // ── Build SVG body (rows only, no header) ─────────────────────────────────
-    const bodyH = SH - HDR;
     let svg=`<svg width="${TW}" height="${bodyH}" xmlns="http://www.w3.org/2000/svg" style="font-family:Arial,sans-serif;display:block">`;
     svg+=`<rect width="${TW}" height="${bodyH}" fill="#0f2236"/>`;
 
-    // Alternating row bg
-    parents.forEach((t,i)=>{
-      const y=rowYs[i]-HDR-PAD;
-      svg+=`<rect x="0" y="${y}" width="${TW}" height="${rowHeights[i]}" fill="${i%2===0?'rgba(255,255,255,0.02)':'rgba(255,255,255,0.06)'}"/>`;
-    });
-
-    // Weekend columns & day lines
     dArr.forEach((d,i)=>{
       const x=LW+i*DW, dow=d.getDay();
       if(dow===0||dow===6) svg+=`<rect x="${x}" y="0" width="${DW}" height="${bodyH}" fill="rgba(0,0,0,0.15)"/>`;
       svg+=`<line x1="${x}" y1="0" x2="${x}" y2="${bodyH}" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>`;
     });
 
-    // TODAY line
     const tod=new Date(); tod.setHours(0,0,0,0);
-    if(tod>=rS&&tod<=rE){
-      const tx=LW+off(tod)*DW+DW/2;
-      svg+=`<line x1="${tx}" y1="0" x2="${tx}" y2="${bodyH}" stroke="#ff5722" stroke-width="2" stroke-dasharray="4,3"/>`;
-      svg+=`<rect x="${tx-14}" y="2" width="28" height="14" rx="3" fill="#ff5722"/>`;
-      svg+=`<text x="${tx}" y="12" fill="#fff" font-size="8" font-weight="800" text-anchor="middle">TODAY</text>`;
+    const todayCutX = (tod>=rS&&tod<=rE) ? LW+off(tod)*DW+DW/2 : null;
+    if(todayCutX!=null){
+      svg+=`<line x1="${todayCutX}" y1="0" x2="${todayCutX}" y2="${bodyH}" stroke="#ff5722" stroke-width="2" stroke-dasharray="4,3"/>`;
+      svg+=`<rect x="${todayCutX-14}" y="2" width="28" height="14" rx="3" fill="#ff5722"/>`;
+      svg+=`<text x="${todayCutX}" y="12" fill="#fff" font-size="8" font-weight="800" text-anchor="middle">TODAY</text>`;
+    }
+    function timelinePastOpacity(d){ return d && d < tod ? 0.45 : 0.94; }
+    function appendTimelineRangeBar(x,y,w,h,color,keepFullColor){
+      const barColor=color||'#e65100';
+      if(keepFullColor){
+        svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
+      }else{
+        svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.35"/>`;
+        if(todayCutX==null){
+          if(tod<rS) svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
+        }else if(todayCutX<=x){
+          svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
+        }else if(todayCutX<x+w){
+          const futureX=todayCutX, futureW=x+w-todayCutX;
+          svg+=`<rect x="${futureX}" y="${y}" width="${futureW}" height="${h}" rx="3" fill="${barColor}" opacity="0.94"/>`;
+        }
+      }
+      svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
+    }
+    function appendNewDateBar(r,y,connectorY){
+      if(!r.newStartD && !r.newEndD) return;
+      const ns=r.newStartD||r.newEndD;
+      const ne=r.newEndD||r.newStartD;
+      const first=ns<=ne?ns:ne;
+      const last=ns<=ne?ne:ns;
+      const bx=rangeStartX(first);
+      const ex=rangeEndX(last);
+      const bw=Math.max(ex-bx,DW);
+      const labelEndX=LW-12;
+      const connectorEndX=Math.max(labelEndX+6,bx-6);
+      if(connectorEndX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${connectorY}" x2="${connectorEndX}" y2="${connectorY}" stroke="rgba(240,192,64,0.28)" stroke-width="1" stroke-dasharray="2,4"/>`;
+      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_BAR_H}" rx="3" fill="#f0c040" opacity="0.22" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="4,3"/>`;
+      svg+=`<text x="${bx+5}" y="${y+9}" fill="#ffe082" font-size="8" font-weight="900">NEW ${md(ns)}</text>`;
+      if(bw>74 && r.newStartD && r.newEndD) svg+=`<text x="${bx+bw-5}" y="${y+9}" fill="#ffe082" font-size="8" font-weight="900" text-anchor="end">${md(ne)}</text>`;
     }
 
-    // ── Draw each parent row ──────────────────────────────────────────────────
-    parents.forEach((t,i)=>{
-      try{
-        const rowY = rowYs[i] - HDR - PAD;
-        const rowH = rowHeights[i];
-        const sd=xl(t.start), ed=xl(t.end);
-        if(!sd||!ed) return;
-        const color=bc(t), sc=secC[t.section]||'#1565c0';
+    let y=PAD;
+    grouped.forEach((g,gi)=>{
+      const groupH=g.items.length*ROW_H;
+      const sc=secC[g.section]||'#1565c0';
+      svg+=`<rect x="0" y="${y-2}" width="${TW}" height="${groupH+4}" fill="${gi%2===0?'rgba(255,255,255,0.02)':'rgba(255,255,255,0.06)'}"/>`;
+      svg+=`<rect x="0" y="${y-2}" width="5" height="${groupH+4}" fill="${sc}"/>`;
+      g.items.forEach((r,idx)=>{
+        const rowY=y+idx*ROW_H;
+        const taskLabel=(r.task.task||'').length>46?(r.task.task||'').slice(0,44)+'…':(r.task.task||'');
+        const parentLabel=r.parent ? ((r.parent.task||'').length>32?(r.parent.task||'').slice(0,30)+'…':r.parent.task) : (r.task.section||'System');
+        svg+=`<text x="14" y="${rowY+20}" fill="#fff" font-size="13" font-weight="900">${esc(r.task.id)}</text>`;
+        svg+=`<text x="74" y="${rowY+19}" fill="#f0c040" font-size="12" font-weight="800">${esc(parentLabel)}</text>`;
+        svg+=`<text x="74" y="${rowY+43}" fill="#fff" font-size="12" font-weight="700">${esc(taskLabel)}</text>`;
 
-        // ── Main bar: start = task.start, end = max(task.end, all Up dates) ──
-        const childItems = getChildItems(t.id);
-        let mainEnd = new Date(ed);
-        childItems.forEach(child=>{
-          const upD=startupMap[child.id]?xl(startupMap[child.id]):null;
-          if(upD&&upD>mainEnd) mainEnd=new Date(upD);
-        });
-
-        const mainBx = LW+off(sd)*DW;
-        const mainEx = LW+(off(mainEnd)+1)*DW;
-        const mainBw = Math.max(mainEx-mainBx, DW*2);
-        const mainY  = rowY + PAD;
-
-        // Label panel
-        svg+=`<rect x="0" y="${rowY}" width="${LW}" height="${rowH}" fill="rgba(0,0,0,0.3)"/>`;
-        svg+=`<rect x="0" y="${rowY}" width="5" height="${rowH}" fill="${sc}"/>`;
-        svg+=`<rect x="8" y="${rowY+PAD+4}" width="24" height="16" rx="3" fill="${sc}" opacity="0.85"/>`;
-        svg+=`<text x="20" y="${rowY+PAD+15}" fill="#fff" font-size="9" font-weight="800" text-anchor="middle">${t.id}.0</text>`;
-        const lbl=t.task.length>26?t.task.slice(0,24)+'…':t.task;
-        svg+=`<text x="38" y="${rowY+PAD+15}" fill="#fff" font-size="11" font-weight="600">${lbl}</text>`;
-
-        // Main bar
-        svg+=`<rect x="${mainBx+1}" y="${mainY+1}" width="${mainBw}" height="${MAIN_H}" rx="4" fill="rgba(0,0,0,0.25)"/>`;
-        svg+=`<rect x="${mainBx}" y="${mainY}" width="${mainBw}" height="${MAIN_H}" rx="4" fill="${color}" opacity="0.9"/>`;
-        svg+=`<rect x="${mainBx}" y="${mainY}" width="${mainBw}" height="${MAIN_H*0.4}" rx="4" fill="rgba(255,255,255,0.15)"/>`;
-        svg+=`<text x="${mainBx+5}" y="${mainY+MAIN_H/2+4}" fill="#fff" font-size="9" font-weight="700">${md(sd)}</text>`;
-        if(mainBw>65) svg+=`<text x="${mainBx+mainBw-5}" y="${mainY+MAIN_H/2+4}" fill="#fff" font-size="9" font-weight="700" text-anchor="end">${md(mainEnd)}</text>`;
-
-        // ── Sub bars: custom grouping per system ──────────────────────────────────
-        if(childItems.length > 0){
-          // Build sub-bar group definitions for this parent
-          let subGroups = []; // [{label, downIds[], upIds[]}]
-
-          if(t.id === '10'){
-            subGroups = [
-              {label:'Smart Filler', downIds:['10.01'],  upIds:['10.02a']},
-              {label:'LYO',          downIds:['10.02b'], upIds:['10.02c']},
-              {label:'DP Oven',      downIds:['10.02d'], upIds:['10.02e']},
-              {label:'Vial Washer',  downIds:['10.02f'], upIds:['10.02h']},
-              {label:'DP CAL',       downIds:['10.02i'], upIds:['10.02j']},
-            ];
-          } else if(t.id === '11'){
-            const kids11 = allT.filter(k=>!k.isParent&&String(k.id).startsWith('11.'));
-            subGroups = kids11.map(k=>({label:k.task.length>22?k.task.slice(0,20)+'…':k.task, downIds:[k.id], upIds:[k.id]}));
-          } else if(t.id === '13'){
-            subGroups = [
-              {label:'DP MFG', downIds:['13.01.01'], upIds:['13.01.03']},
-              {label:'DS MFG', downIds:['13.02.01'], upIds:['13.02.03']},
-            ];
-          } else {
-            const lbl = FIXED_SUB_LABELS[t.id] || (t.task.length>16?t.task.slice(0,14)+'…':t.task);
-            subGroups = [{label:lbl, downIds:childItems.map(k=>k.id), upIds:childItems.map(k=>k.id)}];
-          }
-
-          // Helper: get earliest date from a list of task IDs (using downMap or task.start)
-          function getEarliestDate(ids, useDown){
-            let best=null;
-            ids.forEach(id=>{
-              const task=allT.find(k=>k.id===id); if(!task) return;
-              const d = useDown && downMap[id]!=null ? xl(downMap[id]) : xl(task.start);
-              if(d&&(!best||d<best)) best=d;
-            });
-            return best;
-          }
-          // Helper: get latest date from a list of task IDs (using startupMap or task.end)
-          function getLatestDate(ids, useUp){
-            let best=null;
-            ids.forEach(id=>{
-              const task=allT.find(k=>k.id===id); if(!task) return;
-              const d = useUp && startupMap[id]!=null ? xl(startupMap[id]) : xl(task.end);
-              if(d&&(!best||d>best)) best=d;
-            });
-            return best;
-          }
-
-          subGroups.forEach((grp, gi)=>{
-            // Get oStart: use downMap date if checked, else task.start of first downId
-            let oStart = null, oEnd = null;
-            // Check if any item in this group is checked
-            const anyChecked = [...grp.downIds,...grp.upIds].some(id=>downMap[id]!=null||startupMap[id]!=null);
-            if(!anyChecked) return; // only draw if at least one checked
-
-            // oStart = earliest Down-checked date, or earliest task.start
-            oStart = getEarliestDate(grp.downIds, true);
-            if(!oStart) oStart = getEarliestDate(grp.downIds, false);
-            // oEnd = latest Up-checked date, or latest task.end
-            oEnd = getLatestDate(grp.upIds, true);
-            if(!oEnd) oEnd = getLatestDate(grp.upIds, false);
-            if(!oStart || !oEnd) return;
-
-            const subY = rowY + PAD + MAIN_H + SUB_GAP + gi*(SUB_H+SUB_GAP);
-            const sbx = LW+off(oStart)*DW;
-            const sex = LW+(off(oEnd)+1)*DW;
-            const sbw = Math.max(sex-sbx, DW);
-
-            // Label in left panel
-            svg+=`<text x="38" y="${subY+SUB_H/2+4}" fill="rgba(255,210,100,0.92)" font-size="10" font-weight="700">${grp.label}</text>`;
-
-            // Orange bar
-            svg+=`<rect x="${sbx+1}" y="${subY+1}" width="${sbw}" height="${SUB_H}" rx="3" fill="rgba(0,0,0,0.25)"/>`;
-            svg+=`<rect x="${sbx}" y="${subY}" width="${sbw}" height="${SUB_H}" rx="3" fill="#e65100" opacity="0.92"/>`;
-            svg+=`<rect x="${sbx}" y="${subY}" width="${sbw}" height="${SUB_H*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
-            // Label + dates inside bar
-            svg+=`<text x="${sbx+5}" y="${subY+SUB_H/2+4}" fill="#fff" font-size="9" font-weight="800">${grp.label}  ${md(oStart)}</text>`;
-            if(sbw>90) svg+=`<text x="${sbx+sbw-5}" y="${subY+SUB_H/2+4}" fill="#fff" font-size="9" font-weight="800" text-anchor="end">${md(oEnd)}</text>`;
-          });
+        const barY=rowY+(ROW_H-BAR_H)/2;
+        const newBarY=rowY+ROW_H-NEW_BAR_H-4;
+        const status=statusMap[r.task.id]||r.task.status||'Pending';
+        const isDelayed=status==='Delayed';
+        const labelEndX=LW-12;
+        const connectorY=barY+BAR_H/2;
+        function appendConnector(targetX){
+          const endX=Math.max(labelEndX+6, targetX);
+          if(endX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${connectorY}" x2="${endX}" y2="${connectorY}" stroke="rgba(255,255,255,0.24)" stroke-width="1" stroke-dasharray="3,4"/>`;
         }
-
-        // Row separator
-        svg+=`<line x1="0" y1="${rowY+rowH}" x2="${TW}" y2="${rowY+rowH}" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>`;
-      }catch(e){ console.warn('Row error:',t.task,e); }
+        if(r.downD&&r.upD){
+          const first=r.downD<=r.upD?r.downD:r.upD;
+          const last=r.downD<=r.upD?r.upD:r.downD;
+          const bx=rangeStartX(first);
+          const ex=rangeEndX(last);
+          const bw=Math.max(ex-bx,DW);
+          appendConnector(bx-6);
+          svg+=`<rect x="${bx+1}" y="${barY+1}" width="${bw}" height="${BAR_H}" rx="3" fill="rgba(0,0,0,0.25)"/>`;
+          appendTimelineRangeBar(bx, barY, bw, BAR_H, sc, isDelayed);
+          svg+=`<text x="${bx+5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800">${isDelayed?'DELAYED • ':''}▼ ${md(r.downD)}</text>`;
+          if(bw>70) svg+=`<text x="${bx+bw-5}" y="${barY+12}" fill="#fff" font-size="9" font-weight="800" text-anchor="end">▲ ${md(r.upD)}</text>`;
+        }else if(r.downD){
+          const x=markerX(r.downD);
+          appendConnector(x-8);
+          svg+=`<polygon points="${x},${barY+BAR_H} ${x-6},${barY+4} ${x+6},${barY+4}" fill="#e53935" opacity="${isDelayed?0.94:timelinePastOpacity(r.downD)}"/>`;
+          svg+=`<text x="${x+9}" y="${barY+13}" fill="#fff" font-size="9" font-weight="800">${isDelayed?'DELAYED • ':''}Down ${md(r.downD)}</text>`;
+        }else if(r.upD){
+          const x=markerX(r.upD);
+          appendConnector(x-8);
+          svg+=`<polygon points="${x},${barY+4} ${x-6},${barY+BAR_H} ${x+6},${barY+BAR_H}" fill="#43a047" opacity="${isDelayed?0.94:timelinePastOpacity(r.upD)}"/>`;
+          svg+=`<text x="${x+9}" y="${barY+13}" fill="#fff" font-size="9" font-weight="800">${isDelayed?'DELAYED • ':''}Start-Up ${md(r.upD)}</text>`;
+        }
+        appendNewDateBar(r,newBarY,newBarY+NEW_BAR_H/2);
+        svg+=`<line x1="0" y1="${rowY+ROW_H}" x2="${TW}" y2="${rowY+ROW_H}" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>`;
+      });
+      y += groupH + GROUP_GAP;
     });
 
     svg+=`<rect x="${LW}" y="0" width="2" height="${bodyH}" fill="rgba(255,255,255,0.15)"/>`;
     svg+=`</svg>`;
 
-    // ── Render: sticky header (above) + scrollable body (below) ────────────────
-    const stickyEl = document.getElementById('tl-header-sticky');
+    const stickyEl=document.getElementById('tl-header-sticky');
     if(stickyEl){
       stickyEl.style.width='100%';
       stickyEl.innerHTML=hdr;
@@ -8947,8 +9174,14 @@ function handleDailyHuddleUrlParams(){
     }, 250);
     return false;
   };
-  window.downloadDailyHuddleSummary=function(ev){
+  var dailyHuddleEmailSaveInProgress=false;
+  var dailyHuddleEmailLastSaveAt=0;
+  window.downloadDailyHuddleSummary=async function(ev){
     if(ev && ev.preventDefault) ev.preventDefault();
+    var now=Date.now();
+    if(dailyHuddleEmailSaveInProgress || (now-dailyHuddleEmailLastSaveAt)<3500) return false;
+    dailyHuddleEmailLastSaveAt=now;
+    dailyHuddleEmailSaveInProgress=true;
     window.ensureDailyHuddleView();
     var today=isoToday();
     var generated=new Date().toLocaleString();
@@ -8978,9 +9211,9 @@ function handleDailyHuddleUrlParams(){
       else if(/^Full Gowning$/i.test(s)){ bg='#1f6b42'; fg='#d7ffe5'; }
       else if(/FULL/i.test(s)){ bg='#174a7a'; }
       else if(/COND/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
-      else if(/In Progress/i.test(s)){ bg='#80520e'; fg='#fff4d0'; }
+      else if(/In Progress/i.test(s)){ bg='#1f6b42'; fg='#d7ffe5'; }
       else if(/Scheduled|Pending/i.test(s)){ bg='#174a7a'; }
-      else if(/Delayed/i.test(s)){ bg='#7a1a1a'; }
+      else if(/Delayed/i.test(s)){ bg='#8a5a08'; fg='#fff0bd'; }
       else if(/Complete/i.test(s)){ bg='#1f6b42'; }
       return '<span style="display:inline-block;background:'+bg+';color:'+fg+';border-radius:999px;padding:3px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(s)+'</span>';
     }
@@ -8989,8 +9222,8 @@ function handleDailyHuddleUrlParams(){
       var fg=primary?'#ffffff':'#1a3a5c';
       var val=primary?'#f0c040':'#1a3a5c';
       var subc=primary?'#d8e8f8':'#526b83';
-      return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:10px 12px;border:3px solid #ffffff;vertical-align:top;">'+
-        '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
+      return '<td style="width:20%;background:'+bg+';color:'+fg+';padding:12px 14px;border:3px solid #ffffff;vertical-align:top;min-width:190px;">'+
+        '<div style="font-size:10px;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;margin-bottom:6px;white-space:nowrap;">'+esc(label)+'</div>'+
         '<div style="font-size:24px;line-height:1;font-weight:bold;color:'+val+';white-space:nowrap;">'+esc(value)+'</div>'+
         '<div style="font-size:11px;margin-top:6px;color:'+subc+';line-height:1.25;">'+esc(sub||'')+'</div>'+ '</td>';
     }
@@ -9004,13 +9237,14 @@ function handleDailyHuddleUrlParams(){
       if(!rows || !rows.length){
         return '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">'+esc(emptyText||'None')+'</div>';
       }
-      var html='<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:fixed;">';
+      var html='<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;table-layout:auto;">';
       html+='<tr>' + headers.map(function(h){return '<th style="background:#eef4fa;color:#1a3a5c;font-size:10px;text-align:left;text-transform:uppercase;letter-spacing:.04em;padding:6px 8px;border-bottom:1px solid #d9e2ec;white-space:nowrap;">'+esc(h)+'</th>';}).join('') + '</tr>';
       rows.forEach(function(cells){
         html+='<tr>' + headers.map(function(h,i){
           var value=cells[i]||'';
           var isStatus=statusCols.indexOf(i)>=0;
-          return '<td style="padding:7px 8px;border-bottom:1px solid #edf2f7;color:#222;font-size:11px;line-height:1.2;vertical-align:top;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'+(isStatus?statusBadge(value):esc(value))+'</td>';
+          var nowrap = isStatus || /^(Start|Target|Progress|Owner|Status)$/i.test(h);
+          return '<td style="padding:7px 8px;border-bottom:1px solid #edf2f7;color:#222;font-size:11px;line-height:1.25;vertical-align:top;'+(nowrap?'white-space:nowrap;':'white-space:normal;')+'">'+(isStatus?statusBadge(value):esc(value))+'</td>';
         }).join('') + '</tr>';
       });
       html+='</table>';
@@ -9068,7 +9302,7 @@ function handleDailyHuddleUrlParams(){
         body='<tr><td style="padding:4px 0;color:#d8e8f8;font-size:10px;font-style:italic;">No operational detail.</td></tr>';
       }
       var detailLabel=(document.getElementById('d-operational-detail-label')||{}).innerText || 'Operational Detail';
-      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:8px 10px;border:3px solid #ffffff;vertical-align:top;">'+
+      return '<td style="width:20%;background:#1a3a5c;color:#ffffff;padding:10px 12px;border:3px solid #ffffff;vertical-align:top;min-width:220px;">'+
         '<div style="font-size:10px;font-weight:bold;letter-spacing:.06em;text-transform:uppercase;margin-bottom:6px;color:#d8e8f8;white-space:nowrap;">'+esc(detailLabel)+'</div>'+
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
@@ -9103,60 +9337,269 @@ function handleDailyHuddleUrlParams(){
     });
     var rawMaint=tableRows('d-maint-activities');
     var maintRows=rawMaint.map(function(c){
-      // Dashboard row: Progress, System ID, Event, Start, Target, New, Status
-      return [c[0]||'—', c[1]||'—', c[2]||'—', c[3]||'TBD', c[4]||'TBD', c[6]||c[5]||'—'];
+      // Dashboard row: Progress, System ID, Event, Vendor, Start, Target, New, Status
+      return [c[0]||'—', c[1]||'—', c[2]||'—', c[3]||'—', c[4]||'TBD', c[5]||'TBD', c[7]||c[6]||'—'];
     });
     var rawUpcoming=tableRows('d-upcoming-schedule');
     var upcomingRows=rawUpcoming.map(function(c){
-      // Dashboard row: Start, Target, System ID, Event, Owner / Resource, Status
-      return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
+      // Dashboard row: Start, Target, System ID, Event, Vendor, Owner / Resource, Status
+      return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—', c[6]||'—'];
     });
 
-    var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Shutdown Daily Huddle</title></head>'+ 
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function canvasToPngBlob(canvas){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+      });
+    }
+
+    async function renderDailyHuddleHtmlToPngBlob(html){
+      setExportStatus('Rendering dashboard PNG...');
+      const width=1400;
+      const parser=new DOMParser();
+      const doc=parser.parseFromString(html, 'text/html');
+      const wrap=document.createElement('div');
+      wrap.style.position='fixed';
+      wrap.style.left='-10000px';
+      wrap.style.top='0';
+      wrap.style.width=width+'px';
+      wrap.style.background='#eef2f6';
+      wrap.style.zIndex='-1';
+      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
+      document.body.appendChild(wrap);
+      try{
+        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
+        try{
+          const h2c=await ensureHtml2Canvas();
+          if(typeof h2c==='function'){
+            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
+            return await canvasToPngBlob(canvas);
+          }
+        }catch(primaryErr){
+          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
+        }
+        const clone=wrap.cloneNode(true);
+        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+        clone.style.position='static';
+        clone.style.left='auto';
+        clone.style.top='auto';
+        clone.style.zIndex='auto';
+        const xhtml=new XMLSerializer().serializeToString(clone);
+        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
+        const url=URL.createObjectURL(svgBlob);
+        try{
+          const img=new Image();
+          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+          img.src=url;
+          await loaded;
+          const canvas=document.createElement('canvas');
+          canvas.width=width;
+          canvas.height=height;
+          const ctx=canvas.getContext('2d');
+          ctx.fillStyle='#eef2f6';
+          ctx.fillRect(0,0,width,height);
+          ctx.drawImage(img,0,0);
+          return await canvasToPngBlob(canvas);
+        }finally{
+          URL.revokeObjectURL(url);
+        }
+      }finally{
+        wrap.remove();
+      }
+    }
+
+    async function saveEmailBodyToSharePointOrDownload(blob, filename){
+      var key='sd26_sharepoint_email_body_url_v1';
+      var folderLink='https://revancetherapeuticsinc.sharepoint.com/:f:/r/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown?csf=1&web=1&e=bgvyre';
+      var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+      function normalizeSharePointUrl(url){
+        url=String(url||'').trim();
+        if(!url) return '';
+        if(url.indexOf(':f:/r/')>=0){
+          var clean=url.split('?')[0].replace('/:f:/r','');
+          return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+        }
+        if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+        return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+      }
+      var url='';
+      try{ url=localStorage.getItem(key)||''; }catch(e){}
+      url=normalizeSharePointUrl(url || defaultFileUrl || folderLink);
+      try{ localStorage.setItem(key,url); }catch(e){}
+      try{
+        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'application/octet-stream'}});
+        if(res.ok || res.status===200 || res.status===201 || res.status===204){
+          setExportStatus('Dashboard PNG saved to SharePoint');
+          setTimeout(function(){setExportStatus('');}, 2600);
+          return true;
+        }
+        throw new Error('SharePoint save failed: HTTP '+res.status);
+      }catch(e){
+        console.warn(e);
+        setExportStatus('SharePoint save blocked; downloading PNG');
+      }
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl; a.download=filename; a.style.display='none';
+      document.body.appendChild(a); a.click();
+      setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
+      setTimeout(function(){setExportStatus('');}, 2600);
+      return false;
+    }
+
+
+    var html='<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Shutdown Daily Huddle</title></head>'+
       '<body style="margin:0;padding:0;background:#eef2f6;font-family:Arial,Helvetica,sans-serif;color:#222;text-align:left;">'+
-      '<div style="width:100%;max-width:1120px;margin:0;padding:14px;background:#0d2137;text-align:left;">'+
+      '<div style="width:1400px;max-width:none;margin:0;padding:14px;background:#0d2137;text-align:left;">'+
       '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;background:#0d2137;text-align:left;">'+
       '<tr><td style="background:#1a3a5c;border-bottom:4px solid #f0c040;padding:14px 16px;color:#fff;text-align:left;">'+
-      '<div style="font-size:21px;font-weight:bold;letter-spacing:.10em;text-transform:uppercase;white-space:nowrap;">2026 Shutdown Daily Huddle</div>'+ 
-      '<div style="font-size:12px;color:#cde;margin-top:5px;">Date: '+esc(today)+' &nbsp;|&nbsp; Generated: '+esc(generated)+'</div>'+ 
-      '</td></tr>'+ 
+      '<div style="font-size:21px;font-weight:bold;letter-spacing:.10em;text-transform:uppercase;white-space:nowrap;">2026 Shutdown Daily Huddle</div>'+
+      '<div style="font-size:12px;color:#cde;margin-top:5px;">Date: '+esc(today)+' &nbsp;|&nbsp; Generated: '+esc(generated)+'</div>'+
+      '</td></tr>'+
       '<tr><td style="padding:12px 0 0 0;">'+
-      '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
+      '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
       kpiCard('Overall Progress (Tasks + Work Orders)', overall, overallSub, true)+
       kpiCard("Today's Work", todayDue+' Due', todayCard, false)+
       kpiCard('Schedule Risk', riskLate+' Late', riskCard, false)+
       kpiCard('Systems Status', systemsOos+' OOS', systemsCard, false)+
       operationalDetailCard('d-progress-system')+
-      '</tr></table></td></tr>'+ 
-      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+ 
-      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+ 
-      '</tr></table></td></tr>'+ 
-      '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+ 
-      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+ 
-      '<td style="width:50%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+ 
-      '<td style="width:50%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+ 
-      '</tr></table></td></tr>'+ 
+      '</tr></table></td></tr>'+
+      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
+      '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+
+      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+
+      '</tr></table></td></tr>'+
+      '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
+      '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
+      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities • Yellow vendor = vendor onsite', dataTable(['Progress','System ID','Event','Vendor','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+
+      '<td style="width:56%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Vendor','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+
+      '</tr></table></td></tr>'+
+      '<tr><td style="padding-top:10px;">'+emailTimelinePanel()+'</td></tr>'+
       '</table></div></body></html>';
-    var filename='Shutdown_Daily_Huddle_Email_Body.html';
+    var filename='Shutdown_Daily_Huddle_Dashboard.png';
     try{
-      var blob=new Blob([html], {type:'text/html;charset=utf-8'});
-      var url=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=url; a.download=filename; a.style.display='none';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){URL.revokeObjectURL(url); a.remove();}, 1500);
-      setExportStatus('Email Body Dashboard downloaded');
-      setTimeout(function(){setExportStatus('');}, 2200);
+      var blob=await renderDailyHuddleHtmlToPngBlob(html);
+      await saveEmailBodyToSharePointOrDownload(blob, filename);
     }catch(e){
       var w=window.open('', '_blank');
       if(w){ w.document.open(); w.document.write(html); w.document.close(); w.document.title=filename; }
-      else alert('Could not download email body dashboard.');
+      else alert('Could not save or download dashboard PNG.');
+    }finally{
+      dailyHuddleEmailSaveInProgress=false;
     }
     return false;
   };
 
   window.handleDailyHuddleUrlParams=function(){
+    if(window.__dailyHuddleUrlParamsHandled) return;
+    window.__dailyHuddleUrlParamsHandled=true;
     try{
       var params=new URLSearchParams(window.location.search||'');
       var view=String(params.get('view')||'').toLowerCase();
@@ -9280,6 +9723,8 @@ function handleDailyHuddleUrlParams(){
     return false;
   };
   window.handleDailyHuddleUrlParams=function(){
+    if(window.__dailyHuddleUrlParamsHandled) return;
+    window.__dailyHuddleUrlParamsHandled=true;
     try{
       var params=new URLSearchParams(window.location.search||'');
       var view=String(params.get('view')||'').toLowerCase();
