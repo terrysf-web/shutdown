@@ -5967,8 +5967,50 @@ function renderDashboard(){
   // Dashboard progress rule:
   // - Complete = 100%
   // - Pending / Scheduled / N/A = 0%
-  // - In Progress / Delayed = schedule-based progress from Start to Target
-  //   capped below 100% until the task is marked Complete.
+  // - In Progress / Delayed = schedule-based progress using working hours
+  //   (7:00 AM to 4:00 PM) from Start to Target, capped below 100% until Complete.
+  function localDateIso(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,'0');
+    const day = String(d.getDate()).padStart(2,'0');
+    return `${y}-${m}-${day}`;
+  }
+  function dashboardTodayIso(){
+    return localDateIso(new Date());
+  }
+  function progressNowDate(){
+    const now = new Date();
+    if(todayIso === dashboardTodayIso()) return now;
+    const d = new Date(todayIso + 'T00:00:00');
+    d.setHours(16,0,0,0);
+    return d;
+  }
+  function workPoint(iso, hour){
+    const d = new Date(iso + 'T00:00:00');
+    d.setHours(hour,0,0,0);
+    return d;
+  }
+  function scheduledWorkMs(startIso, endIso, upTo){
+    const start = normalizeDateValue(startIso);
+    const end = normalizeDateValue(endIso) || start;
+    if(!start) return 0;
+    const startDay = new Date(start + 'T00:00:00');
+    const endDay = new Date(end + 'T00:00:00');
+    if(endDay < startDay) endDay.setTime(startDay.getTime());
+    let total = 0;
+    for(let d = new Date(startDay); d <= endDay; d.setDate(d.getDate()+1)){
+      const iso = localDateIso(d);
+      const dayStart = workPoint(iso, 7);
+      const dayEnd = workPoint(iso, 16);
+      if(upTo){
+        const cappedEnd = new Date(Math.min(dayEnd.getTime(), upTo.getTime()));
+        if(cappedEnd > dayStart) total += cappedEnd - dayStart;
+      }else{
+        total += dayEnd - dayStart;
+      }
+    }
+    return total;
+  }
   function taskProgressPct(t){
     const st = statusMap[t.id] || t.status || 'Pending';
     if(st === 'Complete') return 100;
@@ -5976,17 +6018,16 @@ function renderDashboard(){
 
     const startIso = normalizeDateValue(t.start);
     const endIso = normalizeDateValue(t.end) || startIso;
-    if(!startIso) return st === 'In Progress' ? 10 : 0;
+    if(!startIso) return st === 'In Progress' ? 5 : 0;
 
-    const startDate = new Date(startIso + 'T00:00:00');
-    const endDate = new Date(endIso + 'T00:00:00');
-    if(todayDate < startDate) return 0;
+    const now = progressNowDate();
+    if(now < workPoint(startIso, 7)) return 0;
 
-    const totalDays = Math.max(1, Math.floor((endDate - startDate) / 86400000) + 1);
-    const elapsedDays = Math.max(1, Math.floor((todayDate - startDate) / 86400000) + 1);
-    let pct = Math.round((elapsedDays / totalDays) * 100);
+    const totalMs = Math.max(1, scheduledWorkMs(startIso, endIso));
+    const elapsedMs = Math.max(0, Math.min(totalMs, scheduledWorkMs(startIso, endIso, now)));
+    let pct = Math.round((elapsedMs / totalMs) * 100);
 
-    if(st === 'In Progress') pct = Math.min(95, Math.max(5, pct));
+    if(st === 'In Progress') pct = Math.min(95, Math.max(1, pct));
     if(st === 'Delayed') pct = Math.min(95, Math.max(0, pct));
     return pct;
   }
@@ -9608,102 +9649,6 @@ function handleDailyHuddleUrlParams(){
       return new Promise((resolve,reject)=>{
         canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
       });
-    }
-
-    async function renderDailyHuddleHtmlToPngBlob(html){
-      setExportStatus('Rendering dashboard PNG...');
-      const width=1400;
-      const parser=new DOMParser();
-      const doc=parser.parseFromString(html, 'text/html');
-      const wrap=document.createElement('div');
-      wrap.style.position='fixed';
-      wrap.style.left='-10000px';
-      wrap.style.top='0';
-      wrap.style.width=width+'px';
-      wrap.style.background='#eef2f6';
-      wrap.style.zIndex='-1';
-      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
-      document.body.appendChild(wrap);
-      try{
-        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
-        try{
-          const h2c=await ensureHtml2Canvas();
-          if(typeof h2c==='function'){
-            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
-            return await canvasToPngBlob(canvas);
-          }
-        }catch(primaryErr){
-          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
-        }
-        const clone=wrap.cloneNode(true);
-        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
-        clone.style.position='static';
-        clone.style.left='auto';
-        clone.style.top='auto';
-        clone.style.zIndex='auto';
-        const xhtml=new XMLSerializer().serializeToString(clone);
-        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
-        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-        const url=URL.createObjectURL(svgBlob);
-        try{
-          const img=new Image();
-          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
-          img.src=url;
-          await loaded;
-          const canvas=document.createElement('canvas');
-          canvas.width=width;
-          canvas.height=height;
-          const ctx=canvas.getContext('2d');
-          ctx.fillStyle='#eef2f6';
-          ctx.fillRect(0,0,width,height);
-          ctx.drawImage(img,0,0);
-          return await canvasToPngBlob(canvas);
-        }finally{
-          URL.revokeObjectURL(url);
-        }
-      }finally{
-        wrap.remove();
-      }
-    }
-
-    async function saveEmailBodyToSharePointOrDownload(blob, filename){
-      var key='sd26_sharepoint_email_body_url_v1';
-      var folderLink='https://revancetherapeuticsinc.sharepoint.com/:f:/r/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown?csf=1&web=1&e=bgvyre';
-      var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
-      function normalizeSharePointUrl(url){
-        url=String(url||'').trim();
-        if(!url) return '';
-        if(url.indexOf(':f:/r/')>=0){
-          var clean=url.split('?')[0].replace('/:f:/r','');
-          return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
-        }
-        if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
-        return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
-      }
-      var url='';
-      try{ url=localStorage.getItem(key)||''; }catch(e){}
-      url=normalizeSharePointUrl(url || defaultFileUrl || folderLink);
-      try{ localStorage.setItem(key,url); }catch(e){}
-      try{
-        var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'application/octet-stream'}});
-        if(res.ok || res.status===200 || res.status===201 || res.status===204){
-          setExportStatus('Dashboard PNG saved to SharePoint');
-          setTimeout(function(){setExportStatus('');}, 2600);
-          return true;
-        }
-        throw new Error('SharePoint save failed: HTTP '+res.status);
-      }catch(e){
-        console.warn(e);
-        setExportStatus('SharePoint save blocked; downloading PNG');
-      }
-      var dlUrl=URL.createObjectURL(blob);
-      var a=document.createElement('a');
-      a.href=dlUrl; a.download=filename; a.style.display='none';
-      document.body.appendChild(a); a.click();
-      setTimeout(function(){URL.revokeObjectURL(dlUrl); a.remove();}, 1500);
-      setTimeout(function(){setExportStatus('');}, 2600);
-      return false;
     }
 
     function emailDate(v){
