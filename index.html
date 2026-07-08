@@ -542,6 +542,8 @@ tr.editing{background:#fffceb}
 .huddle-table{width:100%;border-collapse:collapse;font-size:12px}
 .huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}
 .huddle-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;vertical-align:top}
+.vendor-onsite{color:#f0c040!important;font-weight:900}
+.huddle-table-legend{margin-top:8px;font-size:10px;color:#cde;text-align:right;letter-spacing:.03em}
 .huddle-status{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;display:inline-block;white-space:nowrap}
 .huddle-status.normal{background:#1f6b42;color:#d7ffe5}
 .huddle-status.oos{background:#7a1a1a;color:#ffb4ac}
@@ -3951,6 +3953,7 @@ APPENDIX 6.5B)</div>
         <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
+      <div class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</div>
     </div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
@@ -6396,12 +6399,15 @@ function renderDashboard(){
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
       const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
-      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${taskProgressPct(t)}%`;
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
       return `<tr>
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
-        <td>${huddleVendor(t)}</td>
+        <td class="${vendorOnsite?'vendor-onsite':''}">${vendor}</td>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>${newDateText}</td>
@@ -10008,7 +10014,7 @@ function handleDailyHuddleUrlParams(){
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
-      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Vendor','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+
+      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Vendor','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5])+'<div style="margin-top:6px;text-align:right;font-size:9px;color:#cde;"><span style="color:#f0c040;font-weight:bold;">Yellow vendor</span> = vendor onsite</div>')+'</td>'+
       '<td style="width:56%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Vendor','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+emailTimelinePanel()+'</td></tr>'+
