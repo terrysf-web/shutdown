@@ -546,6 +546,13 @@ tr.editing{background:#fffceb}
 .huddle-table-legend{margin-top:8px;font-size:10px;color:#cde;text-align:right;letter-spacing:.03em}
 .huddle-panel-title.with-legend{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .huddle-panel-title.with-legend .huddle-table-legend{margin-top:0;text-transform:none;letter-spacing:.03em;font-size:10px;font-weight:800;white-space:nowrap}
+.morning-hero{background:#102943;border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px;margin-bottom:14px}
+.morning-title{font-size:18px;font-weight:900;color:#fff;letter-spacing:.08em;text-transform:uppercase}
+.morning-sub{font-size:12px;color:#cde;font-weight:800;margin-top:3px}
+.morning-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:12px}
+.morning-kpi{background:#1a3a5c;border:1px solid rgba(255,255,255,.10);border-radius:8px;padding:10px}
+.morning-kpi-title{font-size:10px;color:#f0c040;font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.morning-kpi-lines{font-size:12px;color:#fff;line-height:1.45;font-weight:800}
 .huddle-status{font-size:10px;font-weight:900;border-radius:999px;padding:3px 8px;display:inline-block;white-space:nowrap}
 .huddle-status.normal{background:#1f6b42;color:#d7ffe5}
 .huddle-status.oos{background:#7a1a1a;color:#ffb4ac}
@@ -559,37 +566,11 @@ tr.editing{background:#fffceb}
 .huddle-status.scheduled{background:#174a7a;color:#cce6ff}
 .huddle-status.delayed{background:#8a5a08;color:#fff0bd}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
-.dash-mode-huddle .kpi-section{display:none!important}
-.dash-mode-kpi .huddle-section{display:none!important}
-.dash-mode-kpi #d-delayed-alert{display:none!important}
-.kpi-overview-grid{display:grid;grid-template-columns:.78fr 1.35fr 1.1fr 1.05fr;gap:10px;margin-bottom:10px}
-.kpi-detail-grid{display:grid;grid-template-columns:1.25fr 1fr;gap:10px;margin-bottom:10px}
-.kpi-card{background:#1a3a5c;border:1px solid rgba(255,255,255,.10);border-radius:7px;padding:10px 12px;box-shadow:inset 0 1px 0 rgba(255,255,255,.04);min-width:0}
-.kpi-card-title{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#d5e5f5;margin-bottom:7px;text-align:left}
-.dash-mode-kpi #d-total-num{font-size:44px!important;line-height:.95!important}
-.dash-mode-kpi #d-total-sub{font-size:14px!important;margin-top:6px!important}
-.dash-mode-kpi #d-delayed-badge-card{display:none!important}
-.dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:118px!important}
-.dash-mode-kpi #d-by-area [style*="bottom:20px"],.dash-mode-kpi #d-by-resource [style*="bottom:20px"],.dash-mode-kpi #d-by-type [style*="bottom:20px"]{bottom:16px!important}
-.dash-mode-kpi .bar-wrap{gap:2px!important}
-.dash-mode-kpi .bar-count{font-size:11px!important}
-.dash-mode-kpi .bar-pct{font-size:9px!important}
-.dash-mode-kpi .bar-label{font-size:10px!important;margin-top:2px!important}
-.dash-mode-kpi .bar{width:46px!important}
-.dash-mode-kpi #d-timeline{min-height:120px!important}
-.dash-mode-kpi .kpi-card svg text{font-size:10px!important}
-.dash-mode-kpi .executive-vendor-list{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important}
-.dash-mode-kpi .vendor-progress-row.exec{grid-template-columns:minmax(92px,1fr) repeat(4,44px)!important;gap:5px!important;padding:7px 8px!important;border-radius:6px!important;align-items:center}
-.dash-mode-kpi .vendor-progress-top{display:block!important;margin-bottom:0!important;min-width:0}
-.dash-mode-kpi .vendor-progress-name{font-size:11px!important;line-height:1.1!important}
-.dash-mode-kpi .vendor-progress-total{font-size:11px!important;margin-top:2px!important;color:#f0c040!important}
-.dash-mode-kpi .vendor-metric{font-size:11px!important;text-align:right!important}
-.dash-mode-kpi .vendor-metric span{font-size:7px!important;letter-spacing:.03em!important}
-@media (max-width:1100px){
-  .kpi-overview-grid,.kpi-detail-grid{grid-template-columns:1fr!important}
-  .dash-mode-kpi #d-by-area,.dash-mode-kpi #d-by-resource,.dash-mode-kpi #d-by-type{height:96px!important}
-  .dash-mode-kpi .executive-vendor-list{grid-template-columns:1fr!important}
-}
+.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section{display:none!important}
+.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section{display:none!important}
+.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section{display:none!important}
+.morning-section{display:none}
+.dash-mode-morning .morning-section{display:block!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
 select.msf:focus{border-color:#1565c0;outline:2px solid #aac4e8}
@@ -3838,7 +3819,42 @@ APPENDIX 6.5B)</div>
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
       <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
       <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Save a PNG screenshot of the dashboard to SharePoint, with local download fallback">🖼 Dashboard PNG</button>
+      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">🌅 Morning Brief</button>
+      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">📊 Full Dashboard</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
+    </div>
+  </div>
+
+
+  <!-- Morning Brief: Today-focused communication, no Upcoming Next 7 Days -->
+  <div class="morning-section" id="morningBriefPanel">
+    <div class="morning-hero">
+      <div class="morning-title">Daily Shutdown Morning Brief</div>
+      <div class="morning-sub" id="morningBriefMeta">Date: — | Time: —</div>
+      <div class="morning-kpis">
+        <div class="morning-kpi"><div class="morning-kpi-title">Today's Work</div><div class="morning-kpi-lines" id="mb-todays-work">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">System Status</div><div class="morning-kpi-lines" id="mb-system-summary">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Schedule Risk</div><div class="morning-kpi-lines" id="mb-risk-summary">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Communication</div><div class="morning-kpi-lines" id="mb-comm-summary">—</div></div>
+      </div>
+    </div>
+    <div class="huddle-middle-layout">
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">System Status</div>
+        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Note</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
+      </div>
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Critical / Notification Items</div>
+        <table class="huddle-table small"><thead><tr><th>Type</th><th>System ID</th><th>Task</th><th>Action Needed</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+      </div>
+    </div>
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title with-legend"><span>Today's Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
+      <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
+    </div>
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Delay / New Date / Special Notes</div>
+      <table class="huddle-table small"><thead><tr><th>System ID</th><th>Event</th><th>New Date</th><th>Note</th></tr></thead><tbody id="mb-note-rows"></tbody></table>
     </div>
   </div>
 
@@ -5884,9 +5900,10 @@ function setDashboardMode(mode){
   const panel = document.getElementById('dashboardPanel');
   if(!panel) return;
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
-  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi');
+  panel.classList.toggle('dash-mode-morning', mode === 'morning');
+  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : 'Shutdown Executive Dashboard';
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : 'Shutdown Executive Dashboard');
 }
 
 function getGowningStatus(){
@@ -6381,11 +6398,12 @@ function renderDashboard(){
     return '—';
   }
 
+  let maintItems = [];
   const maintEl = document.getElementById('d-maint-activities');
   if(maintEl){
     // Maintenance Activities shows current-window active work only.
     // Delayed items appear here only after their original start date has arrived.
-    const maintItems = activeLeaf
+    maintItems = activeLeaf
       .filter(t=>{
         const st = statusMap[t.id] || t.status || 'Pending';
         if(st === 'In Progress') return taskOverlapsCurrentWorkWindow(t);
@@ -6474,6 +6492,53 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
+
+
+  function renderMorningBrief(){
+    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
+    const vendorOnsiteTasks = maintItems.filter(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      return st === 'In Progress' && taskProgressPct(t) > 0 && huddleVendor(t) !== '—';
+    });
+    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
+    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
+    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
+
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Gowning</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Gowning</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
+    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+
+    setHtml('mb-maint-rows', maintItems.length ? maintItems.map(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities for today.</td></tr>');
+
+    const commItems = [];
+    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notify', task:t}));
+    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
+      const t=item.task;
+      const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
+      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(action)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+
+    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
+    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
+      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
+  }
+  renderMorningBrief();
 
   const systemEl = document.getElementById('d-progress-system');
   if(systemEl){
