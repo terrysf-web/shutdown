@@ -2144,7 +2144,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="17">
+        <td colspan="18">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -3948,14 +3948,14 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Maintenance Activities</div>
       <table class="huddle-table small">
-        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
     </div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
       <table class="huddle-table small">
-        <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Owner / Resource</th><th>Status</th></tr></thead>
+        <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Owner / Resource</th><th>Status</th></tr></thead>
         <tbody id="d-upcoming-schedule"></tbody>
       </table>
     </div>
@@ -6343,6 +6343,9 @@ function renderDashboard(){
   function huddleStatusHtml(st){
     return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
   }
+  function huddleVendor(t){
+    return String(t.vendor || '').trim() || '—';
+  }
   function delayedNewDate(t){
     const newStartIso = normalizeDateValue(t.newStart || t.newStartDate || t.revisedStart || t.rescheduledStart);
     const newEndIso = normalizeDateValue(t.newEnd || t.newEndDate || t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd);
@@ -6398,12 +6401,13 @@ function renderDashboard(){
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td>${huddleVendor(t)}</td>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
@@ -6450,16 +6454,17 @@ function renderDashboard(){
       });
     upcomingEl.innerHTML = upcomingItems.length ? upcomingItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
-      const owner = t.assigned || t.assignedTo || t.resource || t.owner || t.vendor || '—';
+      const owner = t.assigned || t.assignedTo || t.resource || t.owner || '—';
       return `<tr>
         <td>${displayDate(t.start)||'TBD'}</td>
         <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
+        <td>${huddleVendor(t)}</td>
         <td>${owner}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
-    }).join('') : '<tr><td colspan="6" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
+    }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
 
   const systemEl = document.getElementById('d-progress-system');
@@ -9315,13 +9320,13 @@ function handleDailyHuddleUrlParams(){
     });
     var rawMaint=tableRows('d-maint-activities');
     var maintRows=rawMaint.map(function(c){
-      // Dashboard row: Progress, System ID, Event, Start, Target, New, Status
-      return [c[0]||'—', c[1]||'—', c[2]||'—', c[3]||'TBD', c[4]||'TBD', c[6]||c[5]||'—'];
+      // Dashboard row: Progress, System ID, Event, Vendor, Start, Target, New, Status
+      return [c[0]||'—', c[1]||'—', c[2]||'—', c[3]||'—', c[4]||'TBD', c[5]||'TBD', c[7]||c[6]||'—'];
     });
     var rawUpcoming=tableRows('d-upcoming-schedule');
     var upcomingRows=rawUpcoming.map(function(c){
-      // Dashboard row: Start, Target, System ID, Event, Owner / Resource, Status
-      return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—'];
+      // Dashboard row: Start, Target, System ID, Event, Vendor, Owner / Resource, Status
+      return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—', c[6]||'—'];
     });
     function emailDate(v){
       try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
@@ -10003,8 +10008,8 @@ function handleDailyHuddleUrlParams(){
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
-      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+
-      '<td style="width:56%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+
+      '<td style="width:44%;padding-right:6px;vertical-align:top;">'+panel('Maintenance Activities', dataTable(['Progress','System ID','Event','Vendor','Start','Target','Status'], maintRows, 'No active maintenance activities.', [5]))+'</td>'+
+      '<td style="width:56%;padding-left:6px;vertical-align:top;">'+panel('Upcoming Schedule - Next 7 Days', dataTable(['Start','Target','System ID','Event','Vendor','Owner','Status'], upcomingRows, 'No upcoming scheduled tasks in the next 7 days.', [5]))+'</td>'+
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+emailTimelinePanel()+'</td></tr>'+
       '</table></div></body></html>';
