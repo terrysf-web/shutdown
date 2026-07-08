@@ -571,6 +571,20 @@ tr.editing{background:#fffceb}
 .dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section{display:none!important}
 .morning-section{display:none}
 .dash-mode-morning .morning-section{display:block!important}
+.morning-export-capture{display:block!important;width:980px!important;max-width:980px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
+.morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
+.morning-export-capture .morning-title{font-size:26px!important;letter-spacing:.06em!important}
+.morning-export-capture .morning-sub{font-size:15px!important}
+.morning-export-capture .morning-kpis{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}
+.morning-export-capture .morning-kpi{padding:14px!important}
+.morning-export-capture .morning-kpi-title{font-size:13px!important}
+.morning-export-capture .morning-kpi-lines{font-size:16px!important;line-height:1.45!important}
+.morning-export-capture .huddle-middle-layout,.morning-export-capture .huddle-wide{grid-template-columns:1fr!important;gap:12px!important}
+.morning-export-capture .huddle-panel-title{font-size:15px!important;padding:10px 12px!important}
+.morning-export-capture .huddle-table{font-size:14px!important}
+.morning-export-capture .huddle-table th{font-size:12px!important;padding:9px 10px!important}
+.morning-export-capture .huddle-table td{font-size:14px!important;padding:9px 10px!important;line-height:1.35!important}
+.morning-export-capture .huddle-status{font-size:12px!important;padding:4px 9px!important}
 
 select.msf{font-size:11px;border:1px solid #bbb;border-radius:3px;width:100%;min-width:80px;background:#fff}
 select.msf:focus{border-color:#1565c0;outline:2px solid #aac4e8}
@@ -5934,36 +5948,53 @@ function canvasToMorningBriefPngBlob(canvas){
 }
 
 async function renderMorningBriefPanelToPng(panel){
-  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const host=document.createElement('div');
+  const target=panel.cloneNode(true);
+  target.classList.add('morning-export-capture');
+  target.style.display='block';
+  host.style.position='fixed';
+  host.style.left='-10000px';
+  host.style.top='0';
+  host.style.width='980px';
+  host.style.background='#0d2137';
+  host.style.zIndex='-1';
+  host.appendChild(target);
+  document.body.appendChild(host);
   try{
-    const h2c=await loadHtml2CanvasForMorningBrief();
-    if(typeof h2c==='function'){
-      const rect=panel.getBoundingClientRect();
-      return await canvasToMorningBriefPngBlob(await h2c(panel, {backgroundColor:'#0d2137', scale:1.25, useCORS:true, logging:false, width:Math.ceil(rect.width), height:Math.ceil(panel.scrollHeight || rect.height), windowWidth:Math.ceil(rect.width), windowHeight:Math.ceil(panel.scrollHeight || rect.height)}));
-    }
-  }catch(e){ console.warn('Morning Brief html2canvas failed; trying SVG fallback', e); }
-  const clone=panel.cloneNode(true);
-  clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
-  clone.style.display='block';
-  clone.style.background='#0d2137';
-  clone.style.color='#fff';
-  const width=Math.ceil(panel.scrollWidth || panel.offsetWidth || 1200);
-  const height=Math.ceil(panel.scrollHeight || panel.offsetHeight || 900);
-  const xhtml=new XMLSerializer().serializeToString(clone);
-  const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
-  const url=URL.createObjectURL(new Blob([svg], {type:'image/svg+xml;charset=utf-8'}));
-  try{
-    const img=new Image();
-    const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
-    img.src=url;
-    await loaded;
-    const canvas=document.createElement('canvas');
-    canvas.width=width; canvas.height=height;
-    const ctx=canvas.getContext('2d');
-    ctx.fillStyle='#0d2137'; ctx.fillRect(0,0,width,height);
-    ctx.drawImage(img,0,0);
-    return await canvasToMorningBriefPngBlob(canvas);
-  }finally{ URL.revokeObjectURL(url); }
+    await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+    try{
+      const h2c=await loadHtml2CanvasForMorningBrief();
+      if(typeof h2c==='function'){
+        const width=Math.ceil(target.scrollWidth || target.offsetWidth || 980);
+        const height=Math.ceil(target.scrollHeight || target.offsetHeight || 900);
+        return await canvasToMorningBriefPngBlob(await h2c(target, {backgroundColor:'#0d2137', scale:1.35, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height}));
+      }
+    }catch(e){ console.warn('Morning Brief html2canvas failed; trying SVG fallback', e); }
+    const clone=target.cloneNode(true);
+    clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
+    clone.style.display='block';
+    clone.style.background='#0d2137';
+    clone.style.color='#fff';
+    const width=Math.ceil(target.scrollWidth || target.offsetWidth || 980);
+    const height=Math.ceil(target.scrollHeight || target.offsetHeight || 900);
+    const xhtml=new XMLSerializer().serializeToString(clone);
+    const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
+    const url=URL.createObjectURL(new Blob([svg], {type:'image/svg+xml;charset=utf-8'}));
+    try{
+      const img=new Image();
+      const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
+      img.src=url;
+      await loaded;
+      const canvas=document.createElement('canvas');
+      canvas.width=width; canvas.height=height;
+      const ctx=canvas.getContext('2d');
+      ctx.fillStyle='#0d2137'; ctx.fillRect(0,0,width,height);
+      ctx.drawImage(img,0,0);
+      return await canvasToMorningBriefPngBlob(canvas);
+    }finally{ URL.revokeObjectURL(url); }
+  }finally{
+    host.remove();
+  }
 }
 
 async function downloadMorningBriefPng(ev){
@@ -6573,6 +6604,7 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
+  renderMorningBrief();
 
 
   function renderMorningBrief(){
