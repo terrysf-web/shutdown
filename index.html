@@ -3864,7 +3864,7 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
-      <div class="huddle-panel-title with-legend"><span>Today's Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
+      <div class="huddle-panel-title with-legend"><span>Today's In-Progress Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
       <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
     </div>
     <div class="huddle-panel tight">
@@ -3873,7 +3873,7 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Executive Dashboard Top: Operational KPIs + Gowning Status -->
+  <!-- Executive Dashboard Top: Operational KPIs + Access Condition -->
   <div class="huddle-top-layout huddle-section">
     <div class="progress-brief">
       <div class="progress-brief-head">
@@ -3929,7 +3929,7 @@ APPENDIX 6.5B)</div>
     </div>
 
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Gowning Status</div>
+      <div class="huddle-panel-title">Access Condition</div>
       <div id="d-gowning-status" class="gowning-list dashboard">
         <div class="gowning-row">
           <div class="gowning-area">DP MFG Area</div>
@@ -6622,8 +6622,8 @@ function renderDashboard(){
 
     const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Gowning</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Gowning</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
     setHtml('mb-maint-rows', maintItems.length ? maintItems.map(t=>{
@@ -6634,7 +6634,7 @@ function renderDashboard(){
       const vendor = huddleVendor(t);
       const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
       return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
-    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities for today.</td></tr>');
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
 
     const commItems = [];
     criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
@@ -9814,7 +9814,7 @@ function handleDailyHuddleUrlParams(){
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+
-      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+
+      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Access Condition', dataTable(['Area','Status'], gowningRows, 'No access condition.', [1]))+'</td>'+
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
