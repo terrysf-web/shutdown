@@ -842,7 +842,7 @@ select.msf option:checked{background:#ddeeff}
       <option value="In Progress">In Progress</option>
       <option value="Complete">Complete</option>
       <option value="Delayed">Delayed</option>
-      <option value="On Hold">On Hold</option>
+
       <option value="N/A">N/A</option>
     </select>
     <select id="filterAssigned" onchange="render()"><option value="">All assignees</option><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select>
@@ -875,7 +875,7 @@ select.msf option:checked{background:#ddeeff}
   <div class="tbl-wrap">
     <table>
       <colgroup>
-        <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor"><col style="width:74px">
+        <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor"><col style="width:74px"><col style="width:68px">
         <col class="col-date"><col class="col-date"><col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col style="width:58px"><col style="width:78px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
       </colgroup>
       <thead>
@@ -887,6 +887,7 @@ select.msf option:checked{background:#ddeeff}
           <th class="col-dup" title="Overlapping task IDs for this assignee">Dup Resources</th>
           <th class="sortable" onclick="\&quot;setSort('vendor'," event)\"="">Vendor <span class="sort-indicator" id="sort-vendor" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('vendorOnsite'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Manually mark vendor as onsite">Vendor Onsite <span class="sort-indicator" id="sort-vendorOnsite" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('onHold'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Pause automatic progress while the task remains In Progress">On Hold <span class="sort-indicator" id="sort-onHold" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('start'," event)\"="">Start <span class="sort-indicator" id="sort-start" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('end'," event)\"="">End <span class="sort-indicator" id="sort-end" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('newStart'," event)\"="">New Start <span class="sort-indicator" id="sort-newStart" title="Click to sort · Shift+click for secondary sort"></span></th>
@@ -901,8 +902,8 @@ select.msf option:checked{background:#ddeeff}
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="19">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="19">
+      <tbody id="tbody"><tr class="section-row"><td colspan="20">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1117,7 +1118,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1298,7 +1299,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1411,7 +1412,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1507,7 +1508,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
@@ -1841,7 +1842,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -1937,7 +1938,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2084,7 +2085,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2146,7 +2147,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2190,8 +2191,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="19">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="19">
+    </tr><tr class="section-row"><td colspan="20">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2389,7 +2390,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2536,7 +2537,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2563,8 +2564,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="19">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="19">
+    </tr><tr class="section-row"><td colspan="20">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2710,8 +2711,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="19">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="19">
+    </tr><tr class="section-row"><td colspan="20">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
@@ -4417,6 +4418,21 @@ function migrateBlockedToDelayed(){
   Object.keys(statusMap).forEach(id=>{ if(statusMap[id]==='Blocked') statusMap[id]='Delayed'; });
   tasks.forEach(t=>{ if(t.status==='Blocked') t.status='Delayed'; });
 }
+function migrateOnHoldStatusToColumn(){
+  Object.keys(statusMap).forEach(id=>{
+    if(statusMap[id]==='On Hold'){
+      statusMap[id]='In Progress';
+      const task = tasks.find(t=>t.id===id);
+      if(task) task.onHold = true;
+    }
+  });
+  tasks.forEach(t=>{
+    if(t.status==='On Hold'){
+      t.status='In Progress';
+      t.onHold = true;
+    }
+  });
+}
 
 
 function updateDerivedFields(){
@@ -4429,6 +4445,8 @@ function updateDerivedFields(){
     t.critical = t.critical === true || t.critical === 'true' || t.critical === 'Y' || t.critical === 'Yes';
     t.notification = t.notification === true || t.notification === 'true' || t.notification === 'Y' || t.notification === 'Yes';
     t.vendorOnsite = t.vendorOnsite === true || t.vendorOnsite === 'true' || t.vendorOnsite === 'Y' || t.vendorOnsite === 'Yes';
+    t.onHold = t.onHold === true || t.onHold === 'true' || t.onHold === 'Y' || t.onHold === 'Yes';
+    t.onHoldProgress = Number.isFinite(Number(t.onHoldProgress)) ? Number(t.onHoldProgress) : null;
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
     t.newStart = normalizeDateValue(t.newStart);
@@ -4476,6 +4494,7 @@ function loadLocal(){
 }
 loadLocal();
 migrateBlockedToDelayed();
+migrateOnHoldStatusToColumn();
 normalizeAllTaskIds();
 
 function getAllSections(){ return [...new Set(tasks.map(t=>t.section))]; }
@@ -4692,6 +4711,7 @@ function getSortableValue(task, field){
   if(field === 'critical') return task.critical ? 1 : 0;
   if(field === 'notification') return task.notification ? 1 : 0;
   if(field === 'vendorOnsite') return task.vendorOnsite ? 1 : 0;
+  if(field === 'onHold') return task.onHold ? 1 : 0;
   if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     return normalizeDateValue(task[field]) || '';
   }
@@ -4710,7 +4730,7 @@ function compareByField(a, b, field, dir){
     const wa = (()=>{ const w=getShutdownWeek(a.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     const wb = (()=>{ const w=getShutdownWeek(b.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     result = wa - wb;
-  } else if(field === 'days' || field === 'critical' || field === 'notification' || field === 'vendorOnsite'){
+  } else if(field === 'days' || field === 'critical' || field === 'notification' || field === 'vendorOnsite' || field === 'onHold'){
     result = av - bv;
   } else if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     result = String(av).localeCompare(String(bv));
@@ -4760,7 +4780,7 @@ function setSort(field, event){
   render();
 }
 function updateSortIndicators(){
-  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','critical','notification','vendorOnsite','status','notes','actionComment'].forEach(field=>{
+  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','critical','notification','vendorOnsite','onHold','status','notes','actionComment'].forEach(field=>{
     const el = document.getElementById(`sort-${field}`);
     if(!el) return;
     if(sortField === field){
@@ -5139,7 +5159,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="19">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="20">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5156,7 +5176,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="19">
+        <td colspan="20">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5211,6 +5231,7 @@ function render(){
     const criticalCell = `<td style="text-align:center"><input type="checkbox" ${t.critical?'checked':''} onchange="toggleCritical('${t.id}',this.checked)" title="Mark this task as Critical for the dashboard" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828"></td>`;
     const notificationCell = `<td style="text-align:center"><input type="checkbox" ${t.notification?'checked':''} onchange="toggleNotification('${t.id}',this.checked)" title="Mark this task as requiring notification" style="cursor:pointer;width:15px;height:15px;accent-color:#1565c0"></td>`;
     const vendorOnsiteCell = `<td style="text-align:center"><input type="checkbox" ${t.vendorOnsite?'checked':''} onchange="toggleVendorOnsite('${t.id}',this.checked)" title="Mark vendor as onsite for this task" style="cursor:pointer;width:15px;height:15px;accent-color:#f0c040"></td>`;
+    const onHoldCell = `<td style="text-align:center"><input type="checkbox" ${t.onHold?'checked':''} onchange="toggleOnHold('${t.id}',this.checked)" title="Pause automatic progress while this task is on hold" style="cursor:pointer;width:15px;height:15px;accent-color:#5d6470"></td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5220,6 +5241,7 @@ function render(){
       ${dupCell}
       ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
       ${vendorOnsiteCell}
+      ${onHoldCell}
       ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
       ${endCellHtml}
       ${newStartCell}
@@ -5234,7 +5256,7 @@ function render(){
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="19" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="20" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
@@ -5243,6 +5265,8 @@ function render(){
 
 function changeStatus(sel){
   statusMap[sel.dataset.id]=sel.value;
+  const task = tasks.find(t=>t.id===sel.dataset.id);
+  if(task && sel.value !== 'In Progress'){ task.onHold = false; task.onHoldProgress = null; }
   updateDerivedFields();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -5273,6 +5297,21 @@ function toggleVendorOnsite(id, checked){
   const task = tasks.find(t=>t.id===id);
   if(!task) return;
   task.vendorOnsite = !!checked;
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+function toggleOnHold(id, checked){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  task.onHold = !!checked;
+  if(task.onHold){
+    if(!Number.isFinite(Number(task.onHoldProgress))) task.onHoldProgress = taskProgressPct(task, true);
+  }else{
+    task.onHoldProgress = null;
+  }
   updateDerivedFields();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -5357,6 +5396,8 @@ function insertRow(afterId){
     critical: false,
     notification: false,
     vendorOnsite: false,
+    onHold: false,
+    onHoldProgress: null,
     days: diffDaysInclusive(current.start, current.end) || current.days || null,
     section: current.section,
     isParent:false,
@@ -6190,10 +6231,11 @@ function renderDashboard(){
     }
     return total;
   }
-  function taskProgressPct(t){
+  function taskProgressPct(t, ignoreHold=false){
     const st = statusMap[t.id] || t.status || 'Pending';
     if(st === 'Complete') return 100;
-    if(st === 'Pending' || st === 'Scheduled' || st === 'On Hold' || st === 'N/A') return 0;
+    if(st === 'Pending' || st === 'Scheduled' || st === 'N/A') return 0;
+    if(!ignoreHold && t.onHold === true) return Number.isFinite(Number(t.onHoldProgress)) ? Number(t.onHoldProgress) : 0;
 
     const startIso = normalizeDateValue(t.start);
     const endIso = normalizeDateValue(t.end) || startIso;
@@ -6432,7 +6474,7 @@ function renderDashboard(){
     return status==='Normal' ? 'No active outage' : status==='OOS' ? 'In Progress / out of service' : status==='Cond. REL' ? 'Conditional release' : status==='FUL REL' ? 'Full release' : status==='Breakdown' ? 'Unplanned failure' : 'No active outage';
   }
   function pillClass(status){
-    return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':status==='In Progress'?'progress':status==='Delayed'?'delayed':status==='On Hold'?'onhold':status==='Complete'?'complete':status==='Scheduled'?'scheduled':status==='Pending'?'planned':'na';
+    return status==='Normal'?'normal':status==='OOS'?'oos':status==='Cond. REL'?'cond':status==='FUL REL'?'full':status==='Breakdown'?'breakdown':status==='In Progress'?'progress':status==='Delayed'?'delayed':status==='Complete'?'complete':status==='Scheduled'?'scheduled':status==='Pending'?'planned':'na';
   }
   function huddleStartISO(v){
     if(!v) return null;
@@ -6639,6 +6681,51 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
+
+
+  function renderMorningBrief(){
+    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
+    const vendorOnsiteTasks = activeLeaf.filter(t=>isVendorOnsite(t) && huddleVendor(t) !== '—');
+    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
+    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
+    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
+
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
+    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+
+    const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
+    setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
+
+    const commItems = [];
+    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
+    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
+      const t=item.task;
+      const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
+      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(action)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+
+    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
+    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
+      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
+  }
+  renderMorningBrief();
 
 
   function renderMorningBrief(){
@@ -9844,69 +9931,6 @@ function handleDailyHuddleUrlParams(){
         script.onerror=()=>reject(new Error('html2canvas load failed'));
         document.head.appendChild(script);
       });
-    }
-
-    function canvasToPngBlob(canvas){
-      return new Promise((resolve,reject)=>{
-        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
-      });
-    }
-
-    async function renderDailyHuddleHtmlToPngBlob(html){
-      setExportStatus('Rendering dashboard PNG...');
-      const width=1400;
-      const parser=new DOMParser();
-      const doc=parser.parseFromString(html, 'text/html');
-      const wrap=document.createElement('div');
-      wrap.style.position='fixed';
-      wrap.style.left='-10000px';
-      wrap.style.top='0';
-      wrap.style.width=width+'px';
-      wrap.style.background='#eef2f6';
-      wrap.style.zIndex='-1';
-      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
-      document.body.appendChild(wrap);
-      try{
-        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
-        try{
-          const h2c=await ensureHtml2Canvas();
-          if(typeof h2c==='function'){
-            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
-            return await canvasToPngBlob(canvas);
-          }
-        }catch(primaryErr){
-          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
-        }
-        const clone=wrap.cloneNode(true);
-        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
-        clone.style.position='static';
-        clone.style.left='auto';
-        clone.style.top='auto';
-        clone.style.zIndex='auto';
-        const xhtml=new XMLSerializer().serializeToString(clone);
-        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
-        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-        const url=URL.createObjectURL(svgBlob);
-        try{
-          const img=new Image();
-          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
-          img.src=url;
-          await loaded;
-          const canvas=document.createElement('canvas');
-          canvas.width=width;
-          canvas.height=height;
-          const ctx=canvas.getContext('2d');
-          ctx.fillStyle='#eef2f6';
-          ctx.fillRect(0,0,width,height);
-          ctx.drawImage(img,0,0);
-          return await canvasToPngBlob(canvas);
-        }finally{
-          URL.revokeObjectURL(url);
-        }
-      }finally{
-        wrap.remove();
-      }
     }
 
     function emailDate(v){
