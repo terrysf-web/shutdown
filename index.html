@@ -6643,6 +6643,51 @@ function renderDashboard(){
 
     const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
+    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+
+    const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
+    setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
+      const st = statusMap[t.id] || t.status || 'Pending';
+      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const progressPct = taskProgressPct(t);
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const vendor = huddleVendor(t);
+      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
+
+    const commItems = [];
+    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notify', task:t}));
+    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
+      const t=item.task;
+      const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
+      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(action)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+
+    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
+    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
+      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
+  }
+  renderMorningBrief();
+
+
+  function renderMorningBrief(){
+    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
+    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
+    const vendorOnsiteTasks = activeLeaf.filter(t=>isVendorOnsite(t) && huddleVendor(t) !== '—');
+    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
+    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
+    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
+
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
     if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
     if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
@@ -9775,48 +9820,6 @@ function handleDailyHuddleUrlParams(){
         reader.readAsDataURL(blob);
       });
     }
-
-    async function saveDashboardPngToPowerAutomateOrDownload(blob, filename){
-      var key='sd26_power_automate_dashboard_endpoint_v1';
-      var defaultEndpoint='https://default48a554d384034f70b3609b01ba297b.36.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b9cad4ea38a2450a872d41ac4ae1eb51/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aDAb8pYxG-Sm8A0x-mAxK2sawP0NKuKchFpNv-GW6WE';
-      var endpoint='';
-      try{ endpoint=localStorage.getItem(key)||''; }catch(e){}
-      endpoint=String(endpoint||defaultEndpoint||'').trim();
-      if(endpoint.indexOf('sig=')<0) endpoint=defaultEndpoint;
-      try{ if(endpoint) localStorage.setItem(key, endpoint); }catch(e){}
-      try{
-        if(!endpoint) throw new Error('Power Automate endpoint is not configured.');
-        setExportStatus('Sending dashboard PNG to Power Automate...');
-        var fileContentBase64=await blobToBase64(blob);
-        var res=await fetch(endpoint, {
-          method:'POST',
-          mode:'cors',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            fileName:filename,
-            contentType:blob.type || 'image/png',
-            fileContentBase64:fileContentBase64,
-            generatedAt:new Date().toISOString(),
-            source:'shutdown-dashboard'
-          })
-        });
-        if(res.ok || res.status===200 || res.status===201 || res.status===202 || res.status===204){
-          setExportStatus('Dashboard PNG saved through Power Automate');
-          setTimeout(function(){setExportStatus('');}, 3000);
-          return true;
-        }
-        var errText='';
-        try{ errText=await res.text(); }catch(readErr){}
-        throw new Error('Power Automate save failed: HTTP '+res.status+(errText ? ' - '+errText.slice(0,240) : ''));
-      }catch(e){
-        console.warn(e);
-        setExportStatus('Power Automate save failed; check Flow run history');
-        setTimeout(function(){setExportStatus('');}, 5000);
-        alert('Dashboard PNG was not downloaded locally. Power Automate save failed. Check the Flow run history and browser console for details.');
-      }
-      return false;
-    }
-
 
     function emailDate(v){
       try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
