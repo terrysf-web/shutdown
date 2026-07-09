@@ -873,7 +873,7 @@ select.msf option:checked{background:#ddeeff}
   <div class="tbl-wrap">
     <table>
       <colgroup>
-        <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor">
+        <col class="col-id"><col class="col-task"><col class="col-category"><col class="col-assigned"><col class="col-dup"><col class="col-vendor"><col style="width:74px">
         <col class="col-date"><col class="col-date"><col class="col-date"><col class="col-date"><col style="width:52px"><col class="col-days"><col style="width:46px"><col style="width:58px"><col style="width:78px"><col class="col-status"><col class="col-notes"><col class="col-actions-col">
       </colgroup>
       <thead>
@@ -884,6 +884,7 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('assigned'," event)\"="">Assigned <span class="sort-indicator" id="sort-assigned" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="col-dup" title="Overlapping task IDs for this assignee">Dup Resources</th>
           <th class="sortable" onclick="\&quot;setSort('vendor'," event)\"="">Vendor <span class="sort-indicator" id="sort-vendor" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th class="sortable" onclick="\&quot;setSort('vendorOnsite'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Manually mark vendor as onsite">Vendor Onsite <span class="sort-indicator" id="sort-vendorOnsite" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('start'," event)\"="">Start <span class="sort-indicator" id="sort-start" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('end'," event)\"="">End <span class="sort-indicator" id="sort-end" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('newStart'," event)\"="">New Start <span class="sort-indicator" id="sort-newStart" title="Click to sort · Shift+click for secondary sort"></span></th>
@@ -898,8 +899,8 @@ select.msf option:checked{background:#ddeeff}
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="18">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="18">
+      <tbody id="tbody"><tr class="section-row"><td colspan="19">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1114,7 +1115,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1295,7 +1296,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1408,7 +1409,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1504,7 +1505,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
@@ -1838,7 +1839,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -1934,7 +1935,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2081,7 +2082,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2143,7 +2144,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2187,8 +2188,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="18">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="18">
+    </tr><tr class="section-row"><td colspan="19">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2386,7 +2387,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2533,7 +2534,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2560,8 +2561,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="18">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="18">
+    </tr><tr class="section-row"><td colspan="19">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2707,8 +2708,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="18">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="18">
+    </tr><tr class="section-row"><td colspan="19">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
@@ -3864,7 +3865,7 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
-      <div class="huddle-panel-title with-legend"><span>Today's Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
+      <div class="huddle-panel-title with-legend"><span>Today's In-Progress Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
       <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
     </div>
     <div class="huddle-panel tight">
@@ -3873,7 +3874,7 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- Executive Dashboard Top: Operational KPIs + Gowning Status -->
+  <!-- Executive Dashboard Top: Operational KPIs + Access Condition -->
   <div class="huddle-top-layout huddle-section">
     <div class="progress-brief">
       <div class="progress-brief-head">
@@ -3929,7 +3930,7 @@ APPENDIX 6.5B)</div>
     </div>
 
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Gowning Status</div>
+      <div class="huddle-panel-title">Access Condition</div>
       <div id="d-gowning-status" class="gowning-list dashboard">
         <div class="gowning-row">
           <div class="gowning-area">DP MFG Area</div>
@@ -4425,6 +4426,7 @@ function updateDerivedFields(){
     t.actionComment = t.actionComment || '';
     t.critical = t.critical === true || t.critical === 'true' || t.critical === 'Y' || t.critical === 'Yes';
     t.notification = t.notification === true || t.notification === 'true' || t.notification === 'Y' || t.notification === 'Yes';
+    t.vendorOnsite = t.vendorOnsite === true || t.vendorOnsite === 'true' || t.vendorOnsite === 'Y' || t.vendorOnsite === 'Yes';
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
     t.newStart = normalizeDateValue(t.newStart);
@@ -4687,6 +4689,7 @@ function getSortableValue(task, field){
   if(field === 'actionComment') return task.actionComment || '';
   if(field === 'critical') return task.critical ? 1 : 0;
   if(field === 'notification') return task.notification ? 1 : 0;
+  if(field === 'vendorOnsite') return task.vendorOnsite ? 1 : 0;
   if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     return normalizeDateValue(task[field]) || '';
   }
@@ -4705,7 +4708,7 @@ function compareByField(a, b, field, dir){
     const wa = (()=>{ const w=getShutdownWeek(a.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     const wb = (()=>{ const w=getShutdownWeek(b.start); return (!w||w==='—')?9999:parseInt(w.slice(1))||9999; })();
     result = wa - wb;
-  } else if(field === 'days' || field === 'critical' || field === 'notification'){
+  } else if(field === 'days' || field === 'critical' || field === 'notification' || field === 'vendorOnsite'){
     result = av - bv;
   } else if(field === 'start' || field === 'end' || field === 'newStart' || field === 'newEnd'){
     result = String(av).localeCompare(String(bv));
@@ -4755,7 +4758,7 @@ function setSort(field, event){
   render();
 }
 function updateSortIndicators(){
-  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','critical','notification','status','notes','actionComment'].forEach(field=>{
+  ['id','task','category','assigned','vendor','start','end','newStart','newEnd','days','wk','critical','notification','vendorOnsite','status','notes','actionComment'].forEach(field=>{
     const el = document.getElementById(`sort-${field}`);
     if(!el) return;
     if(sortField === field){
@@ -5134,7 +5137,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="18">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="19">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5151,7 +5154,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="18">
+        <td colspan="19">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5205,6 +5208,7 @@ function render(){
       : `<td style="white-space:nowrap;color:${t.newEnd?'#ffcc80':'#8aa4bd'};font-weight:${t.newEnd?'700':'400'}">${displayDate(t.newEnd)||'—'}</td>`;
     const criticalCell = `<td style="text-align:center"><input type="checkbox" ${t.critical?'checked':''} onchange="toggleCritical('${t.id}',this.checked)" title="Mark this task as Critical for the dashboard" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828"></td>`;
     const notificationCell = `<td style="text-align:center"><input type="checkbox" ${t.notification?'checked':''} onchange="toggleNotification('${t.id}',this.checked)" title="Mark this task as requiring notification" style="cursor:pointer;width:15px;height:15px;accent-color:#1565c0"></td>`;
+    const vendorOnsiteCell = `<td style="text-align:center"><input type="checkbox" ${t.vendorOnsite?'checked':''} onchange="toggleVendorOnsite('${t.id}',this.checked)" title="Mark vendor as onsite for this task" style="cursor:pointer;width:15px;height:15px;accent-color:#f0c040"></td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5213,6 +5217,7 @@ function render(){
       <td style="white-space:nowrap;min-width:110px">${assignedCell(t.id, t.assigned||'')}</td>
       ${dupCell}
       ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
+      ${vendorOnsiteCell}
       ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
       ${endCellHtml}
       ${newStartCell}
@@ -5227,7 +5232,7 @@ function render(){
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="18" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="19" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
@@ -5253,6 +5258,16 @@ function toggleNotification(id, checked){
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   renderDashboard();
+}
+function toggleVendorOnsite(id, checked){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  task.vendorOnsite = !!checked;
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
 }
 function updateSaveButton(){ document.getElementById('saveBtn').disabled = !editMode || !dirty; }
 function toggleEditMode(){
@@ -5331,6 +5346,7 @@ function insertRow(afterId){
     newEnd: null,
     critical: false,
     notification: false,
+    vendorOnsite: false,
     days: diffDaysInclusive(current.start, current.end) || current.days || null,
     section: current.section,
     isParent:false,
@@ -6480,6 +6496,9 @@ function renderDashboard(){
   function huddleVendor(t){
     return String(t.vendor || '').trim() || '—';
   }
+  function isVendorOnsite(t){
+    return t && (t.vendorOnsite === true || t.vendorOnsite === 'true' || t.vendorOnsite === 'Y' || t.vendorOnsite === 'Yes');
+  }
   function delayedNewDate(t){
     const newStartIso = normalizeDateValue(t.newStart || t.newStartDate || t.revisedStart || t.rescheduledStart);
     const newEndIso = normalizeDateValue(t.newEnd || t.newEndDate || t.newDate || t.newTarget || t.revisedDate || t.revisedTarget || t.rescheduledDate || t.rescheduledEnd);
@@ -6534,7 +6553,7 @@ function renderDashboard(){
       const progressPct = taskProgressPct(t);
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
-      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
+      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       return `<tr>
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
@@ -6604,16 +6623,12 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
-  renderMorningBrief();
 
 
   function renderMorningBrief(){
     function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
     const notificationTasks = activeLeaf.filter(t=>t.notification === true);
-    const vendorOnsiteTasks = maintItems.filter(t=>{
-      const st = statusMap[t.id] || t.status || 'Pending';
-      return st === 'In Progress' && taskProgressPct(t) > 0 && huddleVendor(t) !== '—';
-    });
+    const vendorOnsiteTasks = activeLeaf.filter(t=>isVendorOnsite(t) && huddleVendor(t) !== '—');
     setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
     setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
     setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
@@ -6622,19 +6637,20 @@ function renderDashboard(){
 
     const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Gowning</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Gowning</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
-    setHtml('mb-maint-rows', maintItems.length ? maintItems.map(t=>{
+    const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
+    setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
       const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
       const progressPct = taskProgressPct(t);
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
-      const vendorOnsite = st === 'In Progress' && progressPct > 0 && vendor !== '—';
+      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
-    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities for today.</td></tr>');
+    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
 
     const commItems = [];
     criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
@@ -9814,7 +9830,7 @@ function handleDailyHuddleUrlParams(){
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
       '<td style="width:62%;padding-right:6px;vertical-align:top;">'+panel('Systems / Utilities Status', simpleRows(systemRows, 'No systems currently OOS.'))+'</td>'+
-      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Gowning Status', dataTable(['Area','Status'], gowningRows, 'No gowning status.', [1]))+'</td>'+
+      '<td style="width:38%;padding-left:6px;vertical-align:top;">'+panel('Access Condition', dataTable(['Area','Status'], gowningRows, 'No access condition.', [1]))+'</td>'+
       '</tr></table></td></tr>'+
       '<tr><td style="padding-top:10px;">'+panel('Return to Service / Delay Description', dataTable(['System','Target RTS','Current Status','Remarks'], rtsRows, 'No systems returned to service.', [2]))+'</td></tr>'+
       '<tr><td style="padding-top:10px;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;"><tr>'+
