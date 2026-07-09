@@ -6705,7 +6705,7 @@ function renderDashboard(){
 
     const commItems = [];
     criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
-    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notify', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
     setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
       const t=item.task;
       const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
@@ -6733,8 +6733,8 @@ function renderDashboard(){
 
     const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Morning access condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Morning access condition</td></tr>`);
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
     const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
@@ -6750,7 +6750,7 @@ function renderDashboard(){
 
     const commItems = [];
     criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
-    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notify', task:t}));
+    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
     setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
       const t=item.task;
       const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
