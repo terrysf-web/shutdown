@@ -3906,7 +3906,7 @@ APPENDIX 6.5B)</div>
       </div>
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">Critical / Notification Items</div>
-        <table class="huddle-table small"><thead><tr><th>Sent</th><th>Impacted Area</th><th>System ID</th><th>Task</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+        <table class="huddle-table small"><thead><tr><th>Sent</th><th>System ID</th><th>Task</th><th>Impacted Area</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
@@ -7177,7 +7177,7 @@ function renderDashboard(){
       const sent = t.notification ? '✓' : '—';
       const impactedArea = huddleAreaForTask(t);
       const impactDate = displayDate(t.newStart) || displayDate(t.start) || displayDate(t.end) || 'TBD';
-      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td>${impactDate}</td></tr>`;
+      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${impactDate}</td></tr>`;
     }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
 
     const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
