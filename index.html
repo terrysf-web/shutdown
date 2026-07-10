@@ -6313,7 +6313,8 @@ function weeklyAutoSummaryData(){
   const delayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
   const lateTasks = activeLeaf.filter(t=>{
     const endIso = normalizeDateValue(t.end);
-    return endIso && endIso < todayIso && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+    const status = statusMap[t.id]||t.status||'Pending';
+    return endIso && endIso < todayIso && status !== 'Complete' && status !== 'Delayed';
   });
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
   const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
