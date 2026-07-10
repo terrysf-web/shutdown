@@ -711,6 +711,16 @@ select.msf option:checked{background:#ddeeff}
 .dashboard-export-btn{background:#f0c040;color:#102943;border:none;border-radius:6px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
 .dashboard-export-btn.secondary{background:#173653;color:#d9e8f7;border:1px solid rgba(255,255,255,.22)}
 .dashboard-export-btn:hover{filter:brightness(.96)}
+.dashboard-view-switch{display:flex;align-items:center;gap:5px;background:#102943;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px}
+.dashboard-view-switch .dashboard-export-btn{padding:6px 10px;font-size:11px}
+.dashboard-export-menu{position:relative}
+.dashboard-export-menu summary{list-style:none;display:inline-flex;align-items:center;gap:6px}
+.dashboard-export-menu summary::-webkit-details-marker{display:none}
+.dashboard-export-menu summary:after{content:"▾";font-size:10px;line-height:1}
+.dashboard-export-menu[open] summary:after{content:"▴"}
+.dashboard-export-dropdown{position:absolute;right:0;top:calc(100% + 6px);z-index:1000;background:#102943;border:1px solid rgba(255,255,255,.22);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.35);padding:7px;display:flex;flex-direction:column;gap:6px;min-width:210px}
+.dashboard-export-dropdown .dashboard-export-btn{width:100%;text-align:left;justify-content:flex-start}
+@media (max-width:900px){.dashboard-export-actions{justify-content:flex-start}.dashboard-view-switch{order:2}.dashboard-export-menu{order:3}.dashboard-export-dropdown{left:0;right:auto}}
 @media print{
   @page{size:landscape;margin:0.28in}
   html,body{height:auto!important;overflow:visible!important;background:#0d2137!important;font-size:9px!important}
@@ -3849,12 +3859,20 @@ APPENDIX 6.5B)</div>
     <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Shutdown Executive Dashboard</span>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
-      <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Send a PNG screenshot of the dashboard to Power Automate for SharePoint saving">🖼 Dashboard PNG</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">🌅 Morning Brief</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">✉ Morning Brief JPG</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('weekly')" title="Show editable weekly executive summary">📝 Weekly Summary</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">📊 Full Dashboard</button>
+      <div class="dashboard-view-switch">
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">Full</button>
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">Morning</button>
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('weekly')" title="Show editable weekly executive summary">Weekly</button>
+      </div>
+      <details class="dashboard-export-menu">
+        <summary class="dashboard-export-btn">Export</summary>
+        <div class="dashboard-export-dropdown">
+          <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">Save PDF</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Save Dashboard, KPI, and Timeline PNGs">Daily Email PNGs</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadWeeklyEmailPngs" type="button" title="Save Weekly Summary, Dashboard, and Timeline PNGs for Friday executive email">Friday Executive PNGs</button>
+          <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">Morning Brief JPG</button>
+        </div>
+      </details>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -3953,7 +3971,7 @@ APPENDIX 6.5B)</div>
 
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Current Dashboard Attachment</div>
-      <div class="weekly-note">For Friday email: send this weekly summary first, then attach the current Dashboard PNG below it.</div>
+      <div class="weekly-note">For Friday email: send this weekly summary first, then place the Dashboard PNG and Timeline PNG below it.</div>
     </div>
   </div>
 
@@ -10575,6 +10593,77 @@ function handleDailyHuddleUrlParams(){
     clone.insertBefore(style, clone.firstChild);
     return clone;
   }
+  function prepWeeklyClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='weeklyExecutiveSummaryCapture';
+    clone.classList.add('email-report-weekly');
+    clone.style.display='block';
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.weekly-actions').forEach(function(el){ el.style.display='none'; });
+    clone.querySelectorAll('textarea.weekly-editor').forEach(function(el){
+      var display=document.createElement('div');
+      display.className='weekly-export-text '+(el.classList.contains('summary') ? 'summary' : '');
+      display.textContent=el.value || el.textContent || '';
+      display.style.whiteSpace='pre-line';
+      display.style.wordBreak='break-word';
+      if(el.classList.contains('summary')){
+        el.parentNode.replaceChild(display, el);
+      }else{
+        el.style.display='none';
+      }
+    });
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.morning-hero', {padding:'18px', marginBottom:'16px'});
+    apply('.morning-title', {fontSize:'30px', lineHeight:'1.1'});
+    apply('.morning-sub', {fontSize:'16px'});
+    apply('.morning-kpis', {display:'grid', gridTemplateColumns:'repeat(4,minmax(0,1fr))', gap:'12px'});
+    apply('.morning-kpi', {padding:'15px', minHeight:'96px'});
+    apply('.morning-kpi-title', {fontSize:'14px'});
+    apply('.morning-kpi-lines', {fontSize:'17px', lineHeight:'1.35'});
+    apply('.huddle-panel', {padding:'16px', borderRadius:'8px', marginBottom:'16px'});
+    apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('.weekly-edit-grid', {display:'grid', gridTemplateColumns:'repeat(3,minmax(0,1fr))', gap:'14px'});
+    apply('.weekly-edit-label', {fontSize:'14px', lineHeight:'1.2', marginBottom:'8px'});
+    apply('.weekly-preview-list', {fontSize:'16px', lineHeight:'1.38', marginTop:'0'});
+    apply('.weekly-preview-list li', {marginBottom:'7px'});
+    apply('.huddle-table', {fontSize:'15px'});
+    apply('.huddle-table th', {fontSize:'13px', padding:'9px 11px'});
+    apply('.huddle-table td', {fontSize:'15px', lineHeight:'1.25', padding:'9px 11px'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-weekly{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-weekly *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-weekly .morning-hero{background:#1a3a5c!important;border-bottom:3px solid #f0c040!important;border-radius:8px!important;padding:18px!important;margin-bottom:16px!important}',
+      '.email-report-weekly .morning-title{font-size:30px!important;line-height:1.1!important;color:#fff!important}',
+      '.email-report-weekly .morning-sub{font-size:16px!important;color:#cde!important}',
+      '.email-report-weekly .morning-kpis{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}',
+      '.email-report-weekly .morning-kpi{background:#102943!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:15px!important;min-height:96px!important}',
+      '.email-report-weekly .morning-kpi-title{font-size:14px!important;color:#cde!important;text-transform:uppercase!important;font-weight:900!important}',
+      '.email-report-weekly .morning-kpi-lines{font-size:17px!important;line-height:1.35!important;color:#fff!important}',
+      '.email-report-weekly .huddle-panel{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:16px!important;margin-bottom:16px!important}',
+      '.email-report-weekly .huddle-panel-title,.email-report-weekly .weekly-edit-label{font-size:17px!important;line-height:1.15!important;color:#f0c040!important;text-transform:uppercase!important;font-weight:900!important}',
+      '.email-report-weekly .weekly-edit-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-weekly .weekly-export-text{background:#102943!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:8px!important;color:#fff!important;font-size:17px!important;line-height:1.42!important;padding:14px 16px!important}',
+      '.email-report-weekly .weekly-export-text.summary{border-left:4px solid #f0c040!important}',
+      '.email-report-weekly .weekly-preview-list{font-size:16px!important;line-height:1.38!important;margin:0 0 0 20px!important;padding:0!important;color:#e8f1fb!important}',
+      '.email-report-weekly .weekly-preview-list li{margin-bottom:7px!important}',
+      '.email-report-weekly .huddle-table{font-size:15px!important;width:100%!important}',
+      '.email-report-weekly .huddle-table th{font-size:13px!important;padding:9px 11px!important}',
+      '.email-report-weekly .huddle-table td{font-size:15px!important;line-height:1.25!important;padding:9px 11px!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    return clone;
+  }
   function buildTimelineClone(width){
     var header=document.getElementById('tl-header-sticky');
     var body=document.getElementById('tl-container');
@@ -10728,12 +10817,72 @@ function handleDailyHuddleUrlParams(){
     }
     return false;
   };
+  window.downloadWeeklyExecutiveEmailPngs=async function(ev){
+    if(ev && ev.preventDefault) ev.preventDefault();
+    if(exportInProgress) return false;
+    exportInProgress=true;
+    setExportStatus('Rendering Weekly Summary, Dashboard, and Timeline PNGs...');
+    try{
+      if(typeof setDashboardMode==='function') setDashboardMode('weekly');
+      if(typeof renderWeeklyExecutiveSummary==='function') renderWeeklyExecutiveSummary();
+      if(typeof initTimelineFilter==='function') initTimelineFilter();
+      if(typeof renderTimeline==='function') renderTimeline();
+      await waitFrames(3);
+      var weekly=document.getElementById('weeklyExecutiveSummaryPanel');
+      var dashboard=document.getElementById('dashboardPanel');
+      var tlHeader=document.getElementById('tl-header-sticky');
+      var tlBody=document.getElementById('tl-container');
+      if(!weekly) throw new Error('Weekly Summary panel not found.');
+      if(!dashboard) throw new Error('Dashboard panel not found.');
+      var weeklyWidth=1400;
+      var dashboardWidth=1400;
+      var timelineWidth=Math.max(
+        1400,
+        Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
+        Math.ceil(tlBody ? tlBody.scrollWidth : 0),
+        svgWidth(tlHeader),
+        svgWidth(tlBody)
+      );
+      var weeklyBlob=await renderNodeToPngBlob(prepWeeklyClone(weekly, weeklyWidth), weeklyWidth);
+      if(typeof setDashboardMode==='function') setDashboardMode('huddle');
+      await waitFrames(2);
+      var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var weeklyFile='Shutdown_Weekly_Executive_Summary.png';
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
+      var weeklySaved=await savePng(weeklyBlob, weeklyFile);
+      var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var timelineSaved=await savePng(timelineBlob, timelineFile);
+      if(weeklySaved && dashSaved && timelineSaved){
+        setExportStatus('Weekly Summary, Dashboard, and Timeline PNGs saved to SharePoint');
+      }else{
+        setExportStatus('SharePoint save blocked; downloading Friday PNGs');
+        if(!weeklySaved) downloadBlob(weeklyBlob, weeklyFile, 0);
+        if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 650);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
+      }
+      setTimeout(function(){ setExportStatus(''); }, 3000);
+    }catch(e){
+      console.error('Weekly Summary, Dashboard, and Timeline PNG export failed:', e);
+      alert('Could not create Weekly Summary, Dashboard, and Timeline PNGs: '+(e && e.message ? e.message : e));
+      setExportStatus('');
+    }finally{
+      exportInProgress=false;
+    }
+    return false;
+  };
   document.addEventListener('DOMContentLoaded', function(){
     var btn=document.getElementById('btnDownloadHuddleSummary');
     if(btn){
-      btn.textContent='🖼 Email PNGs';
+      btn.textContent='Daily Email PNGs';
       btn.title='Save separate Dashboard, KPI, and Timeline PNGs to SharePoint, with local download fallback';
       btn.onclick=window.downloadDailyHuddleSummary;
+    }
+    var weeklyBtn=document.getElementById('btnDownloadWeeklyEmailPngs');
+    if(weeklyBtn){
+      weeklyBtn.title='Save separate Weekly Summary, Dashboard, and Timeline PNGs for the Friday executive email';
+      weeklyBtn.onclick=window.downloadWeeklyExecutiveEmailPngs;
     }
   });
 })();
