@@ -3868,8 +3868,8 @@ APPENDIX 6.5B)</div>
         <summary class="dashboard-export-btn">Export</summary>
         <div class="dashboard-export-dropdown">
           <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">Save PDF</button>
-          <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Save Dashboard, KPI, and Timeline PNGs">Daily Email PNGs</button>
-          <button class="dashboard-export-btn secondary" id="btnDownloadWeeklyEmailPngs" type="button" title="Save Weekly Summary, Dashboard, and Timeline PNGs for Friday executive email">Friday Executive PNGs</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Save compressed Dashboard, KPI, and Timeline JPGs">Daily Email JPGs</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadWeeklyEmailPngs" type="button" title="Save compressed Weekly Summary, Dashboard, and Timeline JPGs for Friday executive email">Friday Executive JPGs</button>
           <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">Morning Brief JPG</button>
         </div>
       </details>
@@ -10433,6 +10433,39 @@ function handleDailyHuddleUrlParams(){
       canvas.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('PNG render failed')); }, 'image/png');
     });
   }
+  function canvasToEmailJpegBlob(canvas, targetBytes){
+    targetBytes=targetBytes || 500000;
+    var scales=[1, .92, .84, .76, .68];
+    var qualities=[.78, .68, .58, .48, .38];
+    function makeCanvas(scale){
+      if(scale===1) return canvas;
+      var scaled=document.createElement('canvas');
+      scaled.width=Math.max(1, Math.round(canvas.width*scale));
+      scaled.height=Math.max(1, Math.round(canvas.height*scale));
+      var ctx=scaled.getContext('2d');
+      ctx.fillStyle='#0d2137';
+      ctx.fillRect(0,0,scaled.width,scaled.height);
+      ctx.drawImage(canvas,0,0,scaled.width,scaled.height);
+      return scaled;
+    }
+    function makeBlob(src, quality){
+      return new Promise(function(resolve,reject){
+        src.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('Email image render failed')); }, 'image/jpeg', quality);
+      });
+    }
+    return (async function(){
+      var best=null;
+      for(var s=0;s<scales.length;s++){
+        var src=makeCanvas(scales[s]);
+        for(var q=0;q<qualities.length;q++){
+          var blob=await makeBlob(src, qualities[q]);
+          if(!best || blob.size<best.size) best=blob;
+          if(blob.size<=targetBytes) return blob;
+        }
+      }
+      return best;
+    })();
+  }
   function svgWidth(el){
     var svg=el && el.querySelector && el.querySelector('svg');
     if(!svg) return 0;
@@ -10695,7 +10728,8 @@ function handleDailyHuddleUrlParams(){
     section.appendChild(wrap);
     return section;
   }
-  async function renderNodeToPngBlob(node, width){
+  async function renderNodeToBlob(node, width, opts){
+    opts=opts || {};
     var root=document.createElement('div');
     root.style.position='fixed';
     root.style.left='-10000px';
@@ -10722,10 +10756,16 @@ function handleDailyHuddleUrlParams(){
         scrollX:0,
         scrollY:0
       });
-      return await canvasToBlob(canvas);
+      return opts.emailJpeg ? await canvasToEmailJpegBlob(canvas, opts.targetBytes) : await canvasToBlob(canvas);
     }finally{
       root.remove();
     }
+  }
+  async function renderNodeToPngBlob(node, width){
+    return await renderNodeToBlob(node, width, {emailJpeg:false});
+  }
+  async function renderNodeToEmailJpegBlob(node, width){
+    return await renderNodeToBlob(node, width, {emailJpeg:true, targetBytes:500000});
   }
   function downloadBlob(blob, filename, delayMs){
     setTimeout(function(){
@@ -10751,13 +10791,13 @@ function handleDailyHuddleUrlParams(){
         var clean=url.split('?')[0].replace('/:f:/r','');
         return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
       }
-      if(/\.(html?|png)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+      if(/\.(html?|png|jpe?g)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
       return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
     }
     url=normalize(url);
     try{ localStorage.setItem(key,url); }catch(e){}
     try{
-      var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':'image/png'}});
+      var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'image/png'}});
       if(res.ok || res.status===200 || res.status===201 || res.status===204){
         return true;
       }
@@ -10771,7 +10811,7 @@ function handleDailyHuddleUrlParams(){
     if(ev && ev.preventDefault) ev.preventDefault();
     if(exportInProgress) return false;
     exportInProgress=true;
-    setExportStatus('Rendering Dashboard, KPI, and Timeline PNGs...');
+    setExportStatus('Rendering compressed Dashboard, KPI, and Timeline JPGs...');
     try{
       if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
       if(typeof initTimelineFilter==='function') initTimelineFilter();
@@ -10790,27 +10830,27 @@ function handleDailyHuddleUrlParams(){
         svgWidth(tlBody)
       );
       var kpiWidth=1600;
-      var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
-      var kpiBlob=await renderNodeToPngBlob(prepKpiClone(dashboard, kpiWidth), kpiWidth);
-      var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
-      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
-      var kpiFile='Shutdown_Daily_Huddle_KPI.png';
-      var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
+      var dashboardBlob=await renderNodeToEmailJpegBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var kpiBlob=await renderNodeToEmailJpegBlob(prepKpiClone(dashboard, kpiWidth), kpiWidth);
+      var timelineBlob=await renderNodeToEmailJpegBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.jpg';
+      var kpiFile='Shutdown_Daily_Huddle_KPI.jpg';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.jpg';
       var dashSaved=await savePng(dashboardBlob, dashboardFile);
       var kpiSaved=await savePng(kpiBlob, kpiFile);
       var timelineSaved=await savePng(timelineBlob, timelineFile);
       if(dashSaved && kpiSaved && timelineSaved){
-        setExportStatus('Dashboard, KPI, and Timeline PNGs saved to SharePoint');
+        setExportStatus('Dashboard, KPI, and Timeline JPGs saved to SharePoint');
       }else{
-        setExportStatus('SharePoint save blocked; downloading PNGs');
+        setExportStatus('SharePoint save blocked; downloading compressed JPGs');
         if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 0);
         if(!kpiSaved) downloadBlob(kpiBlob, kpiFile, 650);
         if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
       }
       setTimeout(function(){ setExportStatus(''); }, 3000);
     }catch(e){
-      console.error('Dashboard, KPI, and Timeline PNG export failed:', e);
-      alert('Could not create Dashboard, KPI, and Timeline PNGs: '+(e && e.message ? e.message : e));
+      console.error('Dashboard, KPI, and Timeline JPG export failed:', e);
+      alert('Could not create Dashboard, KPI, and Timeline JPGs: '+(e && e.message ? e.message : e));
       setExportStatus('');
     }finally{
       exportInProgress=false;
@@ -10821,7 +10861,7 @@ function handleDailyHuddleUrlParams(){
     if(ev && ev.preventDefault) ev.preventDefault();
     if(exportInProgress) return false;
     exportInProgress=true;
-    setExportStatus('Rendering Weekly Summary, Dashboard, and Timeline PNGs...');
+    setExportStatus('Rendering compressed Weekly Summary, Dashboard, and Timeline JPGs...');
     try{
       if(typeof setDashboardMode==='function') setDashboardMode('weekly');
       if(typeof renderWeeklyExecutiveSummary==='function') renderWeeklyExecutiveSummary();
@@ -10843,29 +10883,29 @@ function handleDailyHuddleUrlParams(){
         svgWidth(tlHeader),
         svgWidth(tlBody)
       );
-      var weeklyBlob=await renderNodeToPngBlob(prepWeeklyClone(weekly, weeklyWidth), weeklyWidth);
+      var weeklyBlob=await renderNodeToEmailJpegBlob(prepWeeklyClone(weekly, weeklyWidth), weeklyWidth);
       if(typeof setDashboardMode==='function') setDashboardMode('huddle');
       await waitFrames(2);
-      var dashboardBlob=await renderNodeToPngBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
-      var timelineBlob=await renderNodeToPngBlob(buildTimelineClone(timelineWidth), timelineWidth);
-      var weeklyFile='Shutdown_Weekly_Executive_Summary.png';
-      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.png';
-      var timelineFile='Shutdown_Daily_Huddle_Timeline.png';
+      var dashboardBlob=await renderNodeToEmailJpegBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var timelineBlob=await renderNodeToEmailJpegBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var weeklyFile='Shutdown_Weekly_Executive_Summary.jpg';
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.jpg';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.jpg';
       var weeklySaved=await savePng(weeklyBlob, weeklyFile);
       var dashSaved=await savePng(dashboardBlob, dashboardFile);
       var timelineSaved=await savePng(timelineBlob, timelineFile);
       if(weeklySaved && dashSaved && timelineSaved){
-        setExportStatus('Weekly Summary, Dashboard, and Timeline PNGs saved to SharePoint');
+        setExportStatus('Weekly Summary, Dashboard, and Timeline JPGs saved to SharePoint');
       }else{
-        setExportStatus('SharePoint save blocked; downloading Friday PNGs');
+        setExportStatus('SharePoint save blocked; downloading compressed Friday JPGs');
         if(!weeklySaved) downloadBlob(weeklyBlob, weeklyFile, 0);
         if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 650);
         if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
       }
       setTimeout(function(){ setExportStatus(''); }, 3000);
     }catch(e){
-      console.error('Weekly Summary, Dashboard, and Timeline PNG export failed:', e);
-      alert('Could not create Weekly Summary, Dashboard, and Timeline PNGs: '+(e && e.message ? e.message : e));
+      console.error('Weekly Summary, Dashboard, and Timeline JPG export failed:', e);
+      alert('Could not create Weekly Summary, Dashboard, and Timeline JPGs: '+(e && e.message ? e.message : e));
       setExportStatus('');
     }finally{
       exportInProgress=false;
@@ -10875,13 +10915,14 @@ function handleDailyHuddleUrlParams(){
   document.addEventListener('DOMContentLoaded', function(){
     var btn=document.getElementById('btnDownloadHuddleSummary');
     if(btn){
-      btn.textContent='Daily Email PNGs';
-      btn.title='Save separate Dashboard, KPI, and Timeline PNGs to SharePoint, with local download fallback';
+      btn.textContent='Daily Email JPGs';
+      btn.title='Save compressed Dashboard, KPI, and Timeline JPGs under the email body size limit';
       btn.onclick=window.downloadDailyHuddleSummary;
     }
     var weeklyBtn=document.getElementById('btnDownloadWeeklyEmailPngs');
     if(weeklyBtn){
-      weeklyBtn.title='Save separate Weekly Summary, Dashboard, and Timeline PNGs for the Friday executive email';
+      weeklyBtn.textContent='Friday Executive JPGs';
+      weeklyBtn.title='Save compressed Weekly Summary, Dashboard, and Timeline JPGs for the Friday executive email';
       weeklyBtn.onclick=window.downloadWeeklyExecutiveEmailPngs;
     }
   });
