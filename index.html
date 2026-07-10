@@ -6690,6 +6690,10 @@ function renderDashboard(){
     const endIso = normalizeDateValue(t.end);
     return endIso && new Date(endIso+'T00:00:00') < todayDate && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
   });
+  // Shared Schedule Risk definition for Full Dashboard and Morning Brief.
+  // Delayed items are reported only as Delayed, never duplicated as Late.
+  const riskDelayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
+  const riskLateTasks = overdueTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='Delayed');
   const lookaheadTasks = activeLeaf.filter(t=>{
     const startIso = normalizeDateValue(t.start);
     if(!startIso) return false;
@@ -6737,7 +6741,7 @@ function renderDashboard(){
   const dueTodayTasks = activeLeaf.filter(t=>taskTouchesToday(t) && taskStatus(t)!=='N/A');
   const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
-  const lateTasks = overdueTasks;
+  const lateTasks = riskLateTasks;
   // Critical is manually marked in the Task Tracker Critical column.
   // It no longer comes automatically from Delayed/overdue status because that was not accurate enough.
   const criticalTasks = activeLeaf.filter(t=>t.critical === true);
@@ -6765,7 +6769,7 @@ function renderDashboard(){
   }
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
-  const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
+  const scheduleRiskCount = riskDelayedTasks.length + riskLateTasks.length;
   const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
   setText('d-progress-summary', '');
   setText('d-operational-detail-label', 'Operational Detail (Tasks-' + taskTotal + ')');
@@ -6779,9 +6783,9 @@ function renderDashboard(){
   setText('d-today-complete', completedTodayTasks.length);
   setText('d-today-remaining', remainingTodayTasks.length);
   setText('d-schedule-risk', scheduleRiskCount);
-  setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
-  setText('d-risk-late', lateTasks.length);
-  setText('d-risk-delayed', delayedTasks.length);
+  setText('d-schedule-risk-sub', riskLateTasks.length + ' late / ' + riskDelayedTasks.length + ' delayed');
+  setText('d-risk-late', riskLateTasks.length);
+  setText('d-risk-delayed', riskDelayedTasks.length);
   setText('d-risk-critical', criticalTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
@@ -7127,7 +7131,7 @@ function renderDashboard(){
     setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
     setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
     setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
-    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-risk-summary', `Late: ${riskLateTasks.length}<br>Delayed: ${riskDelayedTasks.length}<br>Critical: ${criticalTasks.length}`);
     setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
 
     function systemTargetNormalDate(s){
