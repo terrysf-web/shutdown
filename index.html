@@ -6294,6 +6294,7 @@ function renderDashboard(){
     return calculateTaskProgressPct(t, ignoreHold);
   }
 
+  const progressTotal = activeLeaf.length;
   const progressDone = statusCounts.Complete || 0;
   const progressPct = progressTotal ? Math.round(activeLeaf.reduce((sum,t)=>sum + taskProgressPct(t), 0) / progressTotal) : 0;
   const overdueTasks = activeLeaf.filter(t=>{
