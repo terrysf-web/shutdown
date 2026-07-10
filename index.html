@@ -7800,6 +7800,7 @@ const FIREBASE_LAST_LOADED_KEY = 'sd26_firebase_last_loaded';
 let firebaseSharedApi = null;
 let firebaseSharedSavePending = false;
 let firebaseSharedApplyingRemote = false;
+let firebaseSharedLoadedRemote = false;
 
 function setFirebaseSyncStatus(text, cls, title){
   const el = document.getElementById('firebaseSyncStatus');
@@ -7840,6 +7841,7 @@ function applyFirebaseSharedPayload(payload, opts){
     if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
   });
   if(payload.generatedAt) localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
+  firebaseSharedLoadedRemote = true;
   refreshSd26FromLocalStorage();
   firebaseSharedApplyingRemote = false;
   if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
@@ -7856,9 +7858,9 @@ async function loadFirebaseSharedData(){
 
 function queueFirebaseSharedSave(){
   if(firebaseSharedApplyingRemote) return;
-  if(!firebaseSharedApi){
+  if(!firebaseSharedApi || !firebaseSharedLoadedRemote){
     firebaseSharedSavePending = true;
-    setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Save will sync after Firebase connects.');
+    setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Waiting for latest Firebase data before saving.');
     return;
   }
   firebaseSharedApi.save();
@@ -7890,6 +7892,11 @@ function queueFirebaseSharedSave(){
         const current = currentSnap.exists() ? currentSnap.data() : null;
         const remoteRev = current && current.generatedAt ? current.generatedAt : '';
         const localRev = localStorage.getItem(FIREBASE_LAST_LOADED_KEY) || '';
+        if(remoteRev && !localRev){
+          setFirebaseSyncStatus('Firebase: load first', 'warn', 'Latest Firebase data must be loaded before saving.');
+          await load();
+          return false;
+        }
         if(remoteRev && localRev && remoteRev !== localRev){
           setFirebaseSyncStatus('Firebase: newer data', 'warn', 'Another user saved first. Click to load latest.');
           const el = document.getElementById('firebaseSyncStatus');
@@ -7898,6 +7905,16 @@ function queueFirebaseSharedSave(){
           return false;
         }
         const payload = getSd26Snapshot();
+        let localTaskCount = 0;
+        let remoteTaskCount = 0;
+        try{ localTaskCount = JSON.parse(payload.data.sd26_tasks_v3 || '[]').length || 0; }catch(e){}
+        try{ remoteTaskCount = current && current.data && current.data.sd26_tasks_v3 ? (JSON.parse(current.data.sd26_tasks_v3).length || 0) : 0; }catch(e){}
+        if(remoteTaskCount > 20 && localTaskCount < Math.max(20, Math.floor(remoteTaskCount * 0.75))){
+          setFirebaseSyncStatus('Firebase: save blocked', 'error', 'Local task data looks incomplete. Latest Firebase data was not overwritten.');
+          alert('Save blocked: local task data looks incomplete, so Firebase was not overwritten. Please reload the page and wait for Firebase: synced.');
+          await load();
+          return false;
+        }
         await firebaseWithTimeout(fsMod.setDoc(sharedRef, Object.assign({}, payload, {
           updatedAt: fsMod.serverTimestamp(),
           updateId: String(Date.now()) + '-' + Math.random().toString(36).slice(2),
@@ -7921,6 +7938,7 @@ function queueFirebaseSharedSave(){
         setFirebaseSyncStatus('Firebase: loading', 'saving', 'Loading latest shared data...');
         const snap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase load');
         if(!snap.exists()){
+          firebaseSharedLoadedRemote = true;
           setFirebaseSyncStatus('Firebase: ready', 'ok', 'No shared data exists yet. Save once to create it.');
           return false;
         }
@@ -7940,12 +7958,12 @@ function queueFirebaseSharedSave(){
     setFirebaseSyncStatus('Firebase: connected', 'ok', 'Realtime shared sync connected.');
     const el = document.getElementById('firebaseSyncStatus');
     if(el) el.onclick = loadFirebaseSharedData;
-    if(firebaseSharedSavePending){
-      firebaseSharedSavePending = false;
-      save();
-    }else{
-      load();
-    }
+    load().then(()=>{
+      if(firebaseSharedSavePending){
+        firebaseSharedSavePending = false;
+        setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest data loaded. Please repeat the change to save it.');
+      }
+    });
 
     fsMod.onSnapshot(sharedRef, snap => {
       if(!snap.exists() || snap.metadata.hasPendingWrites) return;
