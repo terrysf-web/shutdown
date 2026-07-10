@@ -4468,12 +4468,29 @@ function onHoldCutoffDate(t){
   const today = new Date().toISOString().slice(0,10);
   return holdIso === today ? new Date() : workPointGlobal(holdIso, 16);
 }
+function parseOnHoldProgress(v){
+  if(v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if(!Number.isFinite(n)) return null;
+  return Math.max(0, Math.min(95, Math.round(n)));
+}
+function storedOnHoldProgress(t){
+  const stored = parseOnHoldProgress(t && t.onHoldProgress);
+  if(stored === null) return null;
+  if(stored === 0){
+    const startIso = normalizeDateValue(t && t.start);
+    const cutoff = onHoldCutoffDate(t || {});
+    if(startIso && cutoff > workPointGlobal(startIso, 7)) return null;
+  }
+  return stored;
+}
 function calculateTaskProgressPct(t, ignoreHold=false, upToOverride=null){
   const st = statusMap[t.id] || t.status || 'Pending';
   if(st === 'Complete') return 100;
   if(st === 'Pending' || st === 'Scheduled' || st === 'N/A') return 0;
   if(!ignoreHold && t.onHold === true){
-    if(Number.isFinite(Number(t.onHoldProgress))) return Number(t.onHoldProgress);
+    const heldProgress = storedOnHoldProgress(t);
+    if(heldProgress !== null) return heldProgress;
     return calculateTaskProgressPct(t, true, onHoldCutoffDate(t));
   }
   const startIso = normalizeDateValue(t.start);
@@ -4501,7 +4518,7 @@ function updateDerivedFields(){
     t.notification = t.notification === true || t.notification === 'true' || t.notification === 'Y' || t.notification === 'Yes';
     t.vendorOnsite = t.vendorOnsite === true || t.vendorOnsite === 'true' || t.vendorOnsite === 'Y' || t.vendorOnsite === 'Yes';
     t.onHold = t.onHold === true || t.onHold === 'true' || t.onHold === 'Y' || t.onHold === 'Yes';
-    t.onHoldProgress = Number.isFinite(Number(t.onHoldProgress)) ? Number(t.onHoldProgress) : null;
+    t.onHoldProgress = parseOnHoldProgress(t.onHoldProgress);
     t.onHoldDate = normalizeDateValue(t.onHoldDate);
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
