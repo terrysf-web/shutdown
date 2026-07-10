@@ -416,6 +416,10 @@ button.btn{font-size:13px;padding:7px 12px;border:1px solid #1a3a5c;border-radiu
 button.btn.secondary{background:#fff;color:#1a3a5c}
 button.btn:disabled{opacity:.5;cursor:not-allowed}
 .edit-cell input,.edit-cell select{width:100%;font-size:12px;padding:4px 6px;border:1px solid #bbb;border-radius:5px;background:#fff}
+#tbody .edit-cell input,#tbody .edit-cell select,#tbody .multi-assigned-input{font-size:14px;line-height:1.35;padding:7px 9px;min-height:34px}
+#tbody .notes-comment,#tbody .action-comment{font-size:14px;line-height:1.45;min-height:96px;padding:9px 11px}
+#tbody input[data-field="task"]{min-width:260px}
+#tbody input[data-field="impactArea"]{min-width:150px}
 .days-readonly{display:block;width:100%;padding:5px 6px;border:1px solid #ddd;border-radius:5px;background:#f7f7f7;text-align:center;color:#444}
 .col-actions{white-space:normal;text-align:left;min-width:220px;vertical-align:top}
 .icon-btn{font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer}
@@ -7071,15 +7075,33 @@ function renderDashboard(){
     }
     function gowningSuspendTargetDate(areaKey){
       const areaRe = areaKey === 'dp' ? /\bDP\b|DP\s*MFG/i : /\bDS\b|DS\s*MFG/i;
-      const candidates = activeLeaf
+      const releaseIdRe = areaKey === 'dp' ? /^13\.01\./ : /^13\.02\./;
+      const primaryReleaseId = areaKey === 'dp' ? '13.01.01' : '13.02.01';
+      const primaryReleaseTask = tasks.find(t=>String(t.id || '') === primaryReleaseId);
+      if(primaryReleaseTask){
+        const primaryDate = normalizeDateValue(primaryReleaseTask.newStart) || normalizeDateValue(primaryReleaseTask.start) || normalizeDateValue(primaryReleaseTask.newEnd) || normalizeDateValue(primaryReleaseTask.end);
+        if(primaryDate) return displayDate(primaryDate);
+      }
+      const scoped = activeLeaf.filter(t=>{
+        const text = [t.id,t.task,t.section,t.notes,t.actionComment,t.impactArea].join(' ');
+        return areaRe.test(text) || releaseIdRe.test(String(t.id || ''));
+      });
+      const areaReleaseCleaning = scoped
+        .filter(t=>releaseIdRe.test(String(t.id || '')) && /3x\s*clean|cleaning/i.test([t.task,t.notes,t.actionComment].join(' ')))
+        .map(t=>normalizeDateValue(t.newStart) || normalizeDateValue(t.start) || normalizeDateValue(t.newEnd) || normalizeDateValue(t.end))
+        .filter(Boolean)
+        .sort();
+      if(areaReleaseCleaning.length) return displayDate(areaReleaseCleaning[0]);
+
+      const suspendWindows = scoped
         .filter(t=>{
           const text = [t.id,t.task,t.section,t.notes,t.actionComment,t.impactArea].join(' ');
-          return areaRe.test(text) && /(suspend|blue\s*scrub|routine\s*clean|3x\s*clean|return\s*to\s*clean|cleaning)/i.test(text);
+          return /(suspend|blue\s*scrub|routine\s*clean|return\s*to\s*clean|cleaning)/i.test(text);
         })
         .map(t=>normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || normalizeDateValue(t.newStart) || normalizeDateValue(t.start))
         .filter(Boolean)
         .sort();
-      return candidates.length ? displayDate(candidates[0]) : 'TBD';
+      return suspendWindows.length ? displayDate(suspendWindows[0]) : 'TBD';
     }
     const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${systemTargetNormalDate(s)}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
