@@ -4576,7 +4576,7 @@ function storedOnHoldProgress(t){
   const stored = parseOnHoldProgress(t && t.onHoldProgress);
   if(stored === null) return null;
   if(stored === 0){
-    const startIso = normalizeDateValue(t && t.start);
+    const startIso = normalizeDateValue(t && (t.newStart || t.start));
     const cutoff = onHoldCutoffDate(t || {});
     if(startIso && cutoff > workPointGlobal(startIso, 7)) return null;
   }
@@ -4591,8 +4591,8 @@ function calculateTaskProgressPct(t, ignoreHold=false, upToOverride=null){
     if(heldProgress !== null) return heldProgress;
     return calculateTaskProgressPct(t, true, onHoldCutoffDate(t));
   }
-  const startIso = normalizeDateValue(t.start);
-  const endIso = normalizeDateValue(t.end) || startIso;
+  const startIso = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+  const endIso = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || startIso;
   if(!startIso) return st === 'In Progress' ? 5 : 0;
   const now = upToOverride || progressNowDateGlobal();
   if(now < workPointGlobal(startIso, 7)) return 0;
@@ -5402,7 +5402,8 @@ function render(){
     const criticalCell = `<td style="text-align:center"><input type="checkbox" ${t.critical?'checked':''} onchange="toggleCritical('${t.id}',this.checked)" title="Mark this task as Critical for the dashboard" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828"></td>`;
     const notificationCell = `<td style="text-align:center"><input type="checkbox" ${t.notification?'checked':''} onchange="toggleNotification('${t.id}',this.checked)" title="Mark this task as requiring notification" style="cursor:pointer;width:15px;height:15px;accent-color:#1565c0"></td>`;
     const vendorOnsiteCell = `<td style="text-align:center"><input type="checkbox" ${t.vendorOnsite?'checked':''} onchange="toggleVendorOnsite('${t.id}',this.checked)" title="Mark vendor as onsite for this task" style="cursor:pointer;width:15px;height:15px;accent-color:#f0c040"></td>`;
-    const onHoldCell = `<td style="text-align:center"><input type="checkbox" ${t.onHold?'checked':''} onchange="toggleOnHold('${t.id}',this.checked)" title="Pause automatic progress while this task is on hold" style="cursor:pointer;width:15px;height:15px;accent-color:#5d6470"></td>`;
+    const holdPct = parseOnHoldProgress(t.onHoldProgress);
+    const onHoldCell = `<td style="text-align:center"><div style="display:flex;align-items:center;justify-content:center;gap:4px;min-width:82px"><input type="checkbox" ${t.onHold?'checked':''} onchange="toggleOnHold('${t.id}',this.checked)" title="Pause automatic progress while this task is on hold" style="cursor:pointer;width:15px;height:15px;accent-color:#5d6470">${t.onHold?`<input type="number" min="0" max="95" step="1" value="${holdPct===null?calculateTaskProgressPct(t,true,onHoldCutoffDate(t)):holdPct}" onchange="changeOnHoldProgress('${t.id}',this.value)" title="Manual hold progress %" style="width:46px;font-size:11px;padding:2px 3px;border:1px solid #9fb4c8;border-radius:4px;text-align:right"><span style="font-size:10px;color:#5d6470;font-weight:700">%</span>`:''}</div></td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5485,6 +5486,19 @@ function toggleOnHold(id, checked){
     task.onHoldDate = null;
     task.onHoldProgress = null;
   }
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+function changeOnHoldProgress(id, value){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  const pct = parseOnHoldProgress(value);
+  task.onHold = true;
+  task.onHoldDate = normalizeDateValue(task.onHoldDate) || new Date().toISOString().slice(0,10);
+  task.onHoldProgress = pct === null ? calculateTaskProgressPct(task, true, onHoldCutoffDate(task)) : pct;
   updateDerivedFields();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -6503,8 +6517,8 @@ function renderDashboard(){
     return new Date(startIso + 'T00:00:00') <= todayDate;
   }
   function taskOverlapsCurrentWorkWindow(t){
-    const startIso = normalizeDateValue(t.start);
-    const endIso = normalizeDateValue(t.end) || startIso;
+    const startIso = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || startIso;
     if(!startIso && !endIso) return true;
     const startDate = new Date((startIso || endIso) + 'T00:00:00');
     const endDate = new Date((endIso || startIso) + 'T00:00:00');
@@ -6932,13 +6946,15 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
+      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
       return `<tr>
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
         <td class="${vendorOnsite?'vendor-onsite':''}">${vendor}</td>
-        <td>${displayDate(t.start)||'TBD'}</td>
-        <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+        <td>${displayStart}</td>
+        <td>${displayTarget}</td>
         <td>${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
@@ -7047,7 +7063,9 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayStart}</td><td>${displayTarget}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
     }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
 
     const commItems = [];
