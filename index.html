@@ -567,11 +567,25 @@ tr.editing{background:#fffceb}
 .huddle-status.delayed{background:#8a5a08;color:#fff0bd}
 .huddle-status.onhold{background:#5d6470;color:#eef3f8}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
-.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section{display:none!important}
-.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section{display:none!important}
-.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section{display:none!important}
+.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section,.dash-mode-huddle .weekly-section{display:none!important}
+.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section,.dash-mode-kpi .weekly-section{display:none!important}
+.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section,.dash-mode-morning .weekly-section{display:none!important}
+.dash-mode-weekly .huddle-section,.dash-mode-weekly .kpi-section,.dash-mode-weekly .morning-section{display:none!important}
 .morning-section{display:none}
 .dash-mode-morning .morning-section{display:block!important}
+.weekly-section{display:none}
+.dash-mode-weekly .weekly-section{display:block!important}
+.weekly-edit-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.weekly-editor{width:100%;min-height:92px;resize:vertical;background:#102943;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:10px 12px;font-size:13px;line-height:1.4;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box}
+.weekly-editor.summary{min-height:96px;font-size:14px;border-left:4px solid #f0c040}
+.weekly-editor.small{min-height:72px}
+.weekly-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px}
+.weekly-actions button{border:none;border-radius:6px;padding:7px 11px;font-size:12px;font-weight:900;cursor:pointer}
+.weekly-save{background:#f0c040;color:#1a3a5c}.weekly-reset{background:#223f5f;color:#cde}
+.weekly-edit-label{font-size:11px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.weekly-preview-list{margin:8px 0 0 18px;padding:0;color:#e8f1fb;font-size:13px;line-height:1.35}
+.weekly-preview-list li{margin-bottom:5px}
+.weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
 .morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
 .morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
 .morning-export-capture .morning-title{font-size:26px!important;letter-spacing:.06em!important}
@@ -3839,6 +3853,7 @@ APPENDIX 6.5B)</div>
       <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Send a PNG screenshot of the dashboard to Power Automate for SharePoint saving">🖼 Dashboard PNG</button>
       <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">🌅 Morning Brief</button>
       <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">✉ Morning Brief JPG</button>
+      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('weekly')" title="Show editable weekly executive summary">📝 Weekly Summary</button>
       <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">📊 Full Dashboard</button>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
@@ -3874,6 +3889,71 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Delay / New Date / Special Notes</div>
       <table class="huddle-table small"><thead><tr><th>System ID</th><th>Event</th><th>New Date</th><th>Note</th></tr></thead><tbody id="mb-note-rows"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Weekly Executive Summary: auto-generated, editable, and saved to shared data -->
+  <div class="weekly-section" id="weeklyExecutiveSummaryPanel">
+    <div class="morning-hero">
+      <div class="morning-title">Shutdown Weekly Executive Summary</div>
+      <div class="morning-sub" id="weeklySummaryMeta">Week ending —</div>
+      <div class="morning-kpis">
+        <div class="morning-kpi"><div class="morning-kpi-title">Overall Progress</div><div class="morning-kpi-lines" id="wk-overall">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">This Week Completed</div><div class="morning-kpi-lines" id="wk-completed">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Active / Hold</div><div class="morning-kpi-lines" id="wk-active">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Schedule Risk</div><div class="morning-kpi-lines" id="wk-risk">—</div></div>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Executive Summary</div>
+      <textarea id="weeklySummaryText" class="weekly-editor summary" oninput="weeklySummaryDirty=true" placeholder="Auto-generated weekly executive summary..."></textarea>
+      <div class="weekly-actions">
+        <span class="weekly-note" id="weeklySummaryStatus">Auto-generated from current tracker data. Edit and save if needed.</span>
+        <button class="weekly-reset" type="button" onclick="resetWeeklySummaryToAuto()">Reset Auto</button>
+        <button class="weekly-save" type="button" onclick="saveWeeklySummary()">Save Weekly Summary</button>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Weekly Movement</div>
+      <div class="weekly-edit-grid">
+        <div>
+          <div class="weekly-edit-label">Completed This Week</div>
+          <textarea id="weeklyCompletedText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
+          <ul id="weeklyCompletedPreview" class="weekly-preview-list"></ul>
+        </div>
+        <div>
+          <div class="weekly-edit-label">Key Changes</div>
+          <textarea id="weeklyChangesText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
+          <ul id="weeklyChangesPreview" class="weekly-preview-list"></ul>
+        </div>
+        <div>
+          <div class="weekly-edit-label">Next Week Focus</div>
+          <textarea id="weeklyNextText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
+          <ul id="weeklyNextPreview" class="weekly-preview-list"></ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="huddle-middle-layout" style="margin-bottom:14px">
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Top Risks / Decisions Needed</div>
+        <textarea id="weeklyRisksText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One risk or decision per line"></textarea>
+        <ul id="weeklyRisksPreview" class="weekly-preview-list"></ul>
+      </div>
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Systems / Access Status</div>
+        <table class="huddle-table small">
+          <thead><tr><th>Metric</th><th>Current</th><th>Comment</th></tr></thead>
+          <tbody id="weeklySystemsRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Current Dashboard Attachment</div>
+      <div class="weekly-note">For Friday email: send this weekly summary first, then attach the current Dashboard PNG below it.</div>
     </div>
   </div>
 
@@ -6062,9 +6142,169 @@ function setDashboardMode(mode){
   if(!panel) return;
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
   panel.classList.toggle('dash-mode-morning', mode === 'morning');
-  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning');
+  panel.classList.toggle('dash-mode-weekly', mode === 'weekly');
+  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning' && mode !== 'weekly');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : 'Shutdown Executive Dashboard');
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : (mode === 'weekly' ? 'Shutdown Weekly Executive Summary' : 'Shutdown Executive Dashboard'));
+  if(mode === 'weekly' && typeof renderWeeklyExecutiveSummary === 'function') renderWeeklyExecutiveSummary();
+}
+
+const WEEKLY_SUMMARY_KEY = 'sd26_weekly_summary_v1';
+let weeklySummaryDirty = false;
+
+function weeklySummaryLines(value){
+  return String(value || '').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+}
+
+function weeklyListHtml(value){
+  const lines = weeklySummaryLines(value);
+  return lines.length ? lines.map(line=>`<li>${esc(line)}</li>`).join('') : '<li style="color:#9fb4c8;font-style:italic">No items.</li>';
+}
+
+function getWeekRange(todayIso){
+  const base = new Date((todayIso || new Date().toISOString().slice(0,10)) + 'T00:00:00');
+  const day = base.getDay();
+  const monday = new Date(base);
+  monday.setDate(base.getDate() - ((day + 6) % 7));
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  function iso(d){ return d.toISOString().slice(0,10); }
+  return {start:iso(monday), end:iso(friday)};
+}
+
+function taskDateInRange(t, range){
+  const candidates = [t.end, t.newEnd, t.start, t.newStart].map(normalizeDateValue).filter(Boolean);
+  return candidates.some(iso => iso >= range.start && iso <= range.end);
+}
+
+function weeklyAutoSummaryData(){
+  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
+  const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+  const range = getWeekRange(todayIso);
+  const leaf = tasks.filter(t=>!t.isParent);
+  const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
+  const completeTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete');
+  const weekCompleteTasks = completeTasks.filter(t=>taskDateInRange(t, range));
+  const inProgressTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='In Progress');
+  const holdTasks = activeLeaf.filter(t=>t.onHold === true);
+  const delayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
+  const lateTasks = activeLeaf.filter(t=>{
+    const endIso = normalizeDateValue(t.end);
+    return endIso && endIso < todayIso && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+  });
+  const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
+  const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
+  const calDone = calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, calStatusMap)==='Done' : (calStatusMap[i]||'Pending')==='Done').length;
+  const pmDone = pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, pmStatusMap)==='Done' : (pmStatusMap[i]||'Pending')==='Done').length;
+  const taskDone = completeTasks.length;
+  const totalWork = leaf.length + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length) + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
+  const displayTotal = Math.max(totalWork, 559);
+  const doneTotal = taskDone + calDone + pmDone;
+  const pct = displayTotal ? (doneTotal/displayTotal*100).toFixed(1).replace(/\.0$/,'') : '0';
+  const statusCounts = activeLeaf.reduce((acc,t)=>{
+    const s = statusMap[t.id] || t.status || 'Pending';
+    acc[s] = (acc[s]||0)+1;
+    return acc;
+  }, {});
+  const completedLines = weekCompleteTasks.slice(0,5).map(t=>`${t.id} ${t.task} completed`);
+  if(!completedLines.length) completedLines.push(`${weekCompleteTasks.length} tracker tasks completed this week`);
+  const changed = activeLeaf.filter(t=>normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd) || (t.notes||'').trim() || (t.actionComment||'').trim()).slice(0,5);
+  const changeLines = changed.map(t=>`${t.id} ${t.task}: ${t.actionComment || t.notes || 'date/status updated'}`);
+  if(!changeLines.length) changeLines.push('No major schedule changes recorded this week');
+  const nextFocus = activeLeaf.filter(t=>{
+    const startIso = normalizeDateValue(t.start);
+    return startIso && startIso > todayIso && startIso <= getWeekRange(new Date(new Date(todayIso+'T00:00:00').getTime()+7*86400000).toISOString().slice(0,10)).end && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+  }).slice(0,5).map(t=>`${t.id} ${t.task} - ${displayDate(t.start) || 'TBD'}`);
+  if(!nextFocus.length) nextFocus.push('Confirm vendor readiness and close active maintenance windows');
+  const riskLines = delayedTasks.concat(lateTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))).slice(0,6).map(t=>`${t.id} ${t.task} - ${statusMap[t.id]||t.status||'Pending'}${t.actionComment ? ': '+t.actionComment : ''}`);
+  if(!riskLines.length) riskLines.push('No executive-level risks identified from current tracker data');
+  let systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || 0) || 0;
+  try{
+    if(!systemsOos && typeof renderDashboard === 'function') renderDashboard();
+    systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || systemsOos) || systemsOos;
+  }catch(e){}
+  return {
+    todayIso, range, taskDone, calDone, pmDone, doneTotal, displayTotal, pct,
+    weekCompleteTasks, inProgressTasks, holdTasks, delayedTasks, lateTasks, statusCounts, systemsOos,
+    summary:`Shutdown execution progressed this week with ${weekCompleteTasks.length} tracker tasks completed and ${doneTotal} total completed work items. Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
+    completed:completedLines.join('\n'),
+    changes:changeLines.join('\n'),
+    next:nextFocus.join('\n'),
+    risks:riskLines.join('\n')
+  };
+}
+
+function loadWeeklySummarySaved(){
+  try{ return JSON.parse(localStorage.getItem(WEEKLY_SUMMARY_KEY) || '{}') || {}; }catch(e){ return {}; }
+}
+
+function setWeeklyTextarea(id, value){
+  const el = document.getElementById(id);
+  if(el && !weeklySummaryDirty) el.value = value || '';
+}
+
+function renderWeeklyExecutiveSummary(){
+  const auto = weeklyAutoSummaryData();
+  const saved = loadWeeklySummarySaved();
+  const data = {
+    summary: saved.summary || auto.summary,
+    completed: saved.completed || auto.completed,
+    changes: saved.changes || auto.changes,
+    next: saved.next || auto.next,
+    risks: saved.risks || auto.risks
+  };
+  const setText = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  const setHtml = (id,val)=>{ const el=document.getElementById(id); if(el) el.innerHTML=val; };
+  setText('weeklySummaryMeta', 'Week ending ' + displayDate(auto.range.end));
+  setHtml('wk-overall', `${auto.doneTotal} / ${auto.displayTotal}<br>${auto.pct}% complete`);
+  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.calDone + auto.pmDone} work orders done`);
+  setHtml('wk-active', `${auto.inProgressTasks.length} in progress<br>${auto.holdTasks.length} on hold`);
+  setHtml('wk-risk', `${auto.lateTasks.length} late<br>${auto.delayedTasks.length} delayed`);
+  setWeeklyTextarea('weeklySummaryText', data.summary);
+  setWeeklyTextarea('weeklyCompletedText', data.completed);
+  setWeeklyTextarea('weeklyChangesText', data.changes);
+  setWeeklyTextarea('weeklyNextText', data.next);
+  setWeeklyTextarea('weeklyRisksText', data.risks);
+  const previews = [
+    ['weeklyCompletedPreview', data.completed],
+    ['weeklyChangesPreview', data.changes],
+    ['weeklyNextPreview', data.next],
+    ['weeklyRisksPreview', data.risks]
+  ];
+  previews.forEach(([id,value])=>{ const el=document.getElementById(id); if(el) el.innerHTML = weeklyListHtml(value); });
+  const systemsRows = document.getElementById('weeklySystemsRows');
+  if(systemsRows){
+    systemsRows.innerHTML = `
+      <tr><td>OOS</td><td>${auto.systemsOos}</td><td>Shown until returned to service</td></tr>
+      <tr><td>In Progress</td><td>${auto.inProgressTasks.length}</td><td>Active tracker tasks</td></tr>
+      <tr><td>On Hold</td><td>${auto.holdTasks.length}</td><td>Progress frozen at hold time</td></tr>
+      <tr><td>Delayed</td><td>${auto.delayedTasks.length}</td><td>Requires weekly review if still open</td></tr>`;
+  }
+  const status = document.getElementById('weeklySummaryStatus');
+  if(status) status.textContent = saved.updatedAt ? 'Saved weekly summary loaded. Last saved: ' + new Date(saved.updatedAt).toLocaleString() : 'Auto-generated from current tracker data. Edit and save if needed.';
+}
+
+function saveWeeklySummary(){
+  const data = {
+    summary: document.getElementById('weeklySummaryText')?.value || '',
+    completed: document.getElementById('weeklyCompletedText')?.value || '',
+    changes: document.getElementById('weeklyChangesText')?.value || '',
+    next: document.getElementById('weeklyNextText')?.value || '',
+    risks: document.getElementById('weeklyRisksText')?.value || '',
+    updatedAt: new Date().toISOString()
+  };
+  try{ localStorage.setItem(WEEKLY_SUMMARY_KEY, JSON.stringify(data)); }catch(e){}
+  weeklySummaryDirty = false;
+  renderWeeklyExecutiveSummary();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
+
+function resetWeeklySummaryToAuto(){
+  if(!confirm('Reset weekly summary text to auto-generated content?')) return;
+  try{ localStorage.removeItem(WEEKLY_SUMMARY_KEY); }catch(e){}
+  weeklySummaryDirty = false;
+  renderWeeklyExecutiveSummary();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 
 function loadHtml2CanvasForMorningBrief(){
@@ -7848,6 +8088,7 @@ function refreshSd26FromLocalStorage(){
   try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
   try{ if(typeof renderResourceCalendar === 'function') renderResourceCalendar(); }catch(e){}
   try{ if(typeof renderPrintSchedule === 'function') renderPrintSchedule(); }catch(e){}
+  try{ if(typeof renderWeeklyExecutiveSummary === 'function') renderWeeklyExecutiveSummary(); }catch(e){}
   try{ if(typeof updateStats === 'function') updateStats(); }catch(e){}
 }
 
