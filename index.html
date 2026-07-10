@@ -3893,11 +3893,11 @@ APPENDIX 6.5B)</div>
     <div class="huddle-middle-layout">
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">System Status</div>
-        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Note</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
+        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Target Normal</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
       </div>
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">Critical / Notification Items</div>
-        <table class="huddle-table small"><thead><tr><th>Type</th><th>System ID</th><th>Task</th><th>Action Needed</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+        <table class="huddle-table small"><thead><tr><th>Sent</th><th>Impacted Area</th><th>System ID</th><th>Task</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
@@ -6864,6 +6864,10 @@ function renderDashboard(){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     return found ? found.def.system : (t.section||'—');
   }
+  function huddleAreaForTask(t){
+    const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
+    return found ? found.def.name : (t.section||'—');
+  }
   function huddleStatusHtml(st){
     return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
   }
@@ -7009,10 +7013,30 @@ function renderDashboard(){
     setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
     setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
 
-    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    function systemTargetNormalDate(s){
+      const trackerActive = taskTrackerOosWindow(s.items);
+      if(trackerActive && trackerActive.startupIso) return displayDate(trackerActive.startupIso);
+      const releaseTask = s.items
+        .filter(t=>isFullRelTask(t) || isCondRelTask(t) || /startup|start[-\s]*up|return/i.test(t.task||''))
+        .sort((a,b)=>{
+          const ad = normalizeDateValue(a.newEnd) || normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+          const bd = normalizeDateValue(b.newEnd) || normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+          return bd.localeCompare(ad);
+        })[0];
+      const activeTask = s.items
+        .filter(t=>isInProgress(t) || isDelayed(t))
+        .sort((a,b)=>{
+          const ad = normalizeDateValue(a.newEnd) || normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+          const bd = normalizeDateValue(b.newEnd) || normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+          return bd.localeCompare(ad);
+        })[0];
+      const dateVal = (releaseTask && (releaseTask.newEnd || releaseTask.end || releaseTask.start)) || (activeTask && (activeTask.newEnd || activeTask.end || activeTask.start));
+      return displayDate(dateVal) || 'TBD';
+    }
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${systemTargetNormalDate(s)}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>—</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>—</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
     const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
@@ -7031,9 +7055,10 @@ function renderDashboard(){
     notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
     setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
       const t=item.task;
-      const action = (t.actionComment || notesMap[t.id] || t.notes || 'Review / communicate status');
-      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(action)}</td></tr>`;
-    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+      const sent = t.notification ? '✓' : '—';
+      const impactDate = displayDate(t.newStart) || displayDate(t.start) || displayDate(t.end) || 'TBD';
+      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td>${esc(huddleAreaForTask(t))}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td>${impactDate}</td></tr>`;
+    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
 
     const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
