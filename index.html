@@ -6290,9 +6290,11 @@ function taskDateInRange(t, range){
   return candidates.some(iso => iso >= range.start && iso <= range.end);
 }
 
-// Monday huddle cumulative completed-work baseline. This preserves an accurate
-// weekly delta for legacy items that were completed before completedAt tracking.
-const WEEKLY_DONE_BASELINES = {'2026-07-06':52};
+// Monday huddle cumulative completion baseline, split using the 7/6 report:
+// 52 total completed = 12 tracker tasks + 40 work orders.
+const WEEKLY_DONE_BASELINES = {
+  '2026-07-06': {tasks:12, workOrders:40, total:52}
+};
 
 function weeklyAutoSummaryData(){
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
@@ -6323,10 +6325,11 @@ function weeklyAutoSummaryData(){
   const totalWork = leaf.length + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length) + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
   const displayTotal = Math.max(totalWork, 559);
   const doneTotal = taskDone + calDone + pmDone;
-  const baselineDoneTotal = WEEKLY_DONE_BASELINES[range.start];
-  const weekDoneTotal = Number.isFinite(baselineDoneTotal) ? Math.max(0, doneTotal - baselineDoneTotal) : null;
+  const weeklyBaseline = WEEKLY_DONE_BASELINES[range.start];
+  const weekTaskCount = weeklyBaseline ? Math.max(0, taskDone - weeklyBaseline.tasks) : weekCompleteTasks.length;
+  const weekDoneTotal = weeklyBaseline ? Math.max(0, doneTotal - weeklyBaseline.total) : null;
   const datedWeekWorkOrders = calWeekDone + pmWeekDone;
-  const weekWorkOrders = weekDoneTotal === null ? datedWeekWorkOrders : Math.max(datedWeekWorkOrders, weekDoneTotal - weekCompleteTasks.length);
+  const weekWorkOrders = weeklyBaseline ? Math.max(0, calDone + pmDone - weeklyBaseline.workOrders) : datedWeekWorkOrders;
   const pct = displayTotal ? (doneTotal/displayTotal*100).toFixed(1).replace(/\.0$/,'') : '0';
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -6351,9 +6354,9 @@ function weeklyAutoSummaryData(){
     systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || systemsOos) || systemsOos;
   }catch(e){}
   return {
-    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, weekWorkOrders, weekDoneTotal, doneTotal, displayTotal, pct,
+    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, weekTaskCount, weekWorkOrders, weekDoneTotal, doneTotal, displayTotal, pct,
     weekCompleteTasks, inProgressTasks, holdTasks, delayedTasks, lateTasks, statusCounts, systemsOos,
-    summary:`Shutdown execution progressed this week with ${weekCompleteTasks.length} tracker tasks completed and ${doneTotal} total completed work items. Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
+    summary:`Shutdown execution progressed this week with ${weekTaskCount} tracker tasks and ${weekWorkOrders} work orders completed (${weekDoneTotal === null ? weekTaskCount + weekWorkOrders : weekDoneTotal} total this week). Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
     completed:completedLines.join('\n'),
     changes:changeLines.join('\n'),
     next:nextFocus.join('\n'),
@@ -6373,8 +6376,9 @@ function setWeeklyTextarea(id, value){
 function renderWeeklyExecutiveSummary(){
   const auto = weeklyAutoSummaryData();
   const saved = loadWeeklySummarySaved();
+  const savedSummaryIsLegacyAuto = /^Shutdown execution progressed this week with \d+ tracker tasks completed and \d+ total completed work items\./.test(saved.summary || '');
   const data = {
-    summary: saved.summary || auto.summary,
+    summary: (!saved.summary || savedSummaryIsLegacyAuto) ? auto.summary : saved.summary,
     completed: saved.completed || auto.completed,
     changes: saved.changes || auto.changes,
     next: saved.next || auto.next,
@@ -6384,7 +6388,7 @@ function renderWeeklyExecutiveSummary(){
   const setHtml = (id,val)=>{ const el=document.getElementById(id); if(el) el.innerHTML=val; };
   setText('weeklySummaryMeta', 'Week ending ' + displayDate(auto.range.end));
   setHtml('wk-overall', `${auto.doneTotal} / ${auto.displayTotal}<br>${auto.pct}% complete`);
-  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.weekWorkOrders} work orders done`);
+  setHtml('wk-completed', `${auto.weekTaskCount} tasks<br>${auto.weekWorkOrders} work orders done`);
   setHtml('wk-active', `${auto.inProgressTasks.length} in progress<br>${auto.holdTasks.length} on hold`);
   setHtml('wk-risk', `${auto.lateTasks.length} late<br>${auto.delayedTasks.length} delayed`);
   setWeeklyTextarea('weeklySummaryText', data.summary);
