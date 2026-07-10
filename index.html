@@ -5447,9 +5447,17 @@ function render(){
   updateSaveButton();
 }
 
+function trackerCompletionDate(){
+  return document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+}
 function changeStatus(sel){
+  const previousStatus = statusMap[sel.dataset.id] || 'Pending';
   statusMap[sel.dataset.id]=sel.value;
   const task = tasks.find(t=>t.id===sel.dataset.id);
+  if(task){
+    if(sel.value === 'Complete' && previousStatus !== 'Complete') task.completedAt = task.completedAt || trackerCompletionDate();
+    if(sel.value !== 'Complete') task.completedAt = null;
+  }
   if(task && sel.value !== 'In Progress'){ task.onHold = false; task.onHoldDate = null; task.onHoldProgress = null; }
   updateDerivedFields();
   saveLocal();
@@ -5602,7 +5610,12 @@ function collectEditedRows(){
       const field = el.dataset.field;
       let val = el.value;
       if(['start','end','newStart','newEnd'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
-      if(field==='status') statusMap[id] = val || 'Pending';
+      if(field==='status'){
+        const previousStatus = statusMap[id] || task.status || 'Pending';
+        statusMap[id] = val || 'Pending';
+        if(statusMap[id] === 'Complete' && previousStatus !== 'Complete') task.completedAt = task.completedAt || trackerCompletionDate();
+        if(statusMap[id] !== 'Complete') task.completedAt = null;
+      }
       else if(field==='notes') notesMap[id] = val || '';
       else if(field==='actionComment') task.actionComment = val || '';
       else if(field==='assigned') task[field] = normalizeAssigneeText(val);
@@ -6284,7 +6297,10 @@ function weeklyAutoSummaryData(){
   const leaf = tasks.filter(t=>!t.isParent);
   const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
   const completeTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete');
-  const weekCompleteTasks = completeTasks.filter(t=>taskDateInRange(t, range));
+  const weekCompleteTasks = completeTasks.filter(t=>{
+    const completedAt = normalizeDateValue(t.completedAt);
+    return completedAt && completedAt >= range.start && completedAt <= range.end;
+  });
   const inProgressTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='In Progress');
   const holdTasks = activeLeaf.filter(t=>t.onHold === true);
   const delayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
@@ -6296,6 +6312,8 @@ function weeklyAutoSummaryData(){
   const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
   const calDone = calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, calStatusMap)==='Done' : (calStatusMap[i]||'Pending')==='Done').length;
   const pmDone = pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, pmStatusMap)==='Done' : (pmStatusMap[i]||'Pending')==='Done').length;
+  const calWeekDone = calData.filter(r=>woRowStatus(r, calStatusMap)==='Done' && (()=>{ const d=woRowCompletedAt(r, calCompletedMap); return d && d>=range.start && d<=range.end; })()).length;
+  const pmWeekDone = pmData.filter(r=>woRowStatus(r, pmStatusMap)==='Done' && (()=>{ const d=woRowCompletedAt(r, pmCompletedMap); return d && d>=range.start && d<=range.end; })()).length;
   const taskDone = completeTasks.length;
   const totalWork = leaf.length + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length) + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
   const displayTotal = Math.max(totalWork, 559);
@@ -6324,7 +6342,7 @@ function weeklyAutoSummaryData(){
     systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || systemsOos) || systemsOos;
   }catch(e){}
   return {
-    todayIso, range, taskDone, calDone, pmDone, doneTotal, displayTotal, pct,
+    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, doneTotal, displayTotal, pct,
     weekCompleteTasks, inProgressTasks, holdTasks, delayedTasks, lateTasks, statusCounts, systemsOos,
     summary:`Shutdown execution progressed this week with ${weekCompleteTasks.length} tracker tasks completed and ${doneTotal} total completed work items. Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
     completed:completedLines.join('\n'),
@@ -6357,7 +6375,7 @@ function renderWeeklyExecutiveSummary(){
   const setHtml = (id,val)=>{ const el=document.getElementById(id); if(el) el.innerHTML=val; };
   setText('weeklySummaryMeta', 'Week ending ' + displayDate(auto.range.end));
   setHtml('wk-overall', `${auto.doneTotal} / ${auto.displayTotal}<br>${auto.pct}% complete`);
-  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.calDone + auto.pmDone} work orders done`);
+  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.calWeekDone + auto.pmWeekDone} work orders done`);
   setHtml('wk-active', `${auto.inProgressTasks.length} in progress<br>${auto.holdTasks.length} on hold`);
   setHtml('wk-risk', `${auto.lateTasks.length} late<br>${auto.delayedTasks.length} delayed`);
   setWeeklyTextarea('weeklySummaryText', data.summary);
@@ -7779,16 +7797,29 @@ var WO_MANUAL_KEY     = 'sd26_wo_manual_v1';
 
 var calStatusMap = {};
 var pmStatusMap  = {};
+var calCompletedMap = {};
+var pmCompletedMap = {};
 var woManualData = [];
 var woInitialized = false;
+
+var WO_CAL_COMPLETED_KEY = 'sd26_wo_cal_completed_v1';
+var WO_PM_COMPLETED_KEY = 'sd26_wo_pm_completed_v1';
 
 function woLoadStorage(){
   try{ var s=localStorage.getItem(WO_CAL_STATUS_KEY); if(s) calStatusMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_PM_STATUS_KEY);  if(s) pmStatusMap=JSON.parse(s);  }catch(e){}
+  try{ var s=localStorage.getItem(WO_CAL_COMPLETED_KEY); if(s) calCompletedMap=JSON.parse(s); }catch(e){}
+  try{ var s=localStorage.getItem(WO_PM_COMPLETED_KEY);  if(s) pmCompletedMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_MANUAL_KEY);     woManualData=s?JSON.parse(s):[]; if(!Array.isArray(woManualData)) woManualData=[]; }catch(e){ woManualData=[]; }
 }
-function woSaveCAL(){ try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){} }
-function woSavePM(){  try{ localStorage.setItem(WO_PM_STATUS_KEY,  JSON.stringify(pmStatusMap));  }catch(e){} }
+function woSaveCAL(){
+  try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){}
+  try{ localStorage.setItem(WO_CAL_COMPLETED_KEY, JSON.stringify(calCompletedMap)); }catch(e){}
+}
+function woSavePM(){
+  try{ localStorage.setItem(WO_PM_STATUS_KEY, JSON.stringify(pmStatusMap)); }catch(e){}
+  try{ localStorage.setItem(WO_PM_COMPLETED_KEY, JSON.stringify(pmCompletedMap)); }catch(e){}
+}
 function woSaveManual(){
   try{ localStorage.setItem(WO_MANUAL_KEY, JSON.stringify(woManualData)); }catch(e){}
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -7822,6 +7853,10 @@ function woAllPmData(){
 function woRowStatus(row, map){
   if(row && row._woType === 'manual') return woNormalizeStatus(row.status);
   return woNormalizeStatus(map[row._woIndex]);
+}
+function woRowCompletedAt(row, map){
+  if(row && row._woType === 'manual') return normalizeDateValue(row.completedAt) || '';
+  return normalizeDateValue(map[row._woIndex]) || '';
 }
 function woManualFind(id){
   return woManualData.find(function(r){ return r.id === id; });
@@ -7974,9 +8009,19 @@ function calRender(){
 function calStatusChange(sel){
   if(sel.dataset.type === 'manual'){
     var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
+    if(row){
+      var previousStatus = woNormalizeStatus(row.status);
+      row.status = sel.value;
+      if(sel.value === 'Done' && previousStatus !== 'Done') row.completedAt = row.completedAt || trackerCompletionDate();
+      if(sel.value !== 'Done') row.completedAt = null;
+      woSaveManual();
+    }
   }else{
-    calStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    var key = parseInt(sel.dataset.key);
+    var previousStatus = woNormalizeStatus(calStatusMap[key]);
+    calStatusMap[key] = sel.value;
+    if(sel.value === 'Done' && previousStatus !== 'Done') calCompletedMap[key] = calCompletedMap[key] || trackerCompletionDate();
+    if(sel.value !== 'Done') delete calCompletedMap[key];
     woSaveCAL();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }
@@ -8031,9 +8076,19 @@ function pmRender(){
 function pmStatusChange(sel){
   if(sel.dataset.type === 'manual'){
     var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
+    if(row){
+      var previousStatus = woNormalizeStatus(row.status);
+      row.status = sel.value;
+      if(sel.value === 'Done' && previousStatus !== 'Done') row.completedAt = row.completedAt || trackerCompletionDate();
+      if(sel.value !== 'Done') row.completedAt = null;
+      woSaveManual();
+    }
   }else{
-    pmStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    var key = parseInt(sel.dataset.key);
+    var previousStatus = woNormalizeStatus(pmStatusMap[key]);
+    pmStatusMap[key] = sel.value;
+    if(sel.value === 'Done' && previousStatus !== 'Done') pmCompletedMap[key] = pmCompletedMap[key] || trackerCompletionDate();
+    if(sel.value !== 'Done') delete pmCompletedMap[key];
     woSavePM();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }
@@ -8923,7 +8978,10 @@ function rcSaveEdit(){
   const id=document.getElementById('rcEditTitle').dataset.id; const t=rcGetTask(id); if(!t) return;
   t.task=document.getElementById('rcEditTask').value.trim() || t.task;
   t.assigned=normalizeAssigneeText(document.getElementById('rcEditAssigned').value || t.assigned || '');
+  const previousStatus=statusMap[t.id] || t.status || 'Pending';
   t.status=document.getElementById('rcEditStatus').value || 'Pending'; statusMap[t.id]=t.status;
+  if(t.status==='Complete' && previousStatus!=='Complete') t.completedAt=t.completedAt || trackerCompletionDate();
+  if(t.status!=='Complete') t.completedAt=null;
   t.start=document.getElementById('rcEditStart').value || null;
   t.end=document.getElementById('rcEditEnd').value || null;
   if(t.start && t.end && t.end < t.start){ const tmp=t.start; t.start=t.end; t.end=tmp; }
