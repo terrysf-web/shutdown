@@ -420,6 +420,10 @@ button.btn:disabled{opacity:.5;cursor:not-allowed}
 #tbody .notes-comment,#tbody .action-comment{font-size:14px;line-height:1.45;min-height:96px;padding:9px 11px}
 #tbody input[data-field="task"]{min-width:260px}
 #tbody input[data-field="impactArea"]{min-width:150px}
+.morning-editable-cell{cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.35)}
+.morning-editable-cell:hover{background:rgba(255,255,255,.08);color:#fff}
+.morning-editable-cell[contenteditable="true"]{outline:1px solid transparent;border-radius:4px;padding:5px 7px}
+.morning-editable-cell[contenteditable="true"]:focus{outline:2px solid #f0c040;background:rgba(13,33,55,.88);color:#fff}
 .days-readonly{display:block;width:100%;padding:5px 6px;border:1px solid #ddd;border-radius:5px;background:#f7f7f7;text-align:center;color:#444}
 .col-actions{white-space:normal;text-align:left;min-width:220px;vertical-align:top}
 .icon-btn{font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer}
@@ -5487,6 +5491,49 @@ function setTaskImpactArea(id, currentValue){
   renderDashboard();
   render();
 }
+function saveMorningBriefEditableCell(cell){
+  if(!cell || !cell.dataset) return;
+  const task = tasks.find(t=>t.id===cell.dataset.taskId);
+  if(!task) return;
+  const text = String(cell.textContent || '').trim();
+  if(text === String(cell.dataset.original || '').trim()) return;
+  if(cell.dataset.morningEdit === 'note'){
+    task.actionComment = text;
+  }else if(cell.dataset.morningEdit === 'date'){
+    const dates = text.match(/\d{1,2}\/\d{1,2}\/\d{2,4}|\d{4}-\d{1,2}-\d{1,2}/g) || [];
+    task.newStart = normalizeDateValue(dates[0] || '');
+    task.newEnd = normalizeDateValue(dates[1] || dates[0] || '');
+  }else{
+    return;
+  }
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+document.addEventListener('click', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit){
+    morningEdit.focus();
+    return;
+  }
+  const impactEdit = e.target.closest('[data-impact-area-edit]');
+  if(impactEdit){
+    setTaskImpactArea(impactEdit.dataset.taskId, '');
+  }
+});
+document.addEventListener('focusout', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit) saveMorningBriefEditableCell(morningEdit);
+});
+document.addEventListener('keydown', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit && e.key === 'Enter'){
+    e.preventDefault();
+    morningEdit.blur();
+  }
+});
 function toggleVendorOnsite(id, checked){
   const task = tasks.find(t=>t.id===id);
   if(!task) return;
@@ -7130,13 +7177,14 @@ function renderDashboard(){
       const sent = t.notification ? '✓' : '—';
       const impactedArea = huddleAreaForTask(t);
       const impactDate = displayDate(t.newStart) || displayDate(t.start) || displayDate(t.end) || 'TBD';
-      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td onclick="setTaskImpactArea(${JSON.stringify(t.id)}, ${JSON.stringify(t.impactArea||'')})" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td>${impactDate}</td></tr>`;
+      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td>${impactDate}</td></tr>`;
     }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
 
     const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
       const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
-      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+      const newDateText = delayedNewDate(t);
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="date" data-task-id="${esc(t.id)}" data-original="${esc(newDateText)}" title="Click to edit new start / target date">${newDateText}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="note" data-task-id="${esc(t.id)}" data-original="${esc(note)}" title="Click to edit Morning Brief note">${esc(note)}</td></tr>`;
     }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
   }
   renderMorningBrief();
