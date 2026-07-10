@@ -6290,6 +6290,10 @@ function taskDateInRange(t, range){
   return candidates.some(iso => iso >= range.start && iso <= range.end);
 }
 
+// Monday huddle cumulative completed-work baseline. This preserves an accurate
+// weekly delta for legacy items that were completed before completedAt tracking.
+const WEEKLY_DONE_BASELINES = {'2026-07-06':52};
+
 function weeklyAutoSummaryData(){
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
@@ -6299,7 +6303,8 @@ function weeklyAutoSummaryData(){
   const completeTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete');
   const weekCompleteTasks = completeTasks.filter(t=>{
     const completedAt = normalizeDateValue(t.completedAt);
-    return completedAt && completedAt >= range.start && completedAt <= range.end;
+    if(completedAt) return completedAt >= range.start && completedAt <= range.end;
+    return taskDateInRange(t, range);
   });
   const inProgressTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='In Progress');
   const holdTasks = activeLeaf.filter(t=>t.onHold === true);
@@ -6318,6 +6323,10 @@ function weeklyAutoSummaryData(){
   const totalWork = leaf.length + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length) + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
   const displayTotal = Math.max(totalWork, 559);
   const doneTotal = taskDone + calDone + pmDone;
+  const baselineDoneTotal = WEEKLY_DONE_BASELINES[range.start];
+  const weekDoneTotal = Number.isFinite(baselineDoneTotal) ? Math.max(0, doneTotal - baselineDoneTotal) : null;
+  const datedWeekWorkOrders = calWeekDone + pmWeekDone;
+  const weekWorkOrders = weekDoneTotal === null ? datedWeekWorkOrders : Math.max(datedWeekWorkOrders, weekDoneTotal - weekCompleteTasks.length);
   const pct = displayTotal ? (doneTotal/displayTotal*100).toFixed(1).replace(/\.0$/,'') : '0';
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -6342,7 +6351,7 @@ function weeklyAutoSummaryData(){
     systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || systemsOos) || systemsOos;
   }catch(e){}
   return {
-    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, doneTotal, displayTotal, pct,
+    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, weekWorkOrders, weekDoneTotal, doneTotal, displayTotal, pct,
     weekCompleteTasks, inProgressTasks, holdTasks, delayedTasks, lateTasks, statusCounts, systemsOos,
     summary:`Shutdown execution progressed this week with ${weekCompleteTasks.length} tracker tasks completed and ${doneTotal} total completed work items. Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
     completed:completedLines.join('\n'),
@@ -6375,7 +6384,7 @@ function renderWeeklyExecutiveSummary(){
   const setHtml = (id,val)=>{ const el=document.getElementById(id); if(el) el.innerHTML=val; };
   setText('weeklySummaryMeta', 'Week ending ' + displayDate(auto.range.end));
   setHtml('wk-overall', `${auto.doneTotal} / ${auto.displayTotal}<br>${auto.pct}% complete`);
-  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.calWeekDone + auto.pmWeekDone} work orders done`);
+  setHtml('wk-completed', `${auto.weekCompleteTasks.length} tasks<br>${auto.weekWorkOrders} work orders done`);
   setHtml('wk-active', `${auto.inProgressTasks.length} in progress<br>${auto.holdTasks.length} on hold`);
   setHtml('wk-risk', `${auto.lateTasks.length} late<br>${auto.delayedTasks.length} delayed`);
   setWeeklyTextarea('weeklySummaryText', data.summary);
