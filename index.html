@@ -583,7 +583,7 @@ tr.editing{background:#fffceb}
 .dash-mode-morning .morning-section{display:block!important}
 .weekly-section{display:none}
 .dash-mode-weekly .weekly-section{display:block!important}
-.weekly-edit-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.weekly-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .weekly-editor{width:100%;min-height:92px;resize:vertical;background:#102943;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:10px 12px;font-size:16px;line-height:1.45;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box}
 .weekly-editor.summary{min-height:96px;font-size:16px;line-height:1.45;border-left:4px solid #f0c040}
 .weekly-editor.small{min-height:72px}
@@ -594,6 +594,7 @@ tr.editing{background:#fffceb}
 .weekly-preview-list{margin:8px 0 0 18px;padding:0;color:#e8f1fb;font-size:16px;line-height:1.45}
 .weekly-preview-list li{margin-bottom:5px}
 .dash-mode-weekly .huddle-table td{font-size:16px;line-height:1.45}
+.huddle-middle-layout.weekly-status-layout{grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)}
 .weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
 .morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
 .morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
@@ -3952,19 +3953,15 @@ APPENDIX 6.5B)</div>
           <ul id="weeklyCompletedPreview" class="weekly-preview-list"></ul>
         </div>
         <div>
-          <div class="weekly-edit-label">Key Changes</div>
-          <textarea id="weeklyChangesText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
-          <ul id="weeklyChangesPreview" class="weekly-preview-list"></ul>
-        </div>
-        <div>
           <div class="weekly-edit-label">Next Week Focus</div>
           <textarea id="weeklyNextText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
           <ul id="weeklyNextPreview" class="weekly-preview-list"></ul>
         </div>
       </div>
+      <textarea id="weeklyChangesText" style="display:none" aria-hidden="true"></textarea>
     </div>
 
-    <div class="huddle-middle-layout" style="margin-bottom:14px">
+    <div class="huddle-middle-layout weekly-status-layout" style="margin-bottom:14px">
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">Top Risks / Decisions Needed</div>
         <textarea id="weeklyRisksText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One risk or decision per line"></textarea>
@@ -10812,7 +10809,8 @@ function handleDailyHuddleUrlParams(){
     apply('.morning-kpi-lines', {fontSize:'17px', lineHeight:'1.35'});
     apply('.huddle-panel', {padding:'16px', borderRadius:'8px', marginBottom:'16px'});
     apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
-    apply('.weekly-edit-grid', {display:'grid', gridTemplateColumns:'repeat(3,minmax(0,1fr))', gap:'14px'});
+    apply('.weekly-edit-grid', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'14px'});
+    apply('.weekly-status-layout', {display:'grid', gridTemplateColumns:'minmax(0,2fr) minmax(280px,.8fr)', gap:'14px'});
     apply('.weekly-edit-label', {fontSize:'14px', lineHeight:'1.2', marginBottom:'8px'});
     apply('.weekly-export-text', {fontSize:'16px', lineHeight:'1.38'});
     apply('.weekly-preview-list', {fontSize:'16px', lineHeight:'1.38', marginTop:'0'});
@@ -10833,7 +10831,8 @@ function handleDailyHuddleUrlParams(){
       '.email-report-weekly .morning-kpi-lines{font-size:17px!important;line-height:1.35!important;color:#fff!important}',
       '.email-report-weekly .huddle-panel{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:16px!important;margin-bottom:16px!important}',
       '.email-report-weekly .huddle-panel-title,.email-report-weekly .weekly-edit-label{font-size:17px!important;line-height:1.15!important;color:#f0c040!important;text-transform:uppercase!important;font-weight:900!important}',
-      '.email-report-weekly .weekly-edit-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-weekly .weekly-edit-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-weekly .weekly-status-layout{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)!important;gap:14px!important}',
       '.email-report-weekly .weekly-export-text{background:#102943!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:8px!important;color:#fff!important;font-size:16px!important;line-height:1.38!important;padding:14px 16px!important}',
       '.email-report-weekly .weekly-export-text.summary{border-left:4px solid #f0c040!important}',
       '.email-report-weekly .weekly-preview-list{font-size:16px!important;line-height:1.38!important;margin:0 0 0 20px!important;padding:0!important;color:#e8f1fb!important}',
