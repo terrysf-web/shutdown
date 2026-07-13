@@ -416,6 +416,14 @@ button.btn{font-size:13px;padding:7px 12px;border:1px solid #1a3a5c;border-radiu
 button.btn.secondary{background:#fff;color:#1a3a5c}
 button.btn:disabled{opacity:.5;cursor:not-allowed}
 .edit-cell input,.edit-cell select{width:100%;font-size:12px;padding:4px 6px;border:1px solid #bbb;border-radius:5px;background:#fff}
+#tbody .edit-cell input,#tbody .edit-cell select,#tbody .multi-assigned-input{font-size:14px;line-height:1.35;padding:7px 9px;min-height:34px}
+#tbody .notes-comment,#tbody .action-comment{font-size:14px;line-height:1.45;min-height:96px;padding:9px 11px}
+#tbody input[data-field="task"]{min-width:260px}
+#tbody input[data-field="impactArea"]{min-width:150px}
+.morning-editable-cell{cursor:pointer;border-bottom:1px dashed rgba(255,255,255,.35)}
+.morning-editable-cell:hover{background:rgba(255,255,255,.08);color:#fff}
+.morning-editable-cell[contenteditable="true"]{outline:1px solid transparent;border-radius:4px;padding:5px 7px}
+.morning-editable-cell[contenteditable="true"]:focus{outline:2px solid #f0c040;background:rgba(13,33,55,.88);color:#fff}
 .days-readonly{display:block;width:100%;padding:5px 6px;border:1px solid #ddd;border-radius:5px;background:#f7f7f7;text-align:center;color:#444}
 .col-actions{white-space:normal;text-align:left;min-width:220px;vertical-align:top}
 .icon-btn{font-size:12px;padding:4px 8px;border:1px solid #ccc;border-radius:5px;background:#fff;cursor:pointer}
@@ -486,7 +494,7 @@ tr.editing{background:#fffceb}
 .progress-kpi-value.compact{font-size:24px;line-height:1.05}
 .operational-detail-kpi{max-width:330px;background:#1a3a5c;border:1px solid rgba(255,255,255,.16);box-shadow:inset 0 0 0 1px rgba(255,255,255,.04)}
 .operational-detail-kpi .progress-kpi-label{color:#cfe1f3;margin-bottom:7px}
-.operational-detail-kpi .progress-row{grid-template-columns:minmax(94px,1fr) 34px minmax(96px,1.15fr) 40px;gap:5px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
+.operational-detail-kpi .progress-row{grid-template-columns:minmax(74px,1fr) 30px minmax(46px,.8fr) 34px;gap:4px;font-size:11px;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.08)}
 .operational-detail-kpi .progress-row-name{font-weight:900;color:#fff}
 .operational-detail-kpi .progress-row-pct{font-size:11px;color:#f0c040;text-align:right}
 .operational-detail-kpi .progress-row-meta{font-size:10px;color:#d6e7f7;text-align:right}
@@ -677,15 +685,19 @@ select.msf option:checked{background:#ddeeff}
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
 .system-status-grid.compact .system-status-row{grid-template-columns:115px minmax(120px,1fr) 78px}
+.system-status-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+.system-status-legend{font-size:10px;font-weight:800;color:#9fb4c8;letter-spacing:.02em;white-space:nowrap}
+.system-status-legend b{color:#cce6ff}
 .huddle-table.small td{padding:7px 8px}
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -693,6 +705,16 @@ select.msf option:checked{background:#ddeeff}
 .dashboard-export-btn{background:#f0c040;color:#102943;border:none;border-radius:6px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}
 .dashboard-export-btn.secondary{background:#173653;color:#d9e8f7;border:1px solid rgba(255,255,255,.22)}
 .dashboard-export-btn:hover{filter:brightness(.96)}
+.dashboard-view-switch{display:flex;align-items:center;gap:5px;background:#102943;border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:4px}
+.dashboard-view-switch .dashboard-export-btn{padding:6px 10px;font-size:11px}
+.dashboard-export-menu{position:relative}
+.dashboard-export-menu summary{list-style:none;display:inline-flex;align-items:center;gap:6px}
+.dashboard-export-menu summary::-webkit-details-marker{display:none}
+.dashboard-export-menu summary:after{content:"▾";font-size:10px;line-height:1}
+.dashboard-export-menu[open] summary:after{content:"▴"}
+.dashboard-export-dropdown{position:absolute;right:0;top:calc(100% + 6px);z-index:1000;background:#102943;border:1px solid rgba(255,255,255,.22);border-radius:8px;box-shadow:0 12px 28px rgba(0,0,0,.35);padding:7px;display:flex;flex-direction:column;gap:6px;min-width:210px}
+.dashboard-export-dropdown .dashboard-export-btn{width:100%;text-align:left;justify-content:flex-start}
+@media (max-width:900px){.dashboard-export-actions{justify-content:flex-start}.dashboard-view-switch{order:2}.dashboard-export-menu{order:3}.dashboard-export-dropdown{left:0;right:auto}}
 @media print{
   @page{size:landscape;margin:0.28in}
   html,body{height:auto!important;overflow:visible!important;background:#0d2137!important;font-size:9px!important}
@@ -703,7 +725,9 @@ select.msf option:checked{background:#ddeeff}
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -836,6 +860,7 @@ select.msf option:checked{background:#ddeeff}
       <option value="In Progress">In Progress</option>
       <option value="Complete">Complete</option>
       <option value="Delayed">Delayed</option>
+
       <option value="N/A">N/A</option>
     </select>
     <select id="filterAssigned" onchange="render()"><option value="">All assignees</option><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select>
@@ -860,7 +885,7 @@ select.msf option:checked{background:#ddeeff}
       <div class="advanced-filter-field"><label for="headerFilterEnd">End</label><input type="date" id="headerFilterEnd" onchange="render()"></div>
       <div class="advanced-filter-field"><label for="headerFilterDays">Days</label><input type="number" id="headerFilterDays" placeholder="Days" oninput="render()"></div>
       <div class="advanced-filter-field"><label for="headerFilterWk">WK</label><select id="headerFilterWk" class="msf" multiple="" size="5" onchange="render()"><option value="W1">W1</option><option value="W2">W2</option><option value="W3">W3</option><option value="W4">W4</option><option value="W5">W5</option><option value="W6">W6</option><option value="W7">W7</option><option value="W8">W8</option><option value="W9">W9</option></select></div>
-      <div class="advanced-filter-field"><label for="headerFilterStatus">Status</label><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="Scheduled">Scheduled</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="N/A">N/A</option></select></div>
+      <div class="advanced-filter-field"><label for="headerFilterStatus">Status</label><select id="headerFilterStatus" class="msf" multiple="" size="5" onchange="render()"><option value="Pending">Pending</option><option value="Scheduled">Scheduled</option><option value="In Progress">In Progress</option><option value="Complete">Complete</option><option value="Delayed">Delayed</option><option value="On Hold">On Hold</option><option value="N/A">N/A</option></select></div>
       <div class="advanced-filter-field"><label for="headerFilterNotes">Notes</label><input type="text" id="headerFilterNotes" placeholder="Filter" oninput="render()"></div>
     </div>
   </div>
@@ -886,6 +911,7 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('newStart'," event)\"="">New Start <span class="sort-indicator" id="sort-newStart" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('newEnd'," event)\"="">New End <span class="sort-indicator" id="sort-newEnd" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th style="white-space:nowrap;text-align:center;font-size:11px" title="Check if this task's end date is impacted">End Impact</th>
+          <th style="white-space:nowrap;font-size:11px" title="Manual impacted area for Morning Brief notifications">Impact Area</th>
           <th class="sortable" onclick="\&quot;setSort('days'," event)\"="">Days <span class="sort-indicator" id="sort-days" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('wk'," event)\"="" style="white-space:nowrap">WK <span class="sort-indicator" id="sort-wk" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('critical'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Manually mark this item as critical">Critical <span class="sort-indicator" id="sort-critical" title="Click to sort · Shift+click for secondary sort"></span></th>
@@ -920,7 +946,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="1.02">
@@ -937,7 +963,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.03">
@@ -954,7 +980,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">7</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.04">
@@ -971,7 +997,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="1.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.05">
@@ -988,7 +1014,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.06">
@@ -1005,7 +1031,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">480V, DI Bottle and need to provide city water</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.07">
@@ -1022,7 +1048,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.08">
@@ -1039,7 +1065,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.09">
@@ -1056,7 +1082,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="1.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="1.10">
@@ -1073,7 +1099,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.11">
@@ -1090,7 +1116,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="1.12">
@@ -1107,7 +1133,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="1.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="1.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1135,7 +1161,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="2.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="2.02">
@@ -1152,7 +1178,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="2.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.03">
@@ -1169,7 +1195,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="2.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">Plant steam</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.04">
@@ -1186,7 +1212,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="2.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.05">
@@ -1203,7 +1229,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.06">
@@ -1220,7 +1246,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.07">
@@ -1237,7 +1263,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.08">
@@ -1254,7 +1280,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="2.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.09">
@@ -1271,7 +1297,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="2.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="2.10">
@@ -1288,7 +1314,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="2.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="2.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1316,7 +1342,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.02">
@@ -1333,7 +1359,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.03">
@@ -1350,7 +1376,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.04">
@@ -1367,7 +1393,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="3.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.05">
@@ -1384,7 +1410,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">—</td>
-      <td><select class="status-sel" data-id="3.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="3.06">
@@ -1401,7 +1427,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="3.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="3.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1429,7 +1455,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.02">
@@ -1446,7 +1472,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.03">
@@ -1463,7 +1489,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.04">
@@ -1480,7 +1506,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">9:30AM Van Folloso Ref 3498760</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="4.05">
@@ -1497,7 +1523,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="4.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="4.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1525,7 +1551,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.02">
@@ -1542,7 +1568,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.03">
@@ -1559,7 +1585,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.04">
@@ -1576,7 +1602,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.05">
@@ -1593,7 +1619,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.06">
@@ -1610,7 +1636,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.07">
@@ -1627,7 +1653,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="5.08">
@@ -1644,7 +1670,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.09">
@@ -1661,7 +1687,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.09" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.10">
@@ -1678,7 +1704,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.10" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.11">
@@ -1695,7 +1721,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.11" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.12">
@@ -1712,7 +1738,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.12" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.13">
@@ -1729,7 +1755,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="5.13" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.13" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.14">
@@ -1746,7 +1772,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.14" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.14" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.20.01">
@@ -1763,7 +1789,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="5.20.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.20.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.20.02">
@@ -1780,7 +1806,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.20.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.20.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.01">
@@ -1797,7 +1823,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="5.21.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.02">
@@ -1814,7 +1840,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="5.21.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="5.21.03">
@@ -1831,7 +1857,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="5.21.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="5.21.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1859,7 +1885,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.02">
@@ -1876,7 +1902,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="6.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="6.03">
@@ -1893,7 +1919,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.04">
@@ -1910,7 +1936,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="6.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="6.05">
@@ -1927,7 +1953,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="6.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="6.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -1955,7 +1981,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.02">
@@ -1972,7 +1998,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.03">
@@ -1989,7 +2015,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="7.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.04">
@@ -2006,7 +2032,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="7.05">
@@ -2023,7 +2049,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">—</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="7.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.06">
@@ -2040,7 +2066,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.07">
@@ -2057,7 +2083,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="7.08">
@@ -2074,7 +2100,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="7.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="7.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2102,7 +2128,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="8.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="8.02">
@@ -2119,7 +2145,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="8.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="8.03">
@@ -2136,7 +2162,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W5</td>
-      <td><select class="status-sel" data-id="8.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="8.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2164,7 +2190,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W5</td>
-      <td><select class="status-sel" data-id="9.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="9.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="9.02">
@@ -2181,7 +2207,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="20">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
@@ -2209,7 +2235,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02a">
@@ -2226,7 +2252,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02a" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02a" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02b">
@@ -2243,7 +2269,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02b" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02b" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02c">
@@ -2260,7 +2286,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02c" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02c" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02d">
@@ -2277,7 +2303,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="10.02d" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02d" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="10.02e">
@@ -2294,7 +2320,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02e" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02e" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="10.02f">
@@ -2311,7 +2337,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="10.02f" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02f" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02g">
@@ -2328,7 +2354,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">16</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02g" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02g" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02h">
@@ -2345,7 +2371,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">14</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="10.02h" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02h" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02i">
@@ -2362,7 +2388,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02i" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02i" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="10.02j">
@@ -2379,7 +2405,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="10.02j" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="10.02j" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2407,7 +2433,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="11.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.02">
@@ -2424,7 +2450,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="11.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.03">
@@ -2441,7 +2467,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W3</td>
-      <td><select class="status-sel" data-id="11.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="11.04">
@@ -2458,7 +2484,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">5</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W6</td>
-      <td><select class="status-sel" data-id="11.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.05">
@@ -2475,7 +2501,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">13</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="11.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.05" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.06">
@@ -2492,7 +2518,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">12</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="11.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.06" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.07">
@@ -2509,7 +2535,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">8</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="11.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.07" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="11.08">
@@ -2526,7 +2552,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="11.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="11.08" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
@@ -2554,7 +2580,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">10</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W2</td>
-      <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="20">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
@@ -2582,7 +2608,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.01.02">
@@ -2599,7 +2625,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="13.01.03">
@@ -2616,7 +2642,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="dup-resource" data-id="13.01.04">
@@ -2633,7 +2659,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">8</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W4</td>
-      <td><select class="status-sel" data-id="13.01.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.01.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.01">
@@ -2650,7 +2676,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">2</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W7</td>
-      <td><select class="status-sel" data-id="13.02.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.02">
@@ -2667,7 +2693,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">3</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W7</td>
-      <td><select class="status-sel" data-id="13.02.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.03">
@@ -2684,7 +2710,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W8</td>
-      <td><select class="status-sel" data-id="13.02.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="13.02.04">
@@ -2701,7 +2727,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">1</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W9</td>
-      <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="section-row"><td colspan="20">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
@@ -2729,7 +2755,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">7</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.02">
@@ -2746,7 +2772,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.03">
@@ -2763,7 +2789,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.03" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="" data-id="14.04">
@@ -2780,7 +2806,7 @@ select.msf option:checked{background:#ddeeff}
     </td>
       <td style="text-align:center">4</td>
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">W1</td>
-      <td><select class="status-sel" data-id="14.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select></td>
+      <td><select class="status-sel" data-id="14.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr></tbody>
@@ -3913,7 +3939,7 @@ APPENDIX 6.5B)</div>
           <div class="kpi-lines">
             <div class="kpi-line"><span>Normal</span><b id="d-systems-normal">—</b></div>
             <div class="kpi-line"><span>OOS</span><b id="d-systems-oos">—</b></div>
-            <div class="kpi-line"><span>Returning</span><b id="d-systems-returning">—</b></div>
+            <div class="kpi-line"><span>RTS</span><b id="d-systems-returning">—</b></div>
           </div>
           <div class="progress-kpi-value" id="d-systems-summary" style="display:none">—</div>
           <div class="progress-kpi-sub" id="d-systems-summary-sub" style="display:none">Normal / OOS / RTS</div>
@@ -3949,14 +3975,28 @@ APPENDIX 6.5B)</div>
   <!-- Executive Dashboard Middle: Systems + Return to Service -->
   <div class="huddle-middle-layout huddle-section">
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Systems Status</div>
+      <div class="system-status-head">
+        <div class="huddle-panel-title">Systems Status</div>
+        <div class="system-status-legend"><b>OOS</b> = Out of Service &nbsp; | &nbsp; <b>RTS</b> = Returning to Service</div>
+      </div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
     <div class="huddle-panel tight">
-      <div class="huddle-panel-title">Return to Service / Delay Description</div>
+      <div class="huddle-panel-title">Return to Service</div>
       <table class="huddle-table small">
         <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead>
         <tbody id="d-rts-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Daily Huddle Delay Detail -->
+  <div class="huddle-delay-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Delay Description</div>
+      <table class="huddle-table small">
+        <thead><tr><th>System ID</th><th>Task</th><th>Target</th><th>Notes</th><th>Action</th></tr></thead>
+        <tbody id="d-delay-rows"></tbody>
       </table>
     </div>
   </div>
@@ -3969,6 +4009,7 @@ APPENDIX 6.5B)</div>
         <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
         <tbody id="d-maint-activities"></tbody>
       </table>
+      <div class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</div>
     </div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
@@ -3992,11 +4033,11 @@ APPENDIX 6.5B)</div>
     </table>
   </div>
 
-  <!-- Row 1: Total | By Area | By Resource -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
+  <!-- KPI Overview -->
+  <div class="kpi-section kpi-overview-grid">
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;margin-bottom:10px">TOTAL WORK ORDERS</div>
+    <div class="kpi-card kpi-total-card" style="text-align:center;display:flex;flex-direction:column;justify-content:center">
+      <div class="kpi-card-title" style="text-align:center">TOTAL WORK ORDERS</div>
       <div style="font-size:72px;font-weight:800;line-height:1;color:#fff" id="d-total-num">—</div>
       <div style="font-size:22px;font-weight:700;color:#f0c040;margin-top:10px;font-style:italic" id="d-total-sub">—</div>
       <div id="d-delayed-badge-card" style="display:none;margin-top:10px">
@@ -4004,8 +4045,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY AREA</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY AREA</div>
       <div id="d-by-area" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -4020,8 +4061,8 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY RESOURCE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY RESOURCE</div>
       <div id="d-by-resource" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -4035,13 +4076,9 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Row 2: By Type | Timeline -->
-  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 1.8fr;gap:12px;margin-bottom:12px">
-
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY TYPE</div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">WORK ORDER BY TYPE</div>
       <div id="d-by-type" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
         <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
           <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
@@ -4055,19 +4092,22 @@ APPENDIX 6.5B)</div>
         </div>
       </div>
     </div>
+  </div>
 
-    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
-      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">TASKS BY WEEK</div>
+  <!-- KPI Detail -->
+  <div class="kpi-section kpi-detail-grid">
+
+    <div class="kpi-card">
+      <div class="kpi-card-title">TASKS BY WEEK</div>
       <div style="position:relative;height:150px">
         <svg id="d-timeline" style="width:100%;height:100%"></svg>
       </div>
     </div>
-  </div>
 
-  <!-- Row 3: Vendor Readiness -->
-  <div class="kpi-section" style="background:#1a3a5c;border-radius:8px;padding:16px 20px;margin-bottom:12px">
-    <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:10px">VENDOR READINESS</div>
-    <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    <div class="kpi-card">
+      <div class="kpi-card-title">VENDOR READINESS</div>
+      <div id="d-by-vendor" class="vendor-progress executive-vendor-list"></div>
+    </div>
   </div>
 
 </div>
@@ -4263,7 +4303,7 @@ const rawTasks = [
   {id:'14.01',task:'New Task',assigned:'',vendor:'',start:null,end:null,days:null,section:'PROJECTS'},
 ];
 
-const STATUSES = ['Pending','Scheduled','In Progress','Complete','Delayed','N/A'];
+const STATUSES = ['Pending','Scheduled','In Progress','Complete','Delayed','On Hold','N/A'];
 const CATEGORIES = ['PM','CAL','CM','EM','PROJ'];
 let projectStartDate = null;
 let projectEndDate = null;
@@ -5282,6 +5322,7 @@ function render(){
       ${newStartCell}
       ${newEndCell}
       ${impactCell}
+      ${impactAreaCell}
       ${editMode ? `<td class="edit-cell"><span class="days-readonly">${diffDaysInclusive(t.start, t.end) ?? '—'}</span></td>` : `<td style="text-align:center">${diffDaysInclusive(t.start, t.end) ?? '—'}</td>`}
       <td style="text-align:center;white-space:nowrap;font-size:12px;color:#1a3a5c;font-weight:600">${getShutdownWeek(t.start)}</td>
       ${criticalCell}
@@ -5441,7 +5482,8 @@ function insertRow(afterId){
     isParent:false,
     status:'Pending',
     notes:'',
-    actionComment:''
+    actionComment:'',
+    impactArea:''
   };
   tasks.splice(idx+1, 0, newTask);
   statusMap[tempId] = 'Pending';
@@ -6220,7 +6262,7 @@ function renderDashboard(){
     const s = statusMap[t.id] || t.status || 'Pending';
     acc[s] = (acc[s]||0) + 1;
     return acc;
-  }, {Pending:0,Scheduled:0,'In Progress':0,Complete:0,Delayed:0});
+  }, {Pending:0,Scheduled:0,'In Progress':0,Complete:0,Delayed:0,'On Hold':0});
 
   // Dashboard progress rule:
   // - Complete = 100%
@@ -6279,6 +6321,10 @@ function renderDashboard(){
     const endIso = normalizeDateValue(t.end);
     return endIso && new Date(endIso+'T00:00:00') < todayDate && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
   });
+  // Shared Schedule Risk definition for Full Dashboard and Morning Brief.
+  // Delayed items are reported only as Delayed, never duplicated as Late.
+  const riskDelayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
+  const riskLateTasks = overdueTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='Delayed');
   const lookaheadTasks = activeLeaf.filter(t=>{
     const startIso = normalizeDateValue(t.start);
     if(!startIso) return false;
@@ -6354,7 +6400,7 @@ function renderDashboard(){
   }
 
   setText('d-progress-asof', 'As of ' + displayDate(todayIso));
-  const scheduleRiskCount = delayedTasks.length + overdueTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id)).length;
+  const scheduleRiskCount = riskDelayedTasks.length + riskLateTasks.length;
   const shutdownStatus = daysToStart == null ? 'Planned' : daysToStart > 0 ? 'Planned' : 'Active';
   setText('d-progress-summary', '');
   setText('d-operational-detail-label', 'Operational Detail (Tasks-' + taskTotal + ')');
@@ -6368,9 +6414,9 @@ function renderDashboard(){
   setText('d-today-complete', completedTodayTasks.length);
   setText('d-today-remaining', remainingTodayTasks.length);
   setText('d-schedule-risk', scheduleRiskCount);
-  setText('d-schedule-risk-sub', overdueTasks.length + ' late / ' + delayedTasks.length + ' delayed');
-  setText('d-risk-late', lateTasks.length);
-  setText('d-risk-delayed', delayedTasks.length);
+  setText('d-schedule-risk-sub', riskLateTasks.length + ' late / ' + riskDelayedTasks.length + ' delayed');
+  setText('d-risk-late', riskLateTasks.length);
+  setText('d-risk-delayed', riskDelayedTasks.length);
   setText('d-risk-critical', criticalTasks.length);
   setText('d-progress-inprogress', statusCounts['In Progress'] || 0);
   setText('d-progress-pending', statusCounts.Pending || 0);
@@ -6527,6 +6573,9 @@ function renderDashboard(){
       const st = executiveSystemStatus(status);
       return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
     }
+    function executiveSystemLabel(status){
+      return executiveSystemStatus(status) === 'Returning to Service' ? 'RTS' : executiveSystemStatus(status);
+    }
     const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
     const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
     const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
@@ -6540,8 +6589,8 @@ function renderDashboard(){
     systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${executiveSystemClass(s.status)}">${s.execStatus}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or returning-to-service systems.</div>';
+      <div class="system-pill ${executiveSystemClass(s.status)}">${executiveSystemLabel(s.status)}</div>
+    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or RTS systems.</div>';
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -6658,6 +6707,28 @@ function renderDashboard(){
     }
     rtsEl.innerHTML = rtsItems.length ? rtsItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
   }
+  const delayEl = document.getElementById('d-delay-rows');
+  if(delayEl){
+    const delayRows = delayedTasks
+      .slice()
+      .sort((a,b)=>{
+        const ae = normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+        const be = normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+        return ae.localeCompare(be) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
+      })
+      .map(t=>{
+        const note = String(notesMap[t.id] || t.notes || '').trim();
+        const action = String(t.actionComment || '').trim();
+        return `<tr>
+          <td>${huddleSystemForTask(t)}</td>
+          <td><b>${esc(t.id)}</b> ${esc(t.task)}</td>
+          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+          <td>${note ? esc(note) : '<span style="color:#9fb4c8;font-style:italic">No note</span>'}</td>
+          <td>${action ? esc(action) : '<span style="color:#9fb4c8;font-style:italic">No action</span>'}</td>
+        </tr>`;
+      });
+    delayEl.innerHTML = delayRows.join('') || '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No delayed items.</td></tr>';
+  }
 
   const upcomingEl = document.getElementById('d-upcoming-schedule');
   if(upcomingEl){
@@ -6682,6 +6753,7 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
+  renderMorningBrief();
 
 
   function renderMorningBrief(){
@@ -6795,15 +6867,15 @@ function renderDashboard(){
   function drawBars(elId, items, totalRef, colorFn){
     const el = document.getElementById(elId); if(!el) return;
     const maxVal = Math.max(...items.map(i=>i.v), 1);
-    const BAR_AREA_H = 110; // px height for 100%
+    const BAR_AREA_H = 58; // compact KPI chart height for 100%
     const html = items.map(i=>{
       const barH = Math.max(4, Math.round(i.v/maxVal*BAR_AREA_H));
       const pct  = totalRef ? (i.v/totalRef*100).toFixed(1) : 0;
       const color = typeof colorFn === 'function' ? colorFn(i.k) : colorFn;
       return `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;z-index:1;margin-right:4px">
-        <span style="font-size:13px;font-weight:800;color:#fff">${i.v}</span>
-        <span style="font-size:10px;color:#f0c040;font-weight:600">${pct}%</span>
-        <div style="width:54px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
+        <span style="font-size:11px;font-weight:800;color:#fff">${i.v}</span>
+        <span style="font-size:9px;color:#f0c040;font-weight:600">${pct}%</span>
+        <div style="width:46px;height:${barH}px;background:${color};border-radius:4px 4px 0 0;position:relative">
           <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,0.18) 0%,transparent 60%);border-radius:4px 4px 0 0"></div>
         </div>
         <span style="font-size:10px;color:#cde;font-weight:700;margin-top:2px;text-align:center">${i.k}</span>
@@ -6905,14 +6977,12 @@ function renderDashboard(){
     d.remaining = d.total - d.completed;
   }
   leaf.forEach(t=>addVendorStatus(t.vendor || 'Internal', statusMap[t.id] || t.status || 'Pending'));
-  calData.forEach((r,i)=>addVendorStatus(r.vendor || r.mfr || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
+  calData.forEach((r,i)=>addVendorStatus(r.vendor || 'A&P', typeof woRowStatus === 'function' ? woRowStatus(r, calSMap) : (calSMap[i] || 'Scheduled')));
   pmData.forEach((r,i)=>{
-    const v=(r.mfr||'').trim()||'Internal';
-    const key = v.length>12 ? v.slice(0,11) : v;
-    addVendorStatus(key, typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
+    addVendorStatus(r.vendor || 'Internal', typeof woRowStatus === 'function' ? woRowStatus(r, pmSMap) : (pmSMap[i] || 'Scheduled'));
   });
 
-  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,16);
+  const topVendors = Object.entries(vendorMap).sort((a,b)=>b[1].total-a[1].total).slice(0,8);
   const vendorTotals = Object.values(vendorMap).reduce((acc,d)=>{
     acc.scheduled += d.scheduled;
     acc.inProgress += d.inProgress;
@@ -6930,10 +7000,10 @@ function renderDashboard(){
         <div class="vendor-progress-name" title="${name}">${name}</div>
         <div class="vendor-progress-total">${d.total}</div>
       </div>
-      <div class="vendor-metric">${d.scheduled}<span>Scheduled</span></div>
-      <div class="vendor-metric">${d.inProgress}<span>In Progress</span></div>
-      <div class="vendor-metric">${d.completed}<span>Completed</span></div>
-      <div class="vendor-metric">${d.remaining}<span>Remaining</span></div>
+      <div class="vendor-metric">${d.scheduled}<span>SCH</span></div>
+      <div class="vendor-metric">${d.inProgress}<span>WIP</span></div>
+      <div class="vendor-metric">${d.completed}<span>DONE</span></div>
+      <div class="vendor-metric">${d.remaining}<span>REM</span></div>
     </div>`;
   }).join('');
 }
@@ -6942,7 +7012,7 @@ function renderBars(elId, items, total){
   const max = Math.max(...items.map(i=>i.count), 1);
   const el = document.getElementById(elId);
   el.innerHTML = items.map(i=>{
-    const h = Math.max(4, Math.round(i.count/max*110));
+    const h = Math.max(4, Math.round(i.count/max*44));
     const pct = total ? Math.round(i.count/total*100) : 0;
     return `<div class="bar-wrap">
       <span class="bar-count">${i.count}</span>
@@ -7321,16 +7391,29 @@ var WO_MANUAL_KEY     = 'sd26_wo_manual_v1';
 
 var calStatusMap = {};
 var pmStatusMap  = {};
+var calCompletedMap = {};
+var pmCompletedMap = {};
 var woManualData = [];
 var woInitialized = false;
+
+var WO_CAL_COMPLETED_KEY = 'sd26_wo_cal_completed_v1';
+var WO_PM_COMPLETED_KEY = 'sd26_wo_pm_completed_v1';
 
 function woLoadStorage(){
   try{ var s=localStorage.getItem(WO_CAL_STATUS_KEY); if(s) calStatusMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_PM_STATUS_KEY);  if(s) pmStatusMap=JSON.parse(s);  }catch(e){}
+  try{ var s=localStorage.getItem(WO_CAL_COMPLETED_KEY); if(s) calCompletedMap=JSON.parse(s); }catch(e){}
+  try{ var s=localStorage.getItem(WO_PM_COMPLETED_KEY);  if(s) pmCompletedMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_MANUAL_KEY);     woManualData=s?JSON.parse(s):[]; if(!Array.isArray(woManualData)) woManualData=[]; }catch(e){ woManualData=[]; }
 }
-function woSaveCAL(){ try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){} }
-function woSavePM(){  try{ localStorage.setItem(WO_PM_STATUS_KEY,  JSON.stringify(pmStatusMap));  }catch(e){} }
+function woSaveCAL(){
+  try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){}
+  try{ localStorage.setItem(WO_CAL_COMPLETED_KEY, JSON.stringify(calCompletedMap)); }catch(e){}
+}
+function woSavePM(){
+  try{ localStorage.setItem(WO_PM_STATUS_KEY, JSON.stringify(pmStatusMap)); }catch(e){}
+  try{ localStorage.setItem(WO_PM_COMPLETED_KEY, JSON.stringify(pmCompletedMap)); }catch(e){}
+}
 function woSaveManual(){
   try{ localStorage.setItem(WO_MANUAL_KEY, JSON.stringify(woManualData)); }catch(e){}
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -7364,6 +7447,10 @@ function woAllPmData(){
 function woRowStatus(row, map){
   if(row && row._woType === 'manual') return woNormalizeStatus(row.status);
   return woNormalizeStatus(map[row._woIndex]);
+}
+function woRowCompletedAt(row, map){
+  if(row && row._woType === 'manual') return normalizeDateValue(row.completedAt) || '';
+  return normalizeDateValue(map[row._woIndex]) || '';
 }
 function woManualFind(id){
   return woManualData.find(function(r){ return r.id === id; });
@@ -7516,9 +7603,19 @@ function calRender(){
 function calStatusChange(sel){
   if(sel.dataset.type === 'manual'){
     var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
+    if(row){
+      var previousStatus = woNormalizeStatus(row.status);
+      row.status = sel.value;
+      if(sel.value === 'Done' && previousStatus !== 'Done') row.completedAt = row.completedAt || trackerCompletionDate();
+      if(sel.value !== 'Done') row.completedAt = null;
+      woSaveManual();
+    }
   }else{
-    calStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    var key = parseInt(sel.dataset.key);
+    var previousStatus = woNormalizeStatus(calStatusMap[key]);
+    calStatusMap[key] = sel.value;
+    if(sel.value === 'Done' && previousStatus !== 'Done') calCompletedMap[key] = calCompletedMap[key] || trackerCompletionDate();
+    if(sel.value !== 'Done') delete calCompletedMap[key];
     woSaveCAL();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }
@@ -7573,9 +7670,19 @@ function pmRender(){
 function pmStatusChange(sel){
   if(sel.dataset.type === 'manual'){
     var row = woManualFind(sel.dataset.key);
-    if(row){ row.status = sel.value; woSaveManual(); }
+    if(row){
+      var previousStatus = woNormalizeStatus(row.status);
+      row.status = sel.value;
+      if(sel.value === 'Done' && previousStatus !== 'Done') row.completedAt = row.completedAt || trackerCompletionDate();
+      if(sel.value !== 'Done') row.completedAt = null;
+      woSaveManual();
+    }
   }else{
-    pmStatusMap[parseInt(sel.dataset.key)] = sel.value;
+    var key = parseInt(sel.dataset.key);
+    var previousStatus = woNormalizeStatus(pmStatusMap[key]);
+    pmStatusMap[key] = sel.value;
+    if(sel.value === 'Done' && previousStatus !== 'Done') pmCompletedMap[key] = pmCompletedMap[key] || trackerCompletionDate();
+    if(sel.value !== 'Done') delete pmCompletedMap[key];
     woSavePM();
     if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   }
@@ -7792,6 +7899,7 @@ function refreshSd26FromLocalStorage(){
   try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
   try{ if(typeof renderResourceCalendar === 'function') renderResourceCalendar(); }catch(e){}
   try{ if(typeof renderPrintSchedule === 'function') renderPrintSchedule(); }catch(e){}
+  try{ if(typeof renderWeeklyExecutiveSummary === 'function') renderWeeklyExecutiveSummary(); }catch(e){}
   try{ if(typeof updateStats === 'function') updateStats(); }catch(e){}
 }
 
@@ -8464,7 +8572,10 @@ function rcSaveEdit(){
   const id=document.getElementById('rcEditTitle').dataset.id; const t=rcGetTask(id); if(!t) return;
   t.task=document.getElementById('rcEditTask').value.trim() || t.task;
   t.assigned=normalizeAssigneeText(document.getElementById('rcEditAssigned').value || t.assigned || '');
+  const previousStatus=statusMap[t.id] || t.status || 'Pending';
   t.status=document.getElementById('rcEditStatus').value || 'Pending'; statusMap[t.id]=t.status;
+  if(t.status==='Complete' && previousStatus!=='Complete') t.completedAt=t.completedAt || trackerCompletionDate();
+  if(t.status!=='Complete') t.completedAt=null;
   t.start=document.getElementById('rcEditStart').value || null;
   t.end=document.getElementById('rcEditEnd').value || null;
   if(t.start && t.end && t.end < t.start){ const tmp=t.start; t.start=t.end; t.end=tmp; }
@@ -8544,6 +8655,7 @@ function renderRcVendor(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -8552,7 +8664,7 @@ function renderRcVendor(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -8570,7 +8682,9 @@ function renderRcVendor(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -8710,6 +8824,7 @@ function renderRcMonthlyCalendar(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -8718,7 +8833,7 @@ function renderRcMonthlyCalendar(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -8736,7 +8851,9 @@ function renderRcMonthlyCalendar(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -9047,6 +9164,7 @@ function rcExpandedBarRows(items,start,end){
 .huddle-top-layout .progress-kpi{padding:10px}
 .huddle-top-layout .progress-kpi-value{font-size:28px}
 .huddle-middle-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
+.huddle-delay-layout{display:grid;grid-template-columns:1fr;gap:12px;margin-bottom:14px}
 .huddle-bottom-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
 .huddle-panel.tight{padding:12px}
 .system-status-grid.compact{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}
@@ -9055,7 +9173,7 @@ function rcExpandedBarRows(items,start,end){
 .huddle-table.small th{padding:6px 8px}
 .gowning-list.dashboard{gap:10px}
 .gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}
-@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
+@media (max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr}.huddle-top-layout .progress-kpis{grid-template-columns:1fr 1fr}.system-status-grid.compact{grid-template-columns:1fr}}
 
 
 /* ========== Daily Huddle Export / Power Automate Support ========== */
@@ -9073,7 +9191,9 @@ function rcExpandedBarRows(items,start,end){
   #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}
   #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}
   #dashboardDateTime{font-size:8px!important}
-  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{page-break-inside:avoid;break-inside:avoid;gap:7px!important;margin-bottom:7px!important}
+  .huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr 1fr!important}
+  .huddle-delay-layout{grid-template-columns:1fr!important}
   .progress-brief,.huddle-panel{page-break-inside:avoid;break-inside:avoid;padding:7px!important;border-radius:5px!important}
   .progress-brief-head{margin-bottom:5px!important}
   .progress-brief-title{font-size:12px!important;letter-spacing:.05em!important}
@@ -9506,7 +9626,6 @@ function handleDailyHuddleUrlParams(){
         '<table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;width:100%;">'+body+'</table>'+
       '</td>';
     }
-
     var overall=safe('d-progress-count','—');
     var overallSub=safe('d-progress-pct','—');
     var todayDue=safe('d-today-due','0');
@@ -9534,6 +9653,11 @@ function handleDailyHuddleUrlParams(){
       // Dashboard row: Progress/Status, System ID, Target, Start-Up, Note
       return [c[1]||'—', c[2]||'TBD', c[0]||'—', c[4]||c[3]||'—'];
     });
+    var rawDelay=tableRows('d-delay-rows');
+    var delayRows=rawDelay.map(function(c){
+      // Dashboard row: System ID, Task, Target, Notes, Action
+      return [c[0]||'—', c[1]||'—', c[2]||'TBD', c[3]||'—', c[4]||'—'];
+    });
     var rawMaint=tableRows('d-maint-activities');
     var maintRows=rawMaint.map(function(c){
       // Dashboard row: Progress, System ID, Event, Vendor, Start, Target, New, Status
@@ -9544,6 +9668,227 @@ function handleDailyHuddleUrlParams(){
       // Dashboard row: Start, Target, System ID, Event, Vendor, Owner / Resource, Status
       return [c[0]||'TBD', c[1]||'TBD', c[2]||'—', c[3]||'—', c[4]||'—', c[5]||'—', c[6]||'—'];
     });
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var downSource=typeof downMap!=='undefined' ? downMap : (typeof timelineDownMap!=='undefined' ? timelineDownMap : {});
+      var startupSource=typeof startupMap!=='undefined' ? startupMap : (typeof timelineStartupMap!=='undefined' ? timelineStartupMap : {});
+      var selected=allT.filter(function(t){ return !t.isParent && (downSource[t.id]!=null || startupSource[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:downSource[t.id]!=null?xl(downSource[t.id]):null,upD:startupSource[t.id]!=null?xl(startupSource[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function emailDate(v){
+      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
+      if(!v) return '';
+      var d=new Date(String(v)+'T00:00:00');
+      if(isNaN(d)) return String(v);
+      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
+    }
+    function emailTimelinePanel(){
+      function xl(n){
+        if(n==null||n==='') return null;
+        var num=Number(n);
+        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
+        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
+        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
+        return null;
+      }
+      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
+      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
+      var allT=typeof tasks!=='undefined'?tasks:[];
+      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
+        var parentId=String(t.id).split('.')[0];
+        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
+        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
+      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
+        var pa=Number(a.parentId), pb=Number(b.parentId);
+        if(pa!==pb) return pa-pb;
+        var da=a.downD||a.upD, db=b.downD||b.upD;
+        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
+      });
+      if(!selected.length){
+        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
+      }
+      var minD=null, maxD=null;
+      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
+      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
+      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
+      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
+      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
+      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
+      var todayD=new Date(); todayD.setHours(0,0,0,0);
+      var dayW=16;
+      var totalW=dArr.length*dayW;
+      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
+        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
+        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
+        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
+      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
+      function segment(cols,bg,content,fg){
+        if(cols<=0) return '';
+        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
+      }
+      function timelineCells(r,sc,lc){
+        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
+        if(r.downD&&r.upD){
+          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
+          var firstIdx=Math.max(0, daysBetween(first,rS));
+          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
+          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
+          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
+          var html=spacer(before);
+          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
+            var past=todayIdx-firstIdx;
+            var future=lastIdx-todayIdx+1;
+            html+=segment(past,lc,label);
+            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
+          }else{
+            html+=segment(width,(last<todayD?lc:sc),label);
+          }
+          html+=spacer(after);
+          return html;
+        }
+        var markerD=r.downD||r.upD;
+        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
+        var color=r.downD?'#e53935':'#43a047';
+        var symbol=r.downD?'▼':'▲';
+        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
+      }
+      var rows=selected.map(function(r,idx){
+        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
+        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
+        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
+          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
+        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
+          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
+      }).join('');
+      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
+      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
+    }
+    async function ensureHtml2Canvas(){
+      if(window.html2canvas) return window.html2canvas;
+      return await new Promise((resolve,reject)=>{
+        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+        if(existing){
+          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
+          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
+          return;
+        }
+        const script=document.createElement('script');
+        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+        script.async=true;
+        script.dataset.huddleHtml2canvas='1';
+        script.onload=()=>resolve(window.html2canvas);
+        script.onerror=()=>reject(new Error('html2canvas load failed'));
+        document.head.appendChild(script);
+      });
+    }
+
+    function canvasToPngBlob(canvas){
+      return new Promise((resolve,reject)=>{
+        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
+      });
+    }
 
     function emailDate(v){
       try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
@@ -9957,6 +10302,541 @@ function handleDailyHuddleUrlParams(){
     if(pdf){ pdf.onclick=window.exportDailyHuddlePDF; }
     if(sum){ sum.onclick=window.downloadDailyHuddleSummary; }
     setTimeout(window.handleDailyHuddleUrlParams, 750);
+  });
+})();
+</script>
+
+<script id="dashboard-timeline-png-export">
+(function(){
+  var exportInProgress=false;
+  function setExportStatus(msg){
+    var el=document.getElementById('huddleExportStatus');
+    if(el) el.textContent=msg || '';
+  }
+  function waitFrames(n){
+    return new Promise(function(resolve){
+      function step(){ if(--n<=0) resolve(); else requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    });
+  }
+  async function ensureHtml2Canvas(){
+    if(window.html2canvas) return window.html2canvas;
+    return await new Promise(function(resolve,reject){
+      var existing=document.querySelector('script[data-huddle-html2canvas="1"]');
+      if(existing){
+        existing.addEventListener('load', function(){ resolve(window.html2canvas); }, {once:true});
+        existing.addEventListener('error', function(){ reject(new Error('html2canvas load failed')); }, {once:true});
+        return;
+      }
+      var script=document.createElement('script');
+      script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
+      script.async=true;
+      script.dataset.huddleHtml2canvas='1';
+      script.onload=function(){ resolve(window.html2canvas); };
+      script.onerror=function(){ reject(new Error('html2canvas load failed')); };
+      document.head.appendChild(script);
+    });
+  }
+  function canvasToBlob(canvas){
+    return new Promise(function(resolve,reject){
+      canvas.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('PNG render failed')); }, 'image/png');
+    });
+  }
+  function canvasToEmailJpegBlob(canvas, targetBytes){
+    targetBytes=targetBytes || 500000;
+    var scales=[1, .92, .84, .76, .68];
+    var qualities=[.78, .68, .58, .48, .38];
+    function makeCanvas(scale){
+      if(scale===1) return canvas;
+      var scaled=document.createElement('canvas');
+      scaled.width=Math.max(1, Math.round(canvas.width*scale));
+      scaled.height=Math.max(1, Math.round(canvas.height*scale));
+      var ctx=scaled.getContext('2d');
+      ctx.fillStyle='#0d2137';
+      ctx.fillRect(0,0,scaled.width,scaled.height);
+      ctx.drawImage(canvas,0,0,scaled.width,scaled.height);
+      return scaled;
+    }
+    function makeBlob(src, quality){
+      return new Promise(function(resolve,reject){
+        src.toBlob(function(blob){ blob ? resolve(blob) : reject(new Error('Email image render failed')); }, 'image/jpeg', quality);
+      });
+    }
+    return (async function(){
+      var best=null;
+      for(var s=0;s<scales.length;s++){
+        var src=makeCanvas(scales[s]);
+        for(var q=0;q<qualities.length;q++){
+          var blob=await makeBlob(src, qualities[q]);
+          if(!best || blob.size<best.size) best=blob;
+          if(blob.size<=targetBytes) return blob;
+        }
+      }
+      return best;
+    })();
+  }
+  function svgWidth(el){
+    var svg=el && el.querySelector && el.querySelector('svg');
+    if(!svg) return 0;
+    return Math.ceil(Number(svg.getAttribute('width')) || svg.scrollWidth || svg.clientWidth || 0);
+  }
+  function prepDashboardClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelCapture';
+    clone.classList.add('email-report-dashboard');
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-top-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px'});
+    apply('.progress-brief,.huddle-top-layout>.huddle-panel', {width:'100%', maxWidth:'none'});
+    apply('.progress-brief', {padding:'18px', marginBottom:'0'});
+    apply('.progress-kpis', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'14px'});
+    apply('.progress-kpi', {minHeight:'132px', padding:'18px', borderRadius:'8px'});
+    apply('.progress-kpi-label', {fontSize:'15px', lineHeight:'1.15', marginBottom:'10px', whiteSpace:'normal'});
+    apply('.progress-kpi-value,.progress-kpi-value.compact', {fontSize:'42px', lineHeight:'1'});
+    apply('.progress-kpi-sub', {fontSize:'17px', lineHeight:'1.2'});
+    apply('.kpi-line', {fontSize:'18px', lineHeight:'1.35'});
+    apply('.progress-meter', {height:'12px'});
+    apply('.operational-detail-kpi', {maxWidth:'none', gridColumn:'1 / -1'});
+    apply('.operational-detail-kpi .progress-row', {gridTemplateColumns:'210px 58px minmax(220px,1fr) 72px', gap:'12px', fontSize:'17px', padding:'7px 0'});
+    apply('.operational-detail-kpi .progress-row-name,.operational-detail-kpi .progress-row-pct', {fontSize:'17px'});
+    apply('.operational-detail-kpi .progress-row-meta', {fontSize:'15px'});
+    apply('.operational-detail-kpi .progress-mini-meter', {height:'9px'});
+    apply('.huddle-panel', {padding:'16px', borderRadius:'8px', minHeight:'0'});
+    apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('.gowning-list.dashboard', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'12px'});
+    apply('.gowning-row', {padding:'14px', gridTemplateColumns:'160px minmax(0,1fr)'});
+    apply('.gowning-area,.gowning-select', {fontSize:'17px'});
+    apply('.gowning-select', {height:'36px', padding:'6px 12px'});
+    apply('.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout', {display:'grid', gridTemplateColumns:'1fr', gap:'16px', alignItems:'start', marginBottom:'16px'});
+    apply('.system-status-grid.compact', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'10px'});
+    apply('.system-status-row', {fontSize:'16px', padding:'12px'});
+    apply('.system-status-id,.system-status-name,.system-pill', {fontSize:'16px'});
+    apply('.huddle-table', {fontSize:'16px'});
+    apply('.huddle-table th', {fontSize:'14px', padding:'10px 12px'});
+    apply('.huddle-table td', {fontSize:'16px', lineHeight:'1.25', padding:'10px 12px'});
+    apply('#d-delayed-alert,.kpi-section', {display:'none'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-dashboard{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-dashboard *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-dashboard #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-title{font-size:26px!important;line-height:1.1!important}',
+      '.email-report-dashboard .progress-brief-date{font-size:16px!important}',
+      '.email-report-dashboard .huddle-top-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important}',
+      '.email-report-dashboard .progress-brief,.email-report-dashboard .huddle-top-layout>.huddle-panel{width:100%!important;max-width:none!important}',
+      '.email-report-dashboard .progress-brief{padding:18px!important;margin-bottom:0!important}',
+      '.email-report-dashboard .progress-kpis{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-dashboard .progress-kpi{min-height:132px!important;padding:18px!important;border-radius:8px!important}',
+      '.email-report-dashboard .progress-kpi-label{font-size:15px!important;line-height:1.15!important;margin-bottom:10px!important;white-space:normal!important}',
+      '.email-report-dashboard .progress-kpi-value,.email-report-dashboard .progress-kpi-value.compact{font-size:42px!important;line-height:1!important}',
+      '.email-report-dashboard .progress-kpi-sub{font-size:17px!important;line-height:1.2!important}',
+      '.email-report-dashboard .kpi-line{font-size:18px!important;line-height:1.35!important}',
+      '.email-report-dashboard .progress-meter{height:12px!important}',
+      '.email-report-dashboard .operational-detail-kpi{max-width:none!important;grid-column:1 / -1!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row{grid-template-columns:210px 58px minmax(220px,1fr) 72px!important;gap:12px!important;font-size:17px!important;padding:7px 0!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-kpi-label{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-name,.email-report-dashboard .operational-detail-kpi .progress-row-pct{font-size:17px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-row-meta{font-size:15px!important}',
+      '.email-report-dashboard .operational-detail-kpi .progress-mini-meter{height:9px!important}',
+      '.email-report-dashboard .huddle-panel{padding:16px!important;border-radius:8px!important;min-height:0!important}',
+      '.email-report-dashboard .huddle-panel-title{font-size:17px!important;line-height:1.15!important;margin-bottom:12px!important}',
+      '.email-report-dashboard .gowning-list.dashboard{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:12px!important}',
+      '.email-report-dashboard .gowning-row{padding:14px!important;grid-template-columns:160px minmax(0,1fr)!important}',
+      '.email-report-dashboard .gowning-select{height:36px!important;padding:6px 12px!important}',
+      '.email-report-dashboard .gowning-area,.email-report-dashboard .gowning-select{font-size:17px!important}',
+      '.email-report-dashboard .huddle-middle-layout,.email-report-dashboard .huddle-delay-layout,.email-report-dashboard .huddle-bottom-layout{display:grid!important;grid-template-columns:1fr!important;gap:16px!important;align-items:start!important;margin-bottom:16px!important}',
+      '.email-report-dashboard .system-status-grid.compact{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}',
+      '.email-report-dashboard .system-status-row{font-size:16px!important;padding:12px!important}',
+      '.email-report-dashboard .system-status-id,.email-report-dashboard .system-status-name,.email-report-dashboard .system-pill{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table{font-size:16px!important}',
+      '.email-report-dashboard .huddle-table th{font-size:14px!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table td{font-size:16px!important;line-height:1.25!important;padding:10px 12px!important}',
+      '.email-report-dashboard .huddle-table .status-pill,.email-report-dashboard .huddle-table .pill{font-size:14px!important}',
+      '.email-report-dashboard #d-delayed-alert,.email-report-dashboard .kpi-section{display:none!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    clone.querySelectorAll('[style]').forEach(function(el){
+      if(/overflow-y\s*:\s*auto|overflow\s*:\s*auto|min-height\s*:\s*0/i.test(el.getAttribute('style')||'')){
+        el.style.overflow='visible';
+        el.style.maxHeight='none';
+      }
+    });
+    return clone;
+  }
+  function prepKpiClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='dashboardPanelKpiCapture';
+    clone.classList.remove('dash-mode-huddle');
+    clone.classList.add('dash-mode-kpi');
+    clone.classList.add('email-report-kpi');
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    var title=clone.querySelector('#dashboardTitle');
+    if(title) title.textContent='Shutdown 2026 — KPI Dashboard';
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.huddle-section', {display:'none'});
+    apply('#d-delayed-alert', {display:'none'});
+    apply('.kpi-section', {display:'grid'});
+    apply('.kpi-overview-grid', {gridTemplateColumns:'.8fr 1.35fr 1.1fr 1.05fr', gap:'12px', marginBottom:'12px'});
+    apply('.kpi-detail-grid', {gridTemplateColumns:'1.12fr .88fr', gap:'12px', marginBottom:'0'});
+    apply('.kpi-card', {padding:'14px', borderRadius:'8px'});
+    apply('.kpi-card-title', {fontSize:'14px', lineHeight:'1.15', marginBottom:'10px'});
+    apply('#d-total-num', {fontSize:'54px', lineHeight:'1'});
+    apply('#d-total-sub', {fontSize:'17px', lineHeight:'1.2'});
+    apply('#d-by-area,#d-by-resource,#d-by-type', {height:'128px'});
+    apply('#d-timeline', {height:'150px', minHeight:'150px'});
+    apply('.executive-vendor-list', {display:'grid', gridTemplateColumns:'1fr', gap:'8px'});
+    apply('.vendor-progress-row.exec', {gridTemplateColumns:'minmax(150px,1fr) repeat(4,58px)', gap:'8px', padding:'9px 11px'});
+    apply('.vendor-progress-name,.vendor-progress-total,.vendor-metric', {fontSize:'14px'});
+    apply('.vendor-metric span', {fontSize:'8px'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-kpi{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-kpi *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-kpi #dashboardTitle{font-size:30px!important;line-height:1.1!important}',
+      '.email-report-kpi .dashboard-export-actions{display:none!important}',
+      '.email-report-kpi .huddle-section,.email-report-kpi #d-delayed-alert{display:none!important}',
+      '.email-report-kpi .kpi-overview-grid{display:grid!important;grid-template-columns:.8fr 1.35fr 1.1fr 1.05fr!important;gap:12px!important;margin-bottom:12px!important}',
+      '.email-report-kpi .kpi-detail-grid{display:grid!important;grid-template-columns:1.12fr .88fr!important;gap:12px!important;margin-bottom:0!important}',
+      '.email-report-kpi .kpi-card{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:14px!important;overflow:hidden!important}',
+      '.email-report-kpi .kpi-card-title{font-size:14px!important;line-height:1.15!important;margin-bottom:10px!important;color:#d5e5f5!important}',
+      '.email-report-kpi #d-total-num{font-size:54px!important;line-height:1!important}',
+      '.email-report-kpi #d-total-sub{font-size:17px!important;line-height:1.2!important}',
+      '.email-report-kpi #d-by-area,.email-report-kpi #d-by-resource,.email-report-kpi #d-by-type{height:128px!important}',
+      '.email-report-kpi #d-timeline{height:150px!important;min-height:150px!important}',
+      '.email-report-kpi .executive-vendor-list{display:grid!important;grid-template-columns:1fr!important;gap:8px!important}',
+      '.email-report-kpi .vendor-progress-row.exec{display:grid!important;grid-template-columns:minmax(150px,1fr) repeat(4,58px)!important;gap:8px!important;padding:9px 11px!important;align-items:center!important;overflow:hidden!important}',
+      '.email-report-kpi .vendor-progress-top{display:block!important;min-width:0!important;margin:0!important}',
+      '.email-report-kpi .vendor-progress-name{font-size:14px!important;line-height:1.1!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}',
+      '.email-report-kpi .vendor-progress-total,.email-report-kpi .vendor-metric{font-size:14px!important;line-height:1.1!important;text-align:right!important;white-space:nowrap!important}',
+      '.email-report-kpi .vendor-metric span{font-size:8px!important;line-height:1.1!important;white-space:nowrap!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    return clone;
+  }
+  function prepWeeklyClone(source, width){
+    var clone=source.cloneNode(true);
+    clone.id='weeklyExecutiveSummaryCapture';
+    clone.classList.add('email-report-weekly');
+    clone.style.display='block';
+    clone.style.width=width+'px';
+    clone.style.maxWidth='none';
+    clone.style.height='auto';
+    clone.style.maxHeight='none';
+    clone.style.minHeight='0';
+    clone.style.overflow='visible';
+    clone.style.boxSizing='border-box';
+    clone.querySelectorAll('.weekly-actions').forEach(function(el){ el.style.display='none'; });
+    clone.querySelectorAll('textarea.weekly-editor').forEach(function(el){
+      var display=document.createElement('div');
+      display.className='weekly-export-text '+(el.classList.contains('summary') ? 'summary' : '');
+      display.textContent=el.value || el.textContent || '';
+      display.style.whiteSpace='pre-line';
+      display.style.wordBreak='break-word';
+      if(el.classList.contains('summary')){
+        el.parentNode.replaceChild(display, el);
+      }else{
+        el.style.display='none';
+      }
+    });
+    function apply(selector, styles){
+      clone.querySelectorAll(selector).forEach(function(el){
+        Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
+      });
+    }
+    apply('.morning-hero', {padding:'18px', marginBottom:'16px'});
+    apply('.morning-title', {fontSize:'30px', lineHeight:'1.1'});
+    apply('.morning-sub', {fontSize:'16px'});
+    apply('.morning-kpis', {display:'grid', gridTemplateColumns:'repeat(4,minmax(0,1fr))', gap:'12px'});
+    apply('.morning-kpi', {padding:'15px', minHeight:'96px'});
+    apply('.morning-kpi-title', {fontSize:'14px'});
+    apply('.morning-kpi-lines', {fontSize:'17px', lineHeight:'1.35'});
+    apply('.huddle-panel', {padding:'16px', borderRadius:'8px', marginBottom:'16px'});
+    apply('.huddle-panel-title', {fontSize:'17px', lineHeight:'1.15', marginBottom:'12px'});
+    apply('.weekly-edit-grid', {display:'grid', gridTemplateColumns:'repeat(2,minmax(0,1fr))', gap:'14px'});
+    apply('.weekly-status-layout', {display:'grid', gridTemplateColumns:'minmax(0,2fr) minmax(280px,.8fr)', gap:'14px'});
+    apply('.weekly-edit-label', {fontSize:'14px', lineHeight:'1.2', marginBottom:'8px'});
+    apply('.weekly-export-text', {fontSize:'16px', lineHeight:'1.38'});
+    apply('.weekly-preview-list', {fontSize:'16px', lineHeight:'1.38', marginTop:'0'});
+    apply('.weekly-preview-list li', {marginBottom:'7px'});
+    apply('.huddle-table', {fontSize:'16px'});
+    apply('.huddle-table th', {fontSize:'13px', padding:'9px 11px'});
+    apply('.huddle-table td', {fontSize:'16px', lineHeight:'1.38', padding:'9px 11px'});
+    var style=document.createElement('style');
+    style.textContent=[
+      '.email-report-weekly{padding:24px!important;background:#0d2137!important;color:#fff!important;font-family:Arial,Helvetica,sans-serif!important}',
+      '.email-report-weekly *{box-sizing:border-box!important;letter-spacing:0!important}',
+      '.email-report-weekly .morning-hero{background:#1a3a5c!important;border-bottom:3px solid #f0c040!important;border-radius:8px!important;padding:18px!important;margin-bottom:16px!important}',
+      '.email-report-weekly .morning-title{font-size:30px!important;line-height:1.1!important;color:#fff!important}',
+      '.email-report-weekly .morning-sub{font-size:16px!important;color:#cde!important}',
+      '.email-report-weekly .morning-kpis{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:12px!important}',
+      '.email-report-weekly .morning-kpi{background:#102943!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:15px!important;min-height:96px!important}',
+      '.email-report-weekly .morning-kpi-title{font-size:14px!important;color:#cde!important;text-transform:uppercase!important;font-weight:900!important}',
+      '.email-report-weekly .morning-kpi-lines{font-size:17px!important;line-height:1.35!important;color:#fff!important}',
+      '.email-report-weekly .huddle-panel{background:#1a3a5c!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:8px!important;padding:16px!important;margin-bottom:16px!important}',
+      '.email-report-weekly .huddle-panel-title,.email-report-weekly .weekly-edit-label{font-size:17px!important;line-height:1.15!important;color:#f0c040!important;text-transform:uppercase!important;font-weight:900!important}',
+      '.email-report-weekly .weekly-edit-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}',
+      '.email-report-weekly .weekly-status-layout{display:grid!important;grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)!important;gap:14px!important}',
+      '.email-report-weekly .weekly-export-text{background:#102943!important;border:1px solid rgba(255,255,255,.14)!important;border-radius:8px!important;color:#fff!important;font-size:16px!important;line-height:1.38!important;padding:14px 16px!important}',
+      '.email-report-weekly .weekly-export-text.summary{border-left:4px solid #f0c040!important}',
+      '.email-report-weekly .weekly-preview-list{font-size:16px!important;line-height:1.38!important;margin:0 0 0 20px!important;padding:0!important;color:#e8f1fb!important}',
+      '.email-report-weekly .weekly-preview-list li{margin-bottom:7px!important}',
+      '.email-report-weekly .huddle-table{font-size:16px!important;width:100%!important}',
+      '.email-report-weekly .huddle-table th{font-size:13px!important;padding:9px 11px!important}',
+      '.email-report-weekly .huddle-table td{font-size:16px!important;line-height:1.38!important;padding:9px 11px!important}'
+    ].join('\\n');
+    clone.insertBefore(style, clone.firstChild);
+    return clone;
+  }
+  function buildTimelineClone(width){
+    var header=document.getElementById('tl-header-sticky');
+    var body=document.getElementById('tl-container');
+    var section=document.createElement('div');
+    section.style.background='#0d2137';
+    section.style.color='#fff';
+    section.style.padding='18px 22px 22px';
+    section.style.width=width+'px';
+    section.style.boxSizing='border-box';
+    section.innerHTML='<div style="background:#1a3a5c;padding:13px 18px;border-radius:8px 8px 0 0;border-bottom:3px solid #f0c040;font-size:18px;font-weight:800;letter-spacing:.10em;text-transform:uppercase">System Down / Start-Up Timeline</div>';
+    var wrap=document.createElement('div');
+    wrap.style.background='#0f2236';
+    wrap.style.borderRadius='0 0 8px 8px';
+    wrap.style.overflow='visible';
+    wrap.style.width='100%';
+    wrap.style.boxSizing='border-box';
+    var headerClone=header ? header.cloneNode(true) : document.createElement('div');
+    var bodyClone=body ? body.cloneNode(true) : document.createElement('div');
+    [headerClone, bodyClone].forEach(function(el){
+      el.removeAttribute('id');
+      el.style.overflow='visible';
+      el.style.width='100%';
+      el.style.maxWidth='none';
+      el.style.height='auto';
+      el.style.maxHeight='none';
+    });
+    wrap.appendChild(headerClone);
+    wrap.appendChild(bodyClone);
+    section.appendChild(wrap);
+    return section;
+  }
+  async function renderNodeToBlob(node, width, opts){
+    opts=opts || {};
+    var root=document.createElement('div');
+    root.style.position='fixed';
+    root.style.left='-10000px';
+    root.style.top='0';
+    root.style.width=width+'px';
+    root.style.background='#0d2137';
+    root.style.zIndex='-1';
+    root.style.overflow='visible';
+    root.appendChild(node);
+    document.body.appendChild(root);
+    try{
+      await waitFrames(2);
+      var h2c=await ensureHtml2Canvas();
+      var height=Math.max(500, Math.ceil(root.scrollHeight || root.offsetHeight || 0));
+      var canvas=await h2c(root, {
+        backgroundColor:'#0d2137',
+        scale:1,
+        useCORS:true,
+        logging:false,
+        width:width,
+        height:height,
+        windowWidth:width,
+        windowHeight:height,
+        scrollX:0,
+        scrollY:0
+      });
+      return opts.emailJpeg ? await canvasToEmailJpegBlob(canvas, opts.targetBytes) : await canvasToBlob(canvas);
+    }finally{
+      root.remove();
+    }
+  }
+  async function renderNodeToPngBlob(node, width){
+    return await renderNodeToBlob(node, width, {emailJpeg:false});
+  }
+  async function renderNodeToEmailJpegBlob(node, width){
+    return await renderNodeToBlob(node, width, {emailJpeg:true, targetBytes:500000});
+  }
+  function downloadBlob(blob, filename, delayMs){
+    setTimeout(function(){
+      var dlUrl=URL.createObjectURL(blob);
+      var a=document.createElement('a');
+      a.href=dlUrl;
+      a.download=filename;
+      a.style.display='none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function(){ URL.revokeObjectURL(dlUrl); a.remove(); }, 1500);
+    }, delayMs || 0);
+  }
+  async function savePng(blob, filename){
+    var key='sd26_sharepoint_email_body_url_v1';
+    var defaultFileUrl='https://revancetherapeuticsinc.sharepoint.com/sites/FacilitiesAnnualShutdown/Shared%20Documents/General/2026%20Annual%20Shutdown/'+encodeURIComponent(filename);
+    var url='';
+    try{ url=localStorage.getItem(key)||''; }catch(e){}
+    function normalize(url){
+      url=String(url||'').trim();
+      if(!url) return defaultFileUrl;
+      if(url.indexOf(':f:/r/')>=0){
+        var clean=url.split('?')[0].replace('/:f:/r','');
+        return clean.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+      }
+      if(/\.(html?|png|jpe?g)(\?|$)/i.test(url)) return url.split('?')[0].replace(/\/[^\/]*$/,'')+'/'+encodeURIComponent(filename);
+      return url.replace(/\/$/,'')+'/'+encodeURIComponent(filename);
+    }
+    url=normalize(url);
+    try{ localStorage.setItem(key,url); }catch(e){}
+    try{
+      var res=await fetch(url, {method:'PUT', body:blob, credentials:'include', mode:'cors', headers:{'Content-Type':blob.type || 'image/png'}});
+      if(res.ok || res.status===200 || res.status===201 || res.status===204){
+        return true;
+      }
+      throw new Error('SharePoint save failed: HTTP '+res.status);
+    }catch(e){
+      console.warn(e);
+      return false;
+    }
+  }
+  window.downloadDailyHuddleSummary=async function(ev){
+    if(ev && ev.preventDefault) ev.preventDefault();
+    if(exportInProgress) return false;
+    exportInProgress=true;
+    setExportStatus('Rendering compressed Dashboard, KPI, and Timeline JPGs...');
+    try{
+      if(typeof window.ensureDailyHuddleView==='function') window.ensureDailyHuddleView();
+      if(typeof initTimelineFilter==='function') initTimelineFilter();
+      if(typeof renderTimeline==='function') renderTimeline();
+      await waitFrames(3);
+      var dashboard=document.getElementById('dashboardPanel');
+      var tlHeader=document.getElementById('tl-header-sticky');
+      var tlBody=document.getElementById('tl-container');
+      if(!dashboard) throw new Error('Dashboard panel not found.');
+      var dashboardWidth=1200;
+      var timelineWidth=Math.max(
+        1400,
+        Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
+        Math.ceil(tlBody ? tlBody.scrollWidth : 0),
+        svgWidth(tlHeader),
+        svgWidth(tlBody)
+      );
+      var kpiWidth=1600;
+      var dashboardBlob=await renderNodeToEmailJpegBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var kpiBlob=await renderNodeToEmailJpegBlob(prepKpiClone(dashboard, kpiWidth), kpiWidth);
+      var timelineBlob=await renderNodeToEmailJpegBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.jpg';
+      var kpiFile='Shutdown_Daily_Huddle_KPI.jpg';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.jpg';
+      var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var kpiSaved=await savePng(kpiBlob, kpiFile);
+      var timelineSaved=await savePng(timelineBlob, timelineFile);
+      if(dashSaved && kpiSaved && timelineSaved){
+        setExportStatus('Dashboard, KPI, and Timeline JPGs saved to SharePoint');
+      }else{
+        setExportStatus('SharePoint save blocked; downloading compressed JPGs');
+        if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 0);
+        if(!kpiSaved) downloadBlob(kpiBlob, kpiFile, 650);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
+      }
+      setTimeout(function(){ setExportStatus(''); }, 3000);
+    }catch(e){
+      console.error('Dashboard, KPI, and Timeline JPG export failed:', e);
+      alert('Could not create Dashboard, KPI, and Timeline JPGs: '+(e && e.message ? e.message : e));
+      setExportStatus('');
+    }finally{
+      exportInProgress=false;
+    }
+    return false;
+  };
+  window.downloadWeeklyExecutiveEmailPngs=async function(ev){
+    if(ev && ev.preventDefault) ev.preventDefault();
+    if(exportInProgress) return false;
+    exportInProgress=true;
+    setExportStatus('Rendering compressed Weekly Summary, Dashboard, and Timeline JPGs...');
+    try{
+      if(typeof setDashboardMode==='function') setDashboardMode('weekly');
+      if(typeof renderWeeklyExecutiveSummary==='function') renderWeeklyExecutiveSummary();
+      if(typeof initTimelineFilter==='function') initTimelineFilter();
+      if(typeof renderTimeline==='function') renderTimeline();
+      await waitFrames(3);
+      var weekly=document.getElementById('weeklyExecutiveSummaryPanel');
+      var dashboard=document.getElementById('dashboardPanel');
+      var tlHeader=document.getElementById('tl-header-sticky');
+      var tlBody=document.getElementById('tl-container');
+      if(!weekly) throw new Error('Weekly Summary panel not found.');
+      if(!dashboard) throw new Error('Dashboard panel not found.');
+      var weeklyWidth=1400;
+      var dashboardWidth=1400;
+      var timelineWidth=Math.max(
+        1400,
+        Math.ceil(tlHeader ? tlHeader.scrollWidth : 0),
+        Math.ceil(tlBody ? tlBody.scrollWidth : 0),
+        svgWidth(tlHeader),
+        svgWidth(tlBody)
+      );
+      var weeklyBlob=await renderNodeToEmailJpegBlob(prepWeeklyClone(weekly, weeklyWidth), weeklyWidth);
+      if(typeof setDashboardMode==='function') setDashboardMode('huddle');
+      await waitFrames(2);
+      var dashboardBlob=await renderNodeToEmailJpegBlob(prepDashboardClone(dashboard, dashboardWidth), dashboardWidth);
+      var timelineBlob=await renderNodeToEmailJpegBlob(buildTimelineClone(timelineWidth), timelineWidth);
+      var weeklyFile='Shutdown_Weekly_Executive_Summary.jpg';
+      var dashboardFile='Shutdown_Daily_Huddle_Dashboard.jpg';
+      var timelineFile='Shutdown_Daily_Huddle_Timeline.jpg';
+      var weeklySaved=await savePng(weeklyBlob, weeklyFile);
+      var dashSaved=await savePng(dashboardBlob, dashboardFile);
+      var timelineSaved=await savePng(timelineBlob, timelineFile);
+      if(weeklySaved && dashSaved && timelineSaved){
+        setExportStatus('Weekly Summary, Dashboard, and Timeline JPGs saved to SharePoint');
+      }else{
+        setExportStatus('SharePoint save blocked; downloading compressed Friday JPGs');
+        if(!weeklySaved) downloadBlob(weeklyBlob, weeklyFile, 0);
+        if(!dashSaved) downloadBlob(dashboardBlob, dashboardFile, 650);
+        if(!timelineSaved) downloadBlob(timelineBlob, timelineFile, 1300);
+      }
+      setTimeout(function(){ setExportStatus(''); }, 3000);
+    }catch(e){
+      console.error('Weekly Summary, Dashboard, and Timeline JPG export failed:', e);
+      alert('Could not create Weekly Summary, Dashboard, and Timeline JPGs: '+(e && e.message ? e.message : e));
+      setExportStatus('');
+    }finally{
+      exportInProgress=false;
+    }
+    return false;
+  };
+  document.addEventListener('DOMContentLoaded', function(){
+    var btn=document.getElementById('btnDownloadHuddleSummary');
+    if(btn){
+      btn.textContent='Daily Email JPGs';
+      btn.title='Save compressed Dashboard, KPI, and Timeline JPGs under the email body size limit';
+      btn.onclick=window.downloadDailyHuddleSummary;
+    }
+    var weeklyBtn=document.getElementById('btnDownloadWeeklyEmailPngs');
+    if(weeklyBtn){
+      weeklyBtn.textContent='Friday Executive JPGs';
+      weeklyBtn.title='Save compressed Weekly Summary, Dashboard, and Timeline JPGs for the Friday executive email';
+      weeklyBtn.onclick=window.downloadWeeklyExecutiveEmailPngs;
+    }
   });
 })();
 </script>
