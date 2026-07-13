@@ -596,7 +596,7 @@ tr.editing{background:#fffceb}
 .dash-mode-weekly .huddle-table td{font-size:16px;line-height:1.45}
 .huddle-middle-layout.weekly-status-layout{grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)}
 .weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
-.weekly-plan-execution-card{--wpe-color:#39b968;--wpe-soft:#143d2a;--wpe-border:#4fbf78;--wpe-glow:rgba(57,185,104,.24);display:grid;grid-template-columns:minmax(220px,1.15fr) repeat(2,minmax(105px,.42fr)) minmax(220px,.8fr);align-items:center;gap:14px;background:linear-gradient(105deg,var(--wpe-soft),#132b43 72%);border:1px solid var(--wpe-border);border-left:10px solid var(--wpe-color);border-radius:10px;padding:14px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;break-inside:avoid;page-break-inside:avoid}
+.weekly-plan-execution-card{--wpe-color:#39b968;--wpe-soft:#143d2a;--wpe-border:#4fbf78;--wpe-glow:rgba(57,185,104,.24);display:grid;grid-template-columns:minmax(220px,1.15fr) repeat(2,minmax(105px,.42fr)) minmax(270px,.95fr);align-items:center;gap:14px;background:linear-gradient(105deg,var(--wpe-soft),#132b43 72%);border:1px solid var(--wpe-border);border-left:10px solid var(--wpe-color);border-radius:10px;padding:14px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;break-inside:avoid;page-break-inside:avoid}
 .plan-execution-scoreboard{margin-bottom:14px;border-radius:10px;overflow:hidden;box-shadow:0 6px 18px rgba(0,0,0,.18)}
 .plan-execution-scoreboard .weekly-plan-execution-card{margin:0;border-radius:0;box-shadow:none}
 .plan-execution-scoreboard .overall-scope-card{border-top:0}
@@ -611,6 +611,9 @@ tr.editing{background:#fffceb}
 .weekly-plan-execution-signal{width:22px;height:22px;flex:0 0 22px;border-radius:50%;background:var(--wpe-color);box-shadow:0 0 0 7px var(--wpe-glow)}
 .weekly-plan-execution-state{font-size:20px;line-height:1.05;font-weight:950;color:var(--wpe-color);text-transform:uppercase}
 .weekly-plan-execution-gap{font-size:11px;color:#d8e8f8;font-weight:800;margin-top:4px}
+.weekly-plan-execution-driver{font-size:11px;line-height:1.35;color:#fff;font-weight:800;margin-top:4px}
+.weekly-plan-execution-action{font-size:10px;line-height:1.25;color:var(--wpe-color);font-weight:950;letter-spacing:.05em;text-transform:uppercase;margin-top:4px}
+.weekly-plan-execution-driver[hidden],.weekly-plan-execution-action[hidden]{display:none!important}
 .dash-mode-morning>.shared-report-scoreboard,.dash-mode-weekly>.shared-report-scoreboard{display:none!important}
 @media(max-width:900px){.weekly-plan-execution-card{grid-template-columns:1fr 1fr}.weekly-plan-execution-status{justify-content:flex-start}.weekly-plan-execution-metric{border-left:0;padding-left:0}}
 .morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
@@ -6371,6 +6374,36 @@ function weeklyExecutionState(behind){
       : {key:'red', label:'Critical Behind'};
 }
 
+function executionRiskDetails(activeTasks, asOfIso){
+  const open = activeTasks.filter(t=>{
+    const status = statusMap[t.id] || t.status || 'Pending';
+    return status !== 'Complete' && status !== 'N/A';
+  });
+  const delayed = open.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
+  const late = open.filter(t=>{
+    const status = statusMap[t.id] || t.status || 'Pending';
+    const endIso = normalizeDateValue(t.end);
+    return endIso && endIso < asOfIso && status !== 'Delayed';
+  }).length;
+  const onHold = open.filter(t=>t.onHold === true || (statusMap[t.id]||t.status||'Pending')==='On Hold').length;
+  const critical = open.filter(t=>t.critical === true).length;
+  return {delayed, late, onHold, critical};
+}
+
+function executionExplanation(state, risk){
+  if(state.key === 'green') return {driver:'', action:''};
+  const parts = [
+    [risk.delayed,'Delayed'],
+    [risk.late,'Late'],
+    [risk.onHold,'On Hold'],
+    [risk.critical,'Critical']
+  ].filter(([count])=>count > 0).map(([count,label])=>`${count} ${label}`);
+  return {
+    driver: parts.length ? `Risk drivers: ${parts.join(' · ')}` : 'Execution is below the schedule curve',
+    action: state.key === 'red' ? 'Recovery Plan Required' : ''
+  };
+}
+
 function businessDaysInclusive(startIso,endIso){
   const start = new Date(startIso+'T00:00:00');
   const end = new Date(endIso+'T00:00:00');
@@ -6424,12 +6457,15 @@ function weeklyPlanExecutionData(asOfIso){
   const state = weeklyExecutionState(behind);
   const overallBehind = overallPlanPct - overallPct;
   const overallState = weeklyExecutionState(overallBehind);
+  const risk = executionRiskDetails(active, selectedIso);
+  const explanation = executionExplanation(state, risk);
+  const overallExplanation = executionExplanation(overallState, risk);
   const range = getWeekRange(selectedIso);
   const gapText = behind > 0 ? `${behind} pts behind plan` : (behind < 0 ? `${Math.abs(behind)} pts ahead of plan` : 'Actual matches plan');
   const overallGap = Math.abs(overallBehind).toFixed(1).replace(/\.0$/,'');
   const overallGapText = overallBehind > 0 ? `${overallGap} pts behind plan` : (overallBehind < 0 ? `${overallGap} pts ahead of plan` : 'Actual matches plan');
   return {planPct, actualPct, behind, state, range, gapText, activeCount:active.length,
-    overallPlanPct, overallPct, overallDone, overallTotal, overallBehind, overallState, overallGapText, overallStartIso, overallEndIso};
+    risk, explanation, overallExplanation, overallPlanPct, overallPct, overallDone, overallTotal, overallBehind, overallState, overallGapText, overallStartIso, overallEndIso};
 }
 
 function weeklyPlanExecutionCardHtml(extraClass){
@@ -6438,17 +6474,39 @@ function weeklyPlanExecutionCardHtml(extraClass){
     <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
-    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div></div></div>
+    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
     <div><div class="weekly-plan-execution-title">Overall Plan vs Execution</div><div class="weekly-plan-execution-week">Project ${displayDate(d.overallStartIso)} – ${displayDate(d.overallEndIso)}</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value">${d.overallPct}%</div></div>
-    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.overallState.label}</div><div class="weekly-plan-execution-gap">${d.overallGapText}</div></div></div>
+    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.overallState.label}</div><div class="weekly-plan-execution-gap">${d.overallGapText}</div>${d.overallExplanation.driver?`<div class="weekly-plan-execution-driver">${d.overallExplanation.driver}</div>`:''}${d.overallExplanation.action?`<div class="weekly-plan-execution-action">${d.overallExplanation.action}</div>`:''}</div></div>
   </div></div>`;
 }
 
 function renderWeeklyPlanExecutionCards(){
   const d = weeklyPlanExecutionData();
+  function setExplanation(card, scope, explanation){
+    const statusBody = card.querySelector('.weekly-plan-execution-status > div');
+    if(!statusBody) return;
+    let driver = card.querySelector(`[data-${scope}-driver]`);
+    if(!driver){
+      driver = document.createElement('div');
+      driver.className = 'weekly-plan-execution-driver';
+      driver.setAttribute(`data-${scope}-driver`, '');
+      statusBody.appendChild(driver);
+    }
+    driver.textContent = explanation.driver;
+    driver.hidden = !explanation.driver;
+    let action = card.querySelector(`[data-${scope}-action]`);
+    if(!action){
+      action = document.createElement('div');
+      action.className = 'weekly-plan-execution-action';
+      action.setAttribute(`data-${scope}-action`, '');
+      statusBody.appendChild(action);
+    }
+    action.textContent = explanation.action;
+    action.hidden = !explanation.action;
+  }
   document.querySelectorAll('[data-execution-scope="weekly"]').forEach(card=>{
     card.classList.remove('state-green','state-yellow','state-red');
     card.classList.add(`state-${d.state.key}`);
@@ -6457,8 +6515,9 @@ function renderWeeklyPlanExecutionCards(){
     set('[data-weekly-actual]', `${d.actualPct}%`);
     set('[data-weekly-state]', d.state.label);
     set('[data-weekly-gap]', d.gapText);
+    setExplanation(card, 'weekly', d.explanation);
     set('[data-weekly-plan-week]', `Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}`);
-    card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, ${d.state.label}`);
+    card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, ${d.state.label}. ${d.gapText}${d.explanation.driver ? `. ${d.explanation.driver}` : ''}${d.explanation.action ? `. ${d.explanation.action}` : ''}`);
   });
   document.querySelectorAll('[data-execution-scope="overall"]').forEach(card=>{
     card.classList.remove('state-green','state-yellow','state-red');
@@ -6468,8 +6527,9 @@ function renderWeeklyPlanExecutionCards(){
     set('[data-overall-actual]', `${d.overallPct}%`);
     set('[data-overall-state]', d.overallState.label);
     set('[data-overall-gap]', d.overallGapText);
+    setExplanation(card, 'overall', d.overallExplanation);
     set('[data-overall-plan-range]', `Project ${displayDate(d.overallStartIso)} – ${displayDate(d.overallEndIso)}`);
-    card.setAttribute('aria-label', `Overall Plan ${d.overallPlanPct} percent, Actual ${d.overallPct} percent, ${d.overallState.label}`);
+    card.setAttribute('aria-label', `Overall Plan ${d.overallPlanPct} percent, Actual ${d.overallPct} percent, ${d.overallState.label}. ${d.overallGapText}${d.overallExplanation.driver ? `. ${d.overallExplanation.driver}` : ''}${d.overallExplanation.action ? `. ${d.overallExplanation.action}` : ''}`);
   });
   return d;
 }
