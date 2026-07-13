@@ -596,7 +596,7 @@ tr.editing{background:#fffceb}
 .dash-mode-weekly .huddle-table td{font-size:16px;line-height:1.45}
 .huddle-middle-layout.weekly-status-layout{grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)}
 .weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
-.weekly-plan-execution-card{--wpe-color:#39b968;--wpe-soft:#143d2a;--wpe-border:#4fbf78;--wpe-glow:rgba(57,185,104,.24);display:grid;grid-template-columns:minmax(220px,1.15fr) repeat(2,minmax(105px,.42fr)) minmax(220px,.8fr);align-items:center;gap:14px;background:linear-gradient(105deg,var(--wpe-soft),#132b43 72%);border:1px solid var(--wpe-border);border-left:10px solid var(--wpe-color);border-radius:10px;padding:14px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;break-inside:avoid;page-break-inside:avoid}
+.weekly-plan-execution-card{--wpe-color:#39b968;--wpe-soft:#143d2a;--wpe-border:#4fbf78;--wpe-glow:rgba(57,185,104,.24);display:grid;grid-template-columns:minmax(210px,1.05fr) repeat(3,minmax(96px,.34fr)) minmax(210px,.75fr);align-items:center;gap:14px;background:linear-gradient(105deg,var(--wpe-soft),#132b43 72%);border:1px solid var(--wpe-border);border-left:10px solid var(--wpe-color);border-radius:10px;padding:14px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;break-inside:avoid;page-break-inside:avoid}
 .weekly-plan-execution-card.state-yellow{--wpe-color:#f0b429;--wpe-soft:#4a3513;--wpe-border:#d99a19;--wpe-glow:rgba(240,180,41,.24)}
 .weekly-plan-execution-card.state-red{--wpe-color:#ff6b61;--wpe-soft:#4b1f24;--wpe-border:#e05247;--wpe-glow:rgba(255,107,97,.24)}
 .weekly-plan-execution-title{font-size:15px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
@@ -3848,6 +3848,7 @@ APPENDIX 6.5B)</div>
       <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Overall</div><div class="weekly-plan-execution-value" data-weekly-overall>—%</div></div>
       <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
     </div>
     <div style="display:flex;gap:14px;font-size:11px;color:#cde;flex-wrap:wrap">
@@ -3912,6 +3913,7 @@ APPENDIX 6.5B)</div>
     <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Overall</div><div class="weekly-plan-execution-value" data-weekly-overall>—%</div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
   </div>
 
@@ -3921,6 +3923,7 @@ APPENDIX 6.5B)</div>
       <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Overall</div><div class="weekly-plan-execution-value" data-weekly-overall>—%</div></div>
       <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
     </div>
     <div class="morning-hero">
@@ -3959,6 +3962,7 @@ APPENDIX 6.5B)</div>
       <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
       <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Overall</div><div class="weekly-plan-execution-value" data-weekly-overall>—%</div></div>
       <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
     </div>
     <div class="morning-hero">
@@ -6353,11 +6357,25 @@ function weeklyPlanExecutionData(asOfIso){
   const actualPoints = active.reduce((sum,t)=>sum + calculateTaskProgressPct(t), 0);
   const planPct = active.length ? Math.round(planPoints / active.length) : 0;
   const actualPct = active.length ? Math.round(actualPoints / active.length) : 0;
+  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
+  const allTasks = tasks.filter(t=>!t.isParent);
+  const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
+  const pmData = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
+  const calMap = typeof calStatusMap !== 'undefined' ? calStatusMap : {};
+  const pmMap = typeof pmStatusMap !== 'undefined' ? pmStatusMap : {};
+  const overallDone = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length
+    + calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r,calMap)==='Done' : (calMap[i]||'Pending')==='Done').length
+    + pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r,pmMap)==='Done' : (pmMap[i]||'Pending')==='Done').length;
+  const overallRawTotal = allTasks.length
+    + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length)
+    + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
+  const overallTotal = Math.max(overallRawTotal,559);
+  const overallPct = overallTotal ? Number((overallDone/overallTotal*100).toFixed(1)) : 0;
   const behind = planPct - actualPct;
   const state = weeklyExecutionState(behind);
   const range = getWeekRange(selectedIso);
   const gapText = behind > 0 ? `${behind} pts behind plan` : (behind < 0 ? `${Math.abs(behind)} pts ahead of plan` : 'Actual matches plan');
-  return {planPct, actualPct, behind, state, range, gapText, activeCount:active.length};
+  return {planPct, actualPct, overallPct, overallDone, overallTotal, behind, state, range, gapText, activeCount:active.length};
 }
 
 function weeklyPlanExecutionCardHtml(extraClass){
@@ -6366,6 +6384,7 @@ function weeklyPlanExecutionCardHtml(extraClass){
     <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Overall</div><div class="weekly-plan-execution-value">${d.overallPct}%</div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div></div></div>
   </div>`;
 }
@@ -6378,10 +6397,11 @@ function renderWeeklyPlanExecutionCards(){
     const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
     set('[data-weekly-plan]', `${d.planPct}%`);
     set('[data-weekly-actual]', `${d.actualPct}%`);
+    set('[data-weekly-overall]', `${d.overallPct}%`);
     set('[data-weekly-state]', d.state.label);
     set('[data-weekly-gap]', d.gapText);
     set('[data-weekly-plan-week]', `Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}`);
-    card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, ${d.state.label}`);
+    card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, Overall ${d.overallPct} percent, ${d.state.label}`);
   });
   return d;
 }
