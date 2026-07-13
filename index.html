@@ -865,7 +865,7 @@ select.msf option:checked{background:#ddeeff}
       <div class="project-value" style="color:#1565c0">0</div>
     </div>
     <div class="project-box">
-      <div class="project-label">Delayed</div>
+      <div class="project-label">Active Delayed</div>
       <div class="project-value" style="color:#c62828">0</div>
     </div>
     <div class="project-box" style="min-width:200px;flex:2">
@@ -4806,13 +4806,13 @@ function updateStats(){
   const total=leafTasks.length;
   const done=leafTasks.filter(t=>statusMap[t.id]==='Complete').length;
   const ip=leafTasks.filter(t=>statusMap[t.id]==='In Progress').length;
-  const delayed=leafTasks.filter(t=>statusMap[t.id]==='Delayed').length;
+  const delayed=leafTasks.filter(t=>isActiveDelayedForDate(t,getTodayValue())).length;
   const pct=total?Math.round(done/total*100):0;
   document.getElementById('stats').innerHTML=`
     <div class="stat"><div class="stat-label">Total Tasks</div><div class="stat-val">${total}</div></div>
     <div class="stat"><div class="stat-label">Complete</div><div class="stat-val green">${done}</div><div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div></div>
     <div class="stat"><div class="stat-label">In Progress</div><div class="stat-val blue">${ip}</div></div>
-    <div class="stat"><div class="stat-label">Delayed</div><div class="stat-val red">${delayed}</div></div>
+    <div class="stat"><div class="stat-label">Active Delayed</div><div class="stat-val red">${delayed}</div></div>
     <div class="stat"><div class="stat-label">% Complete</div><div class="stat-val">${pct}%</div></div>
   `;
 }
@@ -5085,7 +5085,9 @@ function updateProjectSummary(){
   const total=leafTasks.length;
   const done=leafTasks.filter(t=>statusMap[t.id]==='Complete').length;
   const ip=leafTasks.filter(t=>statusMap[t.id]==='In Progress').length;
-  const delayed=leafTasks.filter(t=>statusMap[t.id]==='Delayed').length;
+  const delayedFlagged=leafTasks.filter(t=>t.onHold!==true && statusMap[t.id]==='Delayed');
+  const delayed=delayedFlagged.filter(t=>isActiveDelayedForDate(t,todayVal)).length;
+  const futureDelayed=Math.max(0,delayedFlagged.length-delayed);
   const pct=total?Math.round(done/total*100):0;
 
   const catPM   = leafTasks.filter(t=>(t.category||inferCategory(t.task)).toUpperCase()==='PM').length;
@@ -5137,8 +5139,9 @@ function updateProjectSummary(){
       <div class="project-value" style="color:#1565c0">${ip}</div>
     </div>
     <div class="project-box">
-      <div class="project-label">Delayed</div>
+      <div class="project-label" title="Original start date has arrived; On Hold is excluded">Active Delayed</div>
       <div class="project-value" style="color:#c62828">${delayed}</div>
+      ${futureDelayed ? `<div style="font-size:10px;color:#9a6b00;font-weight:800;margin-top:2px">${futureDelayed} future flagged</div>` : ''}
     </div>
     <div class="project-box" style="min-width:200px;flex:2">
       <div class="project-label">% Complete</div>
@@ -6389,14 +6392,18 @@ function hasOriginalStartArrivedForDate(t, asOfIso){
   return !startIso || startIso <= reportIso;
 }
 
+function isActiveDelayedForDate(t, asOfIso){
+  return !!t && t.onHold !== true
+    && (statusMap[t.id]||t.status||'Pending') === 'Delayed'
+    && hasOriginalStartArrivedForDate(t, asOfIso);
+}
+
 function executionRiskDetails(activeTasks, asOfIso){
   const open = activeTasks.filter(t=>{
     const status = statusMap[t.id] || t.status || 'Pending';
     return status !== 'Complete' && status !== 'N/A';
   });
-  const delayed = open.filter(t=>t.onHold !== true
-    && (statusMap[t.id]||t.status||'Pending')==='Delayed'
-    && hasOriginalStartArrivedForDate(t, asOfIso)).length;
+  const delayed = open.filter(t=>isActiveDelayedForDate(t, asOfIso)).length;
   const late = open.filter(t=>{
     const status = statusMap[t.id] || t.status || 'Pending';
     const endIso = normalizeDateValue(t.end);
@@ -6675,9 +6682,7 @@ function weeklyAutoSummaryData(){
   });
   const inProgressTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='In Progress');
   const holdTasks = activeLeaf.filter(t=>t.onHold === true);
-  const delayedTasks = activeLeaf.filter(t=>t.onHold !== true
-    && (statusMap[t.id]||t.status||'Pending')==='Delayed'
-    && hasOriginalStartArrivedForDate(t, todayIso));
+  const delayedTasks = activeLeaf.filter(t=>isActiveDelayedForDate(t, todayIso));
   const lateTasks = activeLeaf.filter(t=>{
     const endIso = normalizeDateValue(t.end);
     const status = statusMap[t.id]||t.status||'Pending';
@@ -6986,7 +6991,7 @@ function renderDashboard(){
     const endDate = new Date((endIso || startIso) + 'T00:00:00');
     return startDate <= sevenDayEndDate && endDate >= todayDate;
   }
-  const delayedTasks = leaf.filter(t=>t.onHold !== true && statusMap[t.id]==='Delayed' && hasOriginalStartArrived(t));
+  const delayedTasks = leaf.filter(t=>isActiveDelayedForDate(t, todayIso));
   const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
   const statusCounts = activeLeaf.reduce((acc,t)=>{
     const s = statusMap[t.id] || t.status || 'Pending';
@@ -7055,9 +7060,7 @@ function renderDashboard(){
   });
   // Shared Schedule Risk definition for Full Dashboard and Morning Brief.
   // Delayed items are reported only as Delayed, never duplicated as Late.
-  const riskDelayedTasks = activeLeaf.filter(t=>t.onHold !== true
-    && (statusMap[t.id]||t.status||'Pending')==='Delayed'
-    && hasOriginalStartArrived(t));
+  const riskDelayedTasks = activeLeaf.filter(t=>isActiveDelayedForDate(t, todayIso));
   const riskLateTasks = overdueTasks.filter(t=>t.onHold !== true && (statusMap[t.id]||t.status||'Pending')!=='Delayed');
   const lookaheadTasks = activeLeaf.filter(t=>{
     const startIso = normalizeDateValue(t.start);
@@ -7596,7 +7599,7 @@ function renderDashboard(){
       const done = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
       // Only show delayed section counts after the task's original start date has arrived.
       // Future items marked Delayed should not appear as delayed in Operational Detail yet.
-      const delayed = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed' && hasOriginalStartArrived(t)).length;
+      const delayed = items.filter(t=>isActiveDelayedForDate(t, todayIso)).length;
       const label = sec.replace(' SYSTEM','').replace('PROCESS EQUIPMENT','PROCESS EQ');
       return pctRowHtml(label, done, items.length, delayed ? delayed+' delayed' : done+'/'+items.length, delayed ? '#c62828' : '#4a90d9');
     }).join('');
