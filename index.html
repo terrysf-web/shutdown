@@ -575,11 +575,27 @@ tr.editing{background:#fffceb}
 .huddle-status.delayed{background:#8a5a08;color:#fff0bd}
 .huddle-status.onhold{background:#5d6470;color:#eef3f8}
 .huddle-status.na{background:rgba(255,255,255,.12);color:#cde}
-.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section{display:none!important}
-.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section{display:none!important}
-.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section{display:none!important}
+.dash-mode-huddle .kpi-section,.dash-mode-huddle .morning-section,.dash-mode-huddle .weekly-section{display:none!important}
+.dash-mode-kpi .huddle-section,.dash-mode-kpi .morning-section,.dash-mode-kpi .weekly-section{display:none!important}
+.dash-mode-morning .huddle-section,.dash-mode-morning .kpi-section,.dash-mode-morning .weekly-section{display:none!important}
+.dash-mode-weekly .huddle-section,.dash-mode-weekly .kpi-section,.dash-mode-weekly .morning-section{display:none!important}
 .morning-section{display:none}
 .dash-mode-morning .morning-section{display:block!important}
+.weekly-section{display:none}
+.dash-mode-weekly .weekly-section{display:block!important}
+.weekly-edit-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.weekly-editor{width:100%;min-height:92px;resize:vertical;background:#102943;color:#fff;border:1px solid rgba(255,255,255,.18);border-radius:7px;padding:10px 12px;font-size:16px;line-height:1.45;font-family:Arial,Helvetica,sans-serif;box-sizing:border-box}
+.weekly-editor.summary{min-height:96px;font-size:16px;line-height:1.45;border-left:4px solid #f0c040}
+.weekly-editor.small{min-height:72px}
+.weekly-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;margin-top:10px}
+.weekly-actions button{border:none;border-radius:6px;padding:7px 11px;font-size:12px;font-weight:900;cursor:pointer}
+.weekly-save{background:#f0c040;color:#1a3a5c}.weekly-reset{background:#223f5f;color:#cde}
+.weekly-edit-label{font-size:11px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px}
+.weekly-preview-list{margin:8px 0 0 18px;padding:0;color:#e8f1fb;font-size:16px;line-height:1.45}
+.weekly-preview-list li{margin-bottom:5px}
+.dash-mode-weekly .huddle-table td{font-size:16px;line-height:1.45}
+.huddle-middle-layout.weekly-status-layout{grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)}
+.weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
 .morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
 .morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
 .morning-export-capture .morning-title{font-size:26px!important;letter-spacing:.06em!important}
@@ -921,8 +937,8 @@ select.msf option:checked{background:#ddeeff}
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="20">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="20">
+      <tbody id="tbody"><tr class="section-row"><td colspan="21">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1137,7 +1153,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1318,7 +1334,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1431,7 +1447,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1527,7 +1543,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
@@ -1861,7 +1877,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -1957,7 +1973,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2104,7 +2120,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2166,7 +2182,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2210,8 +2226,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="20">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="20">
+    </tr><tr class="section-row"><td colspan="21">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2409,7 +2425,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2556,7 +2572,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2583,8 +2599,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="20">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="20">
+    </tr><tr class="section-row"><td colspan="21">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2730,8 +2746,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="20">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="20">
+    </tr><tr class="section-row"><td colspan="21">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
@@ -3854,11 +3870,20 @@ APPENDIX 6.5B)</div>
     <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">Shutdown Executive Dashboard</span>
     <div class="dashboard-export-actions">
       <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
-      <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
-      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Send a PNG screenshot of the dashboard to Power Automate for SharePoint saving">🖼 Dashboard PNG</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">🌅 Morning Brief</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">✉ Morning Brief JPG</button>
-      <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">📊 Full Dashboard</button>
+      <div class="dashboard-view-switch">
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('huddle')" title="Return to full dashboard">Full</button>
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('morning')" title="Show morning brief without Upcoming Next 7 Days">Morning</button>
+        <button class="dashboard-export-btn secondary" type="button" onclick="setDashboardMode('weekly')" title="Show editable weekly executive summary">Weekly</button>
+      </div>
+      <details class="dashboard-export-menu">
+        <summary class="dashboard-export-btn">Export</summary>
+        <div class="dashboard-export-dropdown">
+          <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">Save PDF</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" title="Save compressed Dashboard, KPI, and Timeline JPGs">Daily Email JPGs</button>
+          <button class="dashboard-export-btn secondary" id="btnDownloadWeeklyEmailPngs" type="button" title="Save compressed Weekly Summary, Dashboard, and Timeline JPGs for Friday executive email">Friday Executive JPGs</button>
+          <button class="dashboard-export-btn secondary" type="button" onclick="downloadMorningBriefImage(event)" title="Download a compressed Morning Brief image for email">Morning Brief JPG</button>
+        </div>
+      </details>
       <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
     </div>
   </div>
@@ -3879,11 +3904,11 @@ APPENDIX 6.5B)</div>
     <div class="huddle-middle-layout">
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">System Status</div>
-        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Note</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
+        <table class="huddle-table small"><thead><tr><th>System ID</th><th>System / Area</th><th>Status</th><th>Target Normal</th></tr></thead><tbody id="mb-system-rows"></tbody></table>
       </div>
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">Critical / Notification Items</div>
-        <table class="huddle-table small"><thead><tr><th>Type</th><th>System ID</th><th>Task</th><th>Impacted Area</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+        <table class="huddle-table small"><thead><tr><th>Sent</th><th>System ID</th><th>Task</th><th>Impacted Area</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
@@ -3893,6 +3918,67 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel tight">
       <div class="huddle-panel-title">Delay / New Date / Special Notes</div>
       <table class="huddle-table small"><thead><tr><th>System ID</th><th>Event</th><th>New Date</th><th>Note</th></tr></thead><tbody id="mb-note-rows"></tbody></table>
+    </div>
+  </div>
+
+  <!-- Weekly Executive Summary: auto-generated, editable, and saved to shared data -->
+  <div class="weekly-section" id="weeklyExecutiveSummaryPanel">
+    <div class="morning-hero">
+      <div class="morning-title">Shutdown Weekly Executive Summary</div>
+      <div class="morning-sub" id="weeklySummaryMeta">Week ending —</div>
+      <div class="morning-kpis">
+        <div class="morning-kpi"><div class="morning-kpi-title">Overall Progress</div><div class="morning-kpi-lines" id="wk-overall">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">This Week Completed</div><div class="morning-kpi-lines" id="wk-completed">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Active / Hold</div><div class="morning-kpi-lines" id="wk-active">—</div></div>
+        <div class="morning-kpi"><div class="morning-kpi-title">Schedule Risk</div><div class="morning-kpi-lines" id="wk-risk">—</div></div>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Executive Summary</div>
+      <textarea id="weeklySummaryText" class="weekly-editor summary" oninput="weeklySummaryDirty=true" placeholder="Auto-generated weekly executive summary..."></textarea>
+      <div class="weekly-actions">
+        <span class="weekly-note" id="weeklySummaryStatus">Auto-generated from current tracker data. Edit and save if needed.</span>
+        <button class="weekly-reset" type="button" onclick="resetWeeklySummaryToAuto()">Reset Auto</button>
+        <button class="weekly-save" type="button" onclick="saveWeeklySummary()">Save Weekly Summary</button>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Weekly Movement</div>
+      <div class="weekly-edit-grid">
+        <div>
+          <div class="weekly-edit-label">Completed This Week</div>
+          <textarea id="weeklyCompletedText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
+          <ul id="weeklyCompletedPreview" class="weekly-preview-list"></ul>
+        </div>
+        <div>
+          <div class="weekly-edit-label">Next Week Focus</div>
+          <textarea id="weeklyNextText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One bullet per line"></textarea>
+          <ul id="weeklyNextPreview" class="weekly-preview-list"></ul>
+        </div>
+      </div>
+      <textarea id="weeklyChangesText" style="display:none" aria-hidden="true"></textarea>
+    </div>
+
+    <div class="huddle-middle-layout weekly-status-layout" style="margin-bottom:14px">
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Top Risks / Decisions Needed</div>
+        <textarea id="weeklyRisksText" class="weekly-editor" oninput="weeklySummaryDirty=true" placeholder="One risk or decision per line"></textarea>
+        <ul id="weeklyRisksPreview" class="weekly-preview-list"></ul>
+      </div>
+      <div class="huddle-panel tight">
+        <div class="huddle-panel-title">Systems / Access Status</div>
+        <table class="huddle-table small">
+          <thead><tr><th>Metric</th><th>Current</th><th>Comment</th></tr></thead>
+          <tbody id="weeklySystemsRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Current Dashboard Attachment</div>
+      <div class="weekly-note">For Friday email: send this weekly summary first, then place the Dashboard PNG and Timeline PNG below it.</div>
     </div>
   </div>
 
@@ -4487,16 +4573,33 @@ function onHoldCutoffDate(t){
   const today = new Date().toISOString().slice(0,10);
   return holdIso === today ? new Date() : workPointGlobal(holdIso, 16);
 }
+function parseOnHoldProgress(v){
+  if(v === null || v === undefined || v === '') return null;
+  const n = Number(v);
+  if(!Number.isFinite(n)) return null;
+  return Math.max(0, Math.min(95, Math.round(n)));
+}
+function storedOnHoldProgress(t){
+  const stored = parseOnHoldProgress(t && t.onHoldProgress);
+  if(stored === null) return null;
+  if(stored === 0){
+    const startIso = normalizeDateValue(t && (t.newStart || t.start));
+    const cutoff = onHoldCutoffDate(t || {});
+    if(startIso && cutoff > workPointGlobal(startIso, 7)) return null;
+  }
+  return stored;
+}
 function calculateTaskProgressPct(t, ignoreHold=false, upToOverride=null){
   const st = statusMap[t.id] || t.status || 'Pending';
   if(st === 'Complete') return 100;
   if(st === 'Pending' || st === 'Scheduled' || st === 'N/A') return 0;
   if(!ignoreHold && t.onHold === true){
-    if(Number.isFinite(Number(t.onHoldProgress))) return Number(t.onHoldProgress);
+    const heldProgress = storedOnHoldProgress(t);
+    if(heldProgress !== null) return heldProgress;
     return calculateTaskProgressPct(t, true, onHoldCutoffDate(t));
   }
-  const startIso = normalizeDateValue(t.start);
-  const endIso = normalizeDateValue(t.end) || startIso;
+  const startIso = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+  const endIso = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || startIso;
   if(!startIso) return st === 'In Progress' ? 5 : 0;
   const now = upToOverride || progressNowDateGlobal();
   if(now < workPointGlobal(startIso, 7)) return 0;
@@ -4516,11 +4619,12 @@ function updateDerivedFields(){
     t.category = (t.category || inferCategory(t.task)).toUpperCase();
     t.notes = notesMap[t.id] || '';
     t.actionComment = t.actionComment || '';
+    t.impactArea = t.impactArea || '';
     t.critical = t.critical === true || t.critical === 'true' || t.critical === 'Y' || t.critical === 'Yes';
     t.notification = t.notification === true || t.notification === 'true' || t.notification === 'Y' || t.notification === 'Yes';
     t.vendorOnsite = t.vendorOnsite === true || t.vendorOnsite === 'true' || t.vendorOnsite === 'Y' || t.vendorOnsite === 'Yes';
     t.onHold = t.onHold === true || t.onHold === 'true' || t.onHold === 'Y' || t.onHold === 'Yes';
-    t.onHoldProgress = Number.isFinite(Number(t.onHoldProgress)) ? Number(t.onHoldProgress) : null;
+    t.onHoldProgress = parseOnHoldProgress(t.onHoldProgress);
     t.onHoldDate = normalizeDateValue(t.onHoldDate);
     t.start = normalizeDateValue(t.start);
     t.end = normalizeDateValue(t.end);
@@ -4543,50 +4647,13 @@ function saveLocal(){
     updateSaveButton();
   }catch(e){}
 }
-function isUsableTaskList(list){
-  if(!Array.isArray(list)) return false;
-  const leafCount = list.filter(t=>t && !t.isParent).length;
-  const parentCount = list.filter(t=>t && t.isParent).length;
-  return leafCount >= 20 && parentCount >= 3;
-}
-function parseUsableTaskList(raw){
-  try{
-    const parsed = typeof raw === 'string' ? JSON.parse(raw) : raw;
-    return isUsableTaskList(parsed) ? parsed : null;
-  }catch(e){
-    return null;
-  }
-}
-function resetTasksFromSeed(){
-  tasks = JSON.parse(JSON.stringify(rawTasks));
-  projectStartDate = localStorage.getItem('sd26_projectStart_v1') || projectStartDate || null;
-  projectEndDate = localStorage.getItem('sd26_projectEnd_v1') || projectEndDate || null;
-  updateDerivedFields();
-}
-function ensureUsableTasksForDashboard(){
-  if(isUsableTaskList(tasks)) return false;
-  console.warn('Dashboard task list was incomplete at render time; restoring built-in task list for display.');
-  localStorage.removeItem('sd26_tasks_v3');
-  resetTasksFromSeed();
-  const maps = buildMapsFromTasks();
-  statusMap = maps.statusMap;
-  notesMap = maps.notesMap;
-  return true;
-}
 function loadLocal(){
   try{
     const saved=localStorage.getItem('sd26_tasks_v3');
     if(saved){
-      const parsedTasks = parseUsableTaskList(saved);
-      if(parsedTasks){
-        tasks = parsedTasks;
-        projectStartDate = localStorage.getItem('sd26_projectStart_v1') || null;
-        projectEndDate = localStorage.getItem('sd26_projectEnd_v1') || null;
-      }else{
-        console.warn('Ignored incomplete sd26_tasks_v3 payload; using built-in task list.');
-        localStorage.removeItem('sd26_tasks_v3');
-        resetTasksFromSeed();
-      }
+      tasks = JSON.parse(saved);
+      projectStartDate = localStorage.getItem('sd26_projectStart_v1') || null;
+      projectEndDate = localStorage.getItem('sd26_projectEnd_v1') || null;
     }else{
       const s=localStorage.getItem('sd26_status');
       const n=localStorage.getItem('sd26_notes');
@@ -4600,7 +4667,6 @@ function loadLocal(){
       }
     }
   }catch(e){}
-  if(!isUsableTaskList(tasks)) resetTasksFromSeed();
   let maps = buildMapsFromTasks();
   statusMap = maps.statusMap;
   notesMap = maps.notesMap;
@@ -5272,7 +5338,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="20">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="21">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5289,7 +5355,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="20">
+        <td colspan="21">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5335,6 +5401,9 @@ function render(){
     const impactCell = `<td style="text-align:center">
       <input type="checkbox" ${isImpacted?'checked':''} onchange="toggleEndImpact('${t.id}',this.checked)" title="Mark end date as impacted" style="cursor:pointer;width:15px;height:15px;accent-color:#e65100">
     </td>`;
+    const impactAreaCell = editMode
+      ? `<td class="edit-cell"><input type="text" data-field="impactArea" value="${esc(t.impactArea||'')}" placeholder="Impact area" title="Manual impacted area for Morning Brief"></td>`
+      : `<td style="white-space:nowrap;color:${t.impactArea?'#1a3a5c':'#8aa4bd'};font-weight:${t.impactArea?'700':'400'}">${esc(t.impactArea||'—')}</td>`;
     const newStartCell = editMode
       ? `<td class="edit-cell"><input type="date" data-field="newStart" value="${esc(toDateInputValue(t.newStart)||'')}" title="New start date for delayed/rescheduled work"></td>`
       : `<td style="white-space:nowrap;color:${t.newStart?'#ffcc80':'#8aa4bd'};font-weight:${t.newStart?'700':'400'}">${displayDate(t.newStart)||'—'}</td>`;
@@ -5344,7 +5413,8 @@ function render(){
     const criticalCell = `<td style="text-align:center"><input type="checkbox" ${t.critical?'checked':''} onchange="toggleCritical('${t.id}',this.checked)" title="Mark this task as Critical for the dashboard" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828"></td>`;
     const notificationCell = `<td style="text-align:center"><input type="checkbox" ${t.notification?'checked':''} onchange="toggleNotification('${t.id}',this.checked)" title="Mark this task as requiring notification" style="cursor:pointer;width:15px;height:15px;accent-color:#1565c0"></td>`;
     const vendorOnsiteCell = `<td style="text-align:center"><input type="checkbox" ${t.vendorOnsite?'checked':''} onchange="toggleVendorOnsite('${t.id}',this.checked)" title="Mark vendor as onsite for this task" style="cursor:pointer;width:15px;height:15px;accent-color:#f0c040"></td>`;
-    const onHoldCell = `<td style="text-align:center"><input type="checkbox" ${t.onHold?'checked':''} onchange="toggleOnHold('${t.id}',this.checked)" title="Pause automatic progress while this task is on hold" style="cursor:pointer;width:15px;height:15px;accent-color:#5d6470"></td>`;
+    const holdPct = parseOnHoldProgress(t.onHoldProgress);
+    const onHoldCell = `<td style="text-align:center"><div style="display:flex;align-items:center;justify-content:center;gap:4px;min-width:82px"><input type="checkbox" ${t.onHold?'checked':''} onchange="toggleOnHold('${t.id}',this.checked)" title="Pause automatic progress while this task is on hold" style="cursor:pointer;width:15px;height:15px;accent-color:#5d6470">${t.onHold?`<input type="number" min="0" max="95" step="1" value="${holdPct===null?calculateTaskProgressPct(t,true,onHoldCutoffDate(t)):holdPct}" onchange="changeOnHoldProgress('${t.id}',this.value)" title="Manual hold progress %" style="width:46px;font-size:11px;padding:2px 3px;border:1px solid #9fb4c8;border-radius:4px;text-align:right"><span style="font-size:10px;color:#5d6470;font-weight:700">%</span>`:''}</div></td>`;
 
     rows+=`<tr class="${trClass}" data-id="${t.id}">
       <td class="id-col">${t.id}</td>
@@ -5370,16 +5440,24 @@ function render(){
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="20" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="21" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
   updateSaveButton();
 }
 
+function trackerCompletionDate(){
+  return document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+}
 function changeStatus(sel){
+  const previousStatus = statusMap[sel.dataset.id] || 'Pending';
   statusMap[sel.dataset.id]=sel.value;
   const task = tasks.find(t=>t.id===sel.dataset.id);
+  if(task){
+    if(sel.value === 'Complete' && previousStatus !== 'Complete') task.completedAt = task.completedAt || trackerCompletionDate();
+    if(sel.value !== 'Complete') task.completedAt = null;
+  }
   if(task && sel.value !== 'In Progress'){ task.onHold = false; task.onHoldDate = null; task.onHoldProgress = null; }
   updateDerivedFields();
   saveLocal();
@@ -5407,6 +5485,61 @@ function toggleNotification(id, checked){
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
   renderDashboard();
 }
+function setTaskImpactArea(id, currentValue){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  const next = prompt('Impacted Area', currentValue || task.impactArea || '');
+  if(next === null) return;
+  task.impactArea = String(next || '').trim();
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+function saveMorningBriefEditableCell(cell){
+  if(!cell || !cell.dataset) return;
+  const task = tasks.find(t=>t.id===cell.dataset.taskId);
+  if(!task) return;
+  const text = String(cell.textContent || '').trim();
+  if(text === String(cell.dataset.original || '').trim()) return;
+  if(cell.dataset.morningEdit === 'note'){
+    task.actionComment = text;
+  }else if(cell.dataset.morningEdit === 'date'){
+    const dates = text.match(/\d{1,2}\/\d{1,2}\/\d{2,4}|\d{4}-\d{1,2}-\d{1,2}/g) || [];
+    task.newStart = normalizeDateValue(dates[0] || '');
+    task.newEnd = normalizeDateValue(dates[1] || dates[0] || '');
+  }else{
+    return;
+  }
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+document.addEventListener('click', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit){
+    morningEdit.focus();
+    return;
+  }
+  const impactEdit = e.target.closest('[data-impact-area-edit]');
+  if(impactEdit){
+    setTaskImpactArea(impactEdit.dataset.taskId, '');
+  }
+});
+document.addEventListener('focusout', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit) saveMorningBriefEditableCell(morningEdit);
+});
+document.addEventListener('keydown', function(e){
+  const morningEdit = e.target.closest('[data-morning-edit]');
+  if(morningEdit && e.key === 'Enter'){
+    e.preventDefault();
+    morningEdit.blur();
+  }
+});
 function toggleVendorOnsite(id, checked){
   const task = tasks.find(t=>t.id===id);
   if(!task) return;
@@ -5428,6 +5561,19 @@ function toggleOnHold(id, checked){
     task.onHoldDate = null;
     task.onHoldProgress = null;
   }
+  updateDerivedFields();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  renderDashboard();
+  render();
+}
+function changeOnHoldProgress(id, value){
+  const task = tasks.find(t=>t.id===id);
+  if(!task) return;
+  const pct = parseOnHoldProgress(value);
+  task.onHold = true;
+  task.onHoldDate = normalizeDateValue(task.onHoldDate) || new Date().toISOString().slice(0,10);
+  task.onHoldProgress = pct === null ? calculateTaskProgressPct(task, true, onHoldCutoffDate(task)) : pct;
   updateDerivedFields();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
@@ -5464,7 +5610,12 @@ function collectEditedRows(){
       const field = el.dataset.field;
       let val = el.value;
       if(['start','end','newStart','newEnd'].includes(field)) val = val === '' ? null : normalizeDateValue(val);
-      if(field==='status') statusMap[id] = val || 'Pending';
+      if(field==='status'){
+        const previousStatus = statusMap[id] || task.status || 'Pending';
+        statusMap[id] = val || 'Pending';
+        if(statusMap[id] === 'Complete' && previousStatus !== 'Complete') task.completedAt = task.completedAt || trackerCompletionDate();
+        if(statusMap[id] !== 'Complete') task.completedAt = null;
+      }
       else if(field==='notes') notesMap[id] = val || '';
       else if(field==='actionComment') task.actionComment = val || '';
       else if(field==='assigned') task[field] = normalizeAssigneeText(val);
@@ -6104,9 +6255,188 @@ function setDashboardMode(mode){
   if(!panel) return;
   panel.classList.toggle('dash-mode-kpi', mode === 'kpi');
   panel.classList.toggle('dash-mode-morning', mode === 'morning');
-  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning');
+  panel.classList.toggle('dash-mode-weekly', mode === 'weekly');
+  panel.classList.toggle('dash-mode-huddle', mode !== 'kpi' && mode !== 'morning' && mode !== 'weekly');
   const title = document.getElementById('dashboardTitle');
-  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : 'Shutdown Executive Dashboard');
+  if(title) title.textContent = mode === 'kpi' ? 'Shutdown 2026 — KPI Dashboard' : (mode === 'morning' ? 'Daily Shutdown Morning Brief' : (mode === 'weekly' ? 'Shutdown Weekly Executive Summary' : 'Shutdown Executive Dashboard'));
+  if(mode === 'weekly' && typeof renderWeeklyExecutiveSummary === 'function') renderWeeklyExecutiveSummary();
+}
+
+const WEEKLY_SUMMARY_KEY = 'sd26_weekly_summary_v1';
+let weeklySummaryDirty = false;
+
+function weeklySummaryLines(value){
+  return String(value || '').split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+}
+
+function weeklyListHtml(value){
+  const lines = weeklySummaryLines(value);
+  return lines.length ? lines.map(line=>`<li>${esc(line)}</li>`).join('') : '<li style="color:#9fb4c8;font-style:italic">No items.</li>';
+}
+
+function getWeekRange(todayIso){
+  const base = new Date((todayIso || new Date().toISOString().slice(0,10)) + 'T00:00:00');
+  const day = base.getDay();
+  const monday = new Date(base);
+  monday.setDate(base.getDate() - ((day + 6) % 7));
+  const friday = new Date(monday);
+  friday.setDate(monday.getDate() + 4);
+  function iso(d){ return d.toISOString().slice(0,10); }
+  return {start:iso(monday), end:iso(friday)};
+}
+
+function taskDateInRange(t, range){
+  const candidates = [t.end, t.newEnd, t.start, t.newStart].map(normalizeDateValue).filter(Boolean);
+  return candidates.some(iso => iso >= range.start && iso <= range.end);
+}
+
+// Monday huddle cumulative completion baseline, split using the 7/6 report:
+// 52 total completed = 12 tracker tasks + 40 work orders.
+const WEEKLY_DONE_BASELINES = {
+  '2026-07-06': {tasks:12, workOrders:40, total:52}
+};
+
+function weeklyAutoSummaryData(){
+  try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
+  const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+  const range = getWeekRange(todayIso);
+  const leaf = tasks.filter(t=>!t.isParent);
+  const activeLeaf = leaf.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A');
+  const completeTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete');
+  const weekCompleteTasks = completeTasks.filter(t=>{
+    const completedAt = normalizeDateValue(t.completedAt);
+    if(completedAt) return completedAt >= range.start && completedAt <= range.end;
+    return taskDateInRange(t, range);
+  });
+  const inProgressTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='In Progress');
+  const holdTasks = activeLeaf.filter(t=>t.onHold === true);
+  const delayedTasks = activeLeaf.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed');
+  const lateTasks = activeLeaf.filter(t=>{
+    const endIso = normalizeDateValue(t.end);
+    const status = statusMap[t.id]||t.status||'Pending';
+    return endIso && endIso < todayIso && status !== 'Complete' && status !== 'Delayed';
+  });
+  const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
+  const pmData  = typeof woAllPmData === 'function' ? woAllPmData() : (typeof PM_DATA !== 'undefined' ? PM_DATA : []);
+  const calDone = calData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, calStatusMap)==='Done' : (calStatusMap[i]||'Pending')==='Done').length;
+  const pmDone = pmData.filter((r,i)=>typeof woRowStatus === 'function' ? woRowStatus(r, pmStatusMap)==='Done' : (pmStatusMap[i]||'Pending')==='Done').length;
+  const calWeekDone = calData.filter(r=>woRowStatus(r, calStatusMap)==='Done' && (()=>{ const d=woRowCompletedAt(r, calCompletedMap); return d && d>=range.start && d<=range.end; })()).length;
+  const pmWeekDone = pmData.filter(r=>woRowStatus(r, pmStatusMap)==='Done' && (()=>{ const d=woRowCompletedAt(r, pmCompletedMap); return d && d>=range.start && d<=range.end; })()).length;
+  const taskDone = completeTasks.length;
+  const totalWork = leaf.length + (typeof WO_DATA !== 'undefined' ? WO_DATA.length : calData.length) + (typeof PM_DATA !== 'undefined' ? PM_DATA.length : pmData.length);
+  const displayTotal = Math.max(totalWork, 559);
+  const doneTotal = taskDone + calDone + pmDone;
+  const weeklyBaseline = WEEKLY_DONE_BASELINES[range.start];
+  const weekTaskCount = weeklyBaseline ? Math.max(0, taskDone - weeklyBaseline.tasks) : weekCompleteTasks.length;
+  const weekDoneTotal = weeklyBaseline ? Math.max(0, doneTotal - weeklyBaseline.total) : null;
+  const datedWeekWorkOrders = calWeekDone + pmWeekDone;
+  const weekWorkOrders = weeklyBaseline ? Math.max(0, calDone + pmDone - weeklyBaseline.workOrders) : datedWeekWorkOrders;
+  const pct = displayTotal ? (doneTotal/displayTotal*100).toFixed(1).replace(/\.0$/,'') : '0';
+  const statusCounts = activeLeaf.reduce((acc,t)=>{
+    const s = statusMap[t.id] || t.status || 'Pending';
+    acc[s] = (acc[s]||0)+1;
+    return acc;
+  }, {});
+  const completedLines = weekCompleteTasks.slice(0,5).map(t=>`${t.id} ${t.task} completed`);
+  if(!completedLines.length) completedLines.push(`${weekCompleteTasks.length} tracker tasks completed this week`);
+  const changed = activeLeaf.filter(t=>normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd) || (t.notes||'').trim() || (t.actionComment||'').trim()).slice(0,5);
+  const changeLines = changed.map(t=>`${t.id} ${t.task}: ${t.actionComment || t.notes || 'date/status updated'}`);
+  if(!changeLines.length) changeLines.push('No major schedule changes recorded this week');
+  const nextFocus = activeLeaf.filter(t=>{
+    const startIso = normalizeDateValue(t.start);
+    return startIso && startIso > todayIso && startIso <= getWeekRange(new Date(new Date(todayIso+'T00:00:00').getTime()+7*86400000).toISOString().slice(0,10)).end && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
+  }).slice(0,5).map(t=>`${t.id} ${t.task} - ${displayDate(t.start) || 'TBD'}`);
+  if(!nextFocus.length) nextFocus.push('Confirm vendor readiness and close active maintenance windows');
+  const riskLines = delayedTasks.concat(lateTasks.filter(t=>!delayedTasks.some(d=>d.id===t.id))).slice(0,6).map(t=>`${t.id} ${t.task} - ${statusMap[t.id]||t.status||'Pending'}${t.actionComment ? ': '+t.actionComment : ''}`);
+  if(!riskLines.length) riskLines.push('No executive-level risks identified from current tracker data');
+  let systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || 0) || 0;
+  try{
+    if(!systemsOos && typeof renderDashboard === 'function') renderDashboard();
+    systemsOos = Number(document.getElementById('d-systems-oos')?.textContent || systemsOos) || systemsOos;
+  }catch(e){}
+  return {
+    todayIso, range, taskDone, calDone, pmDone, calWeekDone, pmWeekDone, weekTaskCount, weekWorkOrders, weekDoneTotal, doneTotal, displayTotal, pct,
+    weekCompleteTasks, inProgressTasks, holdTasks, delayedTasks, lateTasks, statusCounts, systemsOos,
+    summary:`Shutdown execution progressed this week with ${weekTaskCount} tracker tasks and ${weekWorkOrders} work orders completed (${weekDoneTotal === null ? weekTaskCount + weekWorkOrders : weekDoneTotal} total this week). Active work remains focused on maintenance closeout, vendor-dependent activities, and system return readiness. Current schedule risk is ${lateTasks.length} late and ${delayedTasks.length} delayed items.`,
+    completed:completedLines.join('\n'),
+    changes:changeLines.join('\n'),
+    next:nextFocus.join('\n'),
+    risks:riskLines.join('\n')
+  };
+}
+
+function loadWeeklySummarySaved(){
+  try{ return JSON.parse(localStorage.getItem(WEEKLY_SUMMARY_KEY) || '{}') || {}; }catch(e){ return {}; }
+}
+
+function setWeeklyTextarea(id, value){
+  const el = document.getElementById(id);
+  if(el && !weeklySummaryDirty) el.value = value || '';
+}
+
+function renderWeeklyExecutiveSummary(){
+  const auto = weeklyAutoSummaryData();
+  const saved = loadWeeklySummarySaved();
+  const savedSummaryIsLegacyAuto = /^Shutdown execution progressed this week with \d+ tracker tasks completed and \d+ total completed work items\./.test(saved.summary || '');
+  const data = {
+    summary: (!saved.summary || savedSummaryIsLegacyAuto) ? auto.summary : saved.summary,
+    completed: saved.completed || auto.completed,
+    changes: saved.changes || auto.changes,
+    next: saved.next || auto.next,
+    risks: saved.risks || auto.risks
+  };
+  const setText = (id,val)=>{ const el=document.getElementById(id); if(el) el.textContent=val; };
+  const setHtml = (id,val)=>{ const el=document.getElementById(id); if(el) el.innerHTML=val; };
+  setText('weeklySummaryMeta', 'Week ending ' + displayDate(auto.range.end));
+  setHtml('wk-overall', `${auto.doneTotal} / ${auto.displayTotal}<br>${auto.pct}% complete`);
+  setHtml('wk-completed', `${auto.weekTaskCount} tasks<br>${auto.weekWorkOrders} work orders done`);
+  setHtml('wk-active', `${auto.inProgressTasks.length} in progress<br>${auto.holdTasks.length} on hold`);
+  setHtml('wk-risk', `${auto.lateTasks.length} late<br>${auto.delayedTasks.length} delayed`);
+  setWeeklyTextarea('weeklySummaryText', data.summary);
+  setWeeklyTextarea('weeklyCompletedText', data.completed);
+  setWeeklyTextarea('weeklyChangesText', data.changes);
+  setWeeklyTextarea('weeklyNextText', data.next);
+  setWeeklyTextarea('weeklyRisksText', data.risks);
+  const previews = [
+    ['weeklyCompletedPreview', data.completed],
+    ['weeklyChangesPreview', data.changes],
+    ['weeklyNextPreview', data.next],
+    ['weeklyRisksPreview', data.risks]
+  ];
+  previews.forEach(([id,value])=>{ const el=document.getElementById(id); if(el) el.innerHTML = weeklyListHtml(value); });
+  const systemsRows = document.getElementById('weeklySystemsRows');
+  if(systemsRows){
+    systemsRows.innerHTML = `
+      <tr><td>OOS</td><td>${auto.systemsOos}</td><td>Shown until returned to service</td></tr>
+      <tr><td>In Progress</td><td>${auto.inProgressTasks.length}</td><td>Active tracker tasks</td></tr>
+      <tr><td>On Hold</td><td>${auto.holdTasks.length}</td><td>Progress frozen at hold time</td></tr>
+      <tr><td>Delayed</td><td>${auto.delayedTasks.length}</td><td>Requires weekly review if still open</td></tr>`;
+  }
+  const status = document.getElementById('weeklySummaryStatus');
+  if(status) status.textContent = saved.updatedAt ? 'Saved weekly summary loaded. Last saved: ' + new Date(saved.updatedAt).toLocaleString() : 'Auto-generated from current tracker data. Edit and save if needed.';
+}
+
+function saveWeeklySummary(){
+  const data = {
+    summary: document.getElementById('weeklySummaryText')?.value || '',
+    completed: document.getElementById('weeklyCompletedText')?.value || '',
+    changes: document.getElementById('weeklyChangesText')?.value || '',
+    next: document.getElementById('weeklyNextText')?.value || '',
+    risks: document.getElementById('weeklyRisksText')?.value || '',
+    updatedAt: new Date().toISOString()
+  };
+  try{ localStorage.setItem(WEEKLY_SUMMARY_KEY, JSON.stringify(data)); }catch(e){}
+  weeklySummaryDirty = false;
+  renderWeeklyExecutiveSummary();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
+
+function resetWeeklySummaryToAuto(){
+  if(!confirm('Reset weekly summary text to auto-generated content?')) return;
+  try{ localStorage.removeItem(WEEKLY_SUMMARY_KEY); }catch(e){}
+  weeklySummaryDirty = false;
+  renderWeeklyExecutiveSummary();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
 }
 
 function loadHtml2CanvasForMorningBrief(){
@@ -6250,7 +6580,6 @@ function showTab(tab, btn){
 }
 
 function renderDashboard(){
-  if(typeof ensureUsableTasksForDashboard === 'function') ensureUsableTasksForDashboard();
   const leaf = tasks.filter(t=>!t.isParent);
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
@@ -6288,8 +6617,8 @@ function renderDashboard(){
     return new Date(startIso + 'T00:00:00') <= todayDate;
   }
   function taskOverlapsCurrentWorkWindow(t){
-    const startIso = normalizeDateValue(t.start);
-    const endIso = normalizeDateValue(t.end) || startIso;
+    const startIso = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || startIso;
     if(!startIso && !endIso) return true;
     const startDate = new Date((startIso || endIso) + 'T00:00:00');
     const endDate = new Date((endIso || startIso) + 'T00:00:00');
@@ -6354,6 +6683,7 @@ function renderDashboard(){
     return calculateTaskProgressPct(t, ignoreHold);
   }
 
+  const progressTotal = activeLeaf.length;
   const progressDone = statusCounts.Complete || 0;
   const progressPct = progressTotal ? Math.round(activeLeaf.reduce((sum,t)=>sum + taskProgressPct(t), 0) / progressTotal) : 0;
   const overdueTasks = activeLeaf.filter(t=>{
@@ -6411,7 +6741,7 @@ function renderDashboard(){
   const dueTodayTasks = activeLeaf.filter(t=>taskTouchesToday(t) && taskStatus(t)!=='N/A');
   const completedTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)==='Complete');
   const remainingTodayTasks = dueTodayTasks.filter(t=>taskStatus(t)!=='Complete');
-  const lateTasks = overdueTasks;
+  const lateTasks = riskLateTasks;
   // Critical is manually marked in the Task Tracker Critical column.
   // It no longer comes automatically from Delayed/overdue status because that was not accurate enough.
   const criticalTasks = activeLeaf.filter(t=>t.critical === true);
@@ -6652,12 +6982,10 @@ function renderDashboard(){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     return found ? found.def.system : (t.section||'—');
   }
-  function huddleImpactedAreaForTask(t){
+  function huddleAreaForTask(t){
+    if(t && String(t.impactArea || '').trim()) return String(t.impactArea).trim();
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     return found ? found.def.name : (t.section||'—');
-  }
-  function huddleImpactDateForTask(t){
-    return displayDate(t.start) || displayDate(t.end) || 'TBD';
   }
   function huddleStatusHtml(st){
     return `<span class="huddle-status ${pillClass(st)}">${st}</span>`;
@@ -6723,13 +7051,15 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
+      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
       return `<tr>
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
         <td class="${vendorOnsite?'vendor-onsite':''}">${vendor}</td>
-        <td>${displayDate(t.start)||'TBD'}</td>
-        <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+        <td>${displayStart}</td>
+        <td>${displayTarget}</td>
         <td>${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
@@ -6792,7 +7122,6 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="7" style="color:#9fb4c8;font-style:italic">No upcoming scheduled tasks in the next 7 days.</td></tr>';
   }
-  renderMorningBrief();
 
 
   function renderMorningBrief(){
@@ -6802,13 +7131,63 @@ function renderDashboard(){
     setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
     setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
     setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
-    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
+    setHtml('mb-risk-summary', `Late: ${riskLateTasks.length}<br>Delayed: ${riskDelayedTasks.length}<br>Critical: ${criticalTasks.length}`);
     setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
 
-    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
+    function systemTargetNormalDate(s){
+      const trackerActive = taskTrackerOosWindow(s.items);
+      if(trackerActive && trackerActive.startupIso) return displayDate(trackerActive.startupIso);
+      const releaseTask = s.items
+        .filter(t=>isFullRelTask(t) || isCondRelTask(t) || /startup|start[-\s]*up|return/i.test(t.task||''))
+        .sort((a,b)=>{
+          const ad = normalizeDateValue(a.newEnd) || normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+          const bd = normalizeDateValue(b.newEnd) || normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+          return bd.localeCompare(ad);
+        })[0];
+      const activeTask = s.items
+        .filter(t=>isInProgress(t) || isDelayed(t))
+        .sort((a,b)=>{
+          const ad = normalizeDateValue(a.newEnd) || normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+          const bd = normalizeDateValue(b.newEnd) || normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
+          return bd.localeCompare(ad);
+        })[0];
+      const dateVal = (releaseTask && (releaseTask.newEnd || releaseTask.end || releaseTask.start)) || (activeTask && (activeTask.newEnd || activeTask.end || activeTask.start));
+      return displayDate(dateVal) || 'TBD';
+    }
+    function gowningSuspendTargetDate(areaKey){
+      const areaRe = areaKey === 'dp' ? /\bDP\b|DP\s*MFG/i : /\bDS\b|DS\s*MFG/i;
+      const releaseIdRe = areaKey === 'dp' ? /^13\.01\./ : /^13\.02\./;
+      const primaryReleaseId = areaKey === 'dp' ? '13.01.01' : '13.02.01';
+      const primaryReleaseTask = tasks.find(t=>String(t.id || '') === primaryReleaseId);
+      if(primaryReleaseTask){
+        const primaryDate = normalizeDateValue(primaryReleaseTask.newStart) || normalizeDateValue(primaryReleaseTask.start) || normalizeDateValue(primaryReleaseTask.newEnd) || normalizeDateValue(primaryReleaseTask.end);
+        if(primaryDate) return displayDate(primaryDate);
+      }
+      const scoped = activeLeaf.filter(t=>{
+        const text = [t.id,t.task,t.section,t.notes,t.actionComment,t.impactArea].join(' ');
+        return areaRe.test(text) || releaseIdRe.test(String(t.id || ''));
+      });
+      const areaReleaseCleaning = scoped
+        .filter(t=>releaseIdRe.test(String(t.id || '')) && /3x\s*clean|cleaning/i.test([t.task,t.notes,t.actionComment].join(' ')))
+        .map(t=>normalizeDateValue(t.newStart) || normalizeDateValue(t.start) || normalizeDateValue(t.newEnd) || normalizeDateValue(t.end))
+        .filter(Boolean)
+        .sort();
+      if(areaReleaseCleaning.length) return displayDate(areaReleaseCleaning[0]);
+
+      const suspendWindows = scoped
+        .filter(t=>{
+          const text = [t.id,t.task,t.section,t.notes,t.actionComment,t.impactArea].join(' ');
+          return /(suspend|blue\s*scrub|routine\s*clean|return\s*to\s*clean|cleaning)/i.test(text);
+        })
+        .map(t=>normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || normalizeDateValue(t.newStart) || normalizeDateValue(t.start))
+        .filter(Boolean)
+        .sort();
+      return suspendWindows.length ? displayDate(suspendWindows[0]) : 'TBD';
+    }
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${systemTargetNormalDate(s)}</td></tr>`);
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
+    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>${gowningSuspendTargetDate('dp')}</td></tr>`);
+    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>${gowningSuspendTargetDate('ds')}</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
     const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
@@ -6819,7 +7198,9 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
+      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
+      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayStart}</td><td>${displayTarget}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
     }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
 
     const commItems = [];
@@ -6827,101 +7208,17 @@ function renderDashboard(){
     notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
     setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
       const t=item.task;
-      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(huddleImpactedAreaForTask(t))}</td><td>${huddleImpactDateForTask(t)}</td></tr>`;
+      const sent = t.notification ? '✓' : '—';
+      const impactedArea = huddleAreaForTask(t);
+      const impactDate = displayDate(t.newStart) || displayDate(t.start) || displayDate(t.end) || 'TBD';
+      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${impactDate}</td></tr>`;
     }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
 
     const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
       const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
-      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
-    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
-  }
-  renderMorningBrief();
-
-
-  function renderMorningBrief(){
-    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
-    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
-    const vendorOnsiteTasks = activeLeaf.filter(t=>isVendorOnsite(t) && huddleVendor(t) !== '—');
-    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
-    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
-    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
-    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
-    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
-
-    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
-    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
-    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
-
-    const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
-    setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
-      const st = statusMap[t.id] || t.status || 'Pending';
-      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
-      const progressPct = taskProgressPct(t);
-      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
-      const vendor = huddleVendor(t);
-      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
-    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
-
-    const commItems = [];
-    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
-    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
-    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
-      const t=item.task;
-      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(huddleImpactedAreaForTask(t))}</td><td>${huddleImpactDateForTask(t)}</td></tr>`;
-    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
-
-    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
-    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
-      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
-      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
-    }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
-  }
-  renderMorningBrief();
-
-
-  function renderMorningBrief(){
-    function setHtml(id, html){ const el=document.getElementById(id); if(el) el.innerHTML=html; }
-    const notificationTasks = activeLeaf.filter(t=>t.notification === true);
-    const vendorOnsiteTasks = activeLeaf.filter(t=>isVendorOnsite(t) && huddleVendor(t) !== '—');
-    setText('morningBriefMeta', 'Date: ' + displayDate(todayIso) + ' | Time: ' + new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
-    setHtml('mb-todays-work', `Due: ${dueTodayTasks.length}<br>In Progress: ${statusCounts['In Progress']||0}<br>Remaining: ${remainingTodayTasks.length}`);
-    setHtml('mb-system-summary', `OOS: ${document.getElementById('d-systems-oos')?.textContent||0}<br>Returning: ${document.getElementById('d-systems-returning')?.textContent||0}<br>Normal: ${document.getElementById('d-systems-normal')?.textContent||0}`);
-    setHtml('mb-risk-summary', `Late: ${lateTasks.length}<br>Delayed: ${delayedTasks.length}<br>Critical: ${criticalTasks.length}`);
-    setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
-
-    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${esc(s.reason||'—')}</td></tr>`);
-    const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
-    if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>Access Condition</td></tr>`);
-    if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>Access Condition</td></tr>`);
-    setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
-
-    const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
-    setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
-      const st = statusMap[t.id] || t.status || 'Pending';
-      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
-      const progressPct = taskProgressPct(t);
-      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
-      const vendor = huddleVendor(t);
-      const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayDate(t.start)||'TBD'}</td><td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
-    }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
-
-    const commItems = [];
-    criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
-    notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
-    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
-      const t=item.task;
-      return `<tr><td>${item.type}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${esc(huddleImpactedAreaForTask(t))}</td><td>${huddleImpactDateForTask(t)}</td></tr>`;
-    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
-
-    const noteItems = activeLeaf.filter(t=>delayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
-    setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
-      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
-      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td>${delayedNewDate(t)}</td><td>${esc(note)}</td></tr>`;
+      const newDateText = delayedNewDate(t);
+      return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="date" data-task-id="${esc(t.id)}" data-original="${esc(newDateText)}" title="Click to edit new start / target date">${newDateText}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="note" data-task-id="${esc(t.id)}" data-original="${esc(note)}" title="Click to edit Morning Brief note">${esc(note)}</td></tr>`;
     }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
   }
   renderMorningBrief();
@@ -7914,12 +8211,7 @@ function applySd26SharedData(payload, opts){
     const data = payload.data || payload;
     if(!data || typeof data !== 'object') throw new Error('Invalid shared data format');
     Object.keys(data).forEach(k => {
-      if(k.indexOf('sd26_') !== 0 || data[k] == null) return;
-      if(k === 'sd26_tasks_v3' && !parseUsableTaskList(data[k])){
-        console.warn('Skipped incomplete shared JSON sd26_tasks_v3 payload.');
-        return;
-      }
-      localStorage.setItem(k, String(data[k]));
+      if(k.indexOf('sd26_') === 0 && data[k] != null) localStorage.setItem(k, String(data[k]));
     });
     if(!opts.silent){
       alert('Shared data loaded. The tracker will refresh now.');
@@ -7960,12 +8252,7 @@ async function tryAutoLoadSharedData(){
     if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
     if(payload && payload.data){
       Object.keys(payload.data).forEach(k => {
-        if(k.indexOf('sd26_') !== 0 || payload.data[k] == null) return;
-        if(k === 'sd26_tasks_v3' && !parseUsableTaskList(payload.data[k])){
-          console.warn('Skipped incomplete auto-loaded sd26_tasks_v3 payload.');
-          return;
-        }
-        localStorage.setItem(k, String(payload.data[k]));
+        if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
       });
       if(incoming) localStorage.setItem('sd26_shared_last_loaded', incoming);
       // Avoid loops: mark the URL once without navigating, then render in place.
@@ -8007,7 +8294,6 @@ let firebaseSharedApi = null;
 let firebaseSharedSavePending = false;
 let firebaseSharedApplyingRemote = false;
 let firebaseSharedLoadedRemote = false;
-let firebaseSharedTaskPayloadRejected = false;
 
 function setFirebaseSyncStatus(text, cls, title){
   const el = document.getElementById('firebaseSyncStatus');
@@ -8045,24 +8331,14 @@ function applyFirebaseSharedPayload(payload, opts){
   opts = opts || {};
   if(!payload || !payload.data) return false;
   firebaseSharedApplyingRemote = true;
-  firebaseSharedTaskPayloadRejected = false;
   Object.keys(payload.data).forEach(k => {
-    if(k.indexOf('sd26_') !== 0 || payload.data[k] == null) return;
-    if(k === 'sd26_tasks_v3' && !parseUsableTaskList(payload.data[k])){
-      firebaseSharedTaskPayloadRejected = true;
-      console.warn('Skipped incomplete Firebase sd26_tasks_v3 payload to avoid blank dashboard.');
-      if(!parseUsableTaskList(localStorage.getItem('sd26_tasks_v3'))) localStorage.removeItem('sd26_tasks_v3');
-      return;
-    }
-    localStorage.setItem(k, String(payload.data[k]));
+    if(k.indexOf('sd26_') === 0 && payload.data[k] != null) localStorage.setItem(k, String(payload.data[k]));
   });
   if(payload.generatedAt) localStorage.setItem(FIREBASE_LAST_LOADED_KEY, payload.generatedAt);
   firebaseSharedLoadedRemote = true;
   refreshSd26FromLocalStorage();
   firebaseSharedApplyingRemote = false;
-  if(firebaseSharedTaskPayloadRejected){
-    setFirebaseSyncStatus('Firebase: task data blocked', 'warn', 'Incomplete task data was ignored so the dashboard stays visible.');
-  }else if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
+  if(!opts.silent) setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest shared data loaded.');
   return true;
 }
 
@@ -8076,12 +8352,6 @@ async function loadFirebaseSharedData(){
 
 function queueFirebaseSharedSave(){
   if(firebaseSharedApplyingRemote) return;
-  if(firebaseSharedTaskPayloadRejected){
-    firebaseSharedSavePending = false;
-    setFirebaseSyncStatus('Firebase: save blocked', 'error', 'Incomplete Firebase task data was detected. Save blocked to avoid overwriting shared data.');
-    alert('Save blocked: Firebase task data looked incomplete, so the dashboard used the built-in task list for display only. Shared data was not overwritten.');
-    return;
-  }
   if(!firebaseSharedApi || !firebaseSharedLoadedRemote){
     firebaseSharedSavePending = true;
     setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Waiting for latest Firebase data before saving.');
@@ -8112,11 +8382,6 @@ function queueFirebaseSharedSave(){
     async function save(){
       try{
         setFirebaseSyncStatus('Firebase: saving', 'saving', 'Saving shared data to Firestore...');
-        if(firebaseSharedTaskPayloadRejected){
-          setFirebaseSyncStatus('Firebase: save blocked', 'error', 'Incomplete Firebase task data was detected. Save blocked to avoid overwriting shared data.');
-          alert('Save blocked: Firebase task data looked incomplete, so shared data was not overwritten.');
-          return false;
-        }
         const currentSnap = await firebaseWithTimeout(fsMod.getDoc(sharedRef), 'Firebase save check');
         const current = currentSnap.exists() ? currentSnap.data() : null;
         const remoteRev = current && current.generatedAt ? current.generatedAt : '';
@@ -9934,229 +10199,6 @@ function handleDailyHuddleUrlParams(){
         script.onerror=()=>reject(new Error('html2canvas load failed'));
         document.head.appendChild(script);
       });
-    }
-
-    function emailDate(v){
-      try{ if(typeof toDateInputValue==='function') v=toDateInputValue(v); }catch(e){}
-      if(!v) return '';
-      var d=new Date(String(v)+'T00:00:00');
-      if(isNaN(d)) return String(v);
-      return (d.getMonth()+1)+'/'+d.getDate()+'/'+d.getFullYear();
-    }
-    function emailTimelinePanel(){
-      function xl(n){
-        if(n==null||n==='') return null;
-        var num=Number(n);
-        if(!isNaN(num)&&num>40000){ var d=new Date(1899,11,30); d.setDate(d.getDate()+num); return d; }
-        if(typeof n==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(n)) return new Date(n+'T00:00:00');
-        if(typeof n==='string'&&n.indexOf('/')>=0){ var p=n.split('/'); if(p.length===3) return new Date(p[2]+'-'+p[0].padStart(2,'0')+'-'+p[1].padStart(2,'0')+'T00:00:00'); }
-        return null;
-      }
-      function md(d){ var M=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return d?M[d.getMonth()]+' '+d.getDate():''; }
-      function daysBetween(a,b){ return Math.floor((a-b)/86400000); }
-      var allT=typeof tasks!=='undefined'?tasks:[];
-      var selected=allT.filter(function(t){ return !t.isParent && (timelineDownMap[t.id]!=null || timelineStartupMap[t.id]!=null); }).map(function(t){
-        var parentId=String(t.id).split('.')[0];
-        var parent=allT.find(function(p){ return p.isParent && String(p.id)===parentId; });
-        return {task:t,parent:parent,parentId:parentId,downD:timelineDownMap[t.id]!=null?xl(timelineDownMap[t.id]):null,upD:timelineStartupMap[t.id]!=null?xl(timelineStartupMap[t.id]):null};
-      }).filter(function(r){ return r.downD || r.upD; }).sort(function(a,b){
-        var pa=Number(a.parentId), pb=Number(b.parentId);
-        if(pa!==pb) return pa-pb;
-        var da=a.downD||a.upD, db=b.downD||b.upD;
-        return da-db || String(a.task.id).localeCompare(String(b.task.id), undefined, {numeric:true});
-      });
-      if(!selected.length){
-        return panel('System Down / Start-Up Timeline', '<div style="padding:10px 12px;color:#66788a;font-size:12px;font-style:italic;">No selected Down / Start-Up timeline items.</div>');
-      }
-      var minD=null, maxD=null;
-      selected.forEach(function(r){ [r.downD,r.upD].forEach(function(d){ if(!d) return; if(!minD||d<minD) minD=new Date(d); if(!maxD||d>maxD) maxD=new Date(d); }); });
-      var rS=new Date(minD); rS.setDate(rS.getDate()-3);
-      var rE=new Date(maxD); rE.setDate(rE.getDate()+3);
-      var dArr=[]; for(var d=new Date(rS); d<=rE; d.setDate(d.getDate()+1)) dArr.push(new Date(d));
-      var secC={'UTILITIES SYSTEM':'#1565c0','PROCESS EQUIPMENT':'#7b1fa2','AREA RELEASE':'#2e7d32','PROJECTS':'#e65100'};
-      var lightC={'UTILITIES SYSTEM':'#9fc5f8','PROCESS EQUIPMENT':'#d5a6e6','AREA RELEASE':'#b6d7a8','PROJECTS':'#f9cb9c'};
-      var todayD=new Date(); todayD.setHours(0,0,0,0);
-      var dayW=16;
-      var totalW=dArr.length*dayW;
-      var header='<tr><td style="width:360px;background:#1a3a5c;color:#f0c040;padding:6px 8px;border-right:2px solid #405a75;font-size:10px;font-weight:bold;white-space:nowrap;">Task / Item</td>'+
-        '<td style="width:'+totalW+'px;background:#142d47;color:#cde;padding:6px 8px;font-size:10px;font-weight:bold;white-space:nowrap;">'+esc(md(rS)+' - '+md(rE))+' &nbsp; <span style="color:#ffb199;">Today</span></td></tr>'+
-        '<tr><td style="width:360px;background:#102841;border-right:2px solid #405a75;border-bottom:1px solid #203a55;">&nbsp;</td>'+
-        dArr.map(function(d){ var isToday=d.getTime()===todayD.getTime(); return '<td style="width:'+dayW+'px;background:'+(isToday?'#ff5722':'#102841')+';color:'+(isToday?'#fff':'#cde')+';font-size:8px;font-weight:bold;text-align:center;line-height:16px;border-left:1px solid #24425f;border-bottom:1px solid #203a55;">'+d.getDate()+'</td>'; }).join('')+'</tr>';
-      function spacer(cols){ return cols>0 ? '<td colspan="'+cols+'" style="height:22px;background:#0f2236;font-size:1px;line-height:1px;">&nbsp;</td>' : ''; }
-      function segment(cols,bg,content,fg){
-        if(cols<=0) return '';
-        return '<td colspan="'+cols+'" style="height:22px;background:'+bg+';color:'+(fg||'#fff')+';font-size:9px;font-weight:bold;text-align:center;line-height:22px;white-space:nowrap;">'+(content||'&nbsp;')+'</td>';
-      }
-      function timelineCells(r,sc,lc){
-        var todayIdx=(todayD>=rS&&todayD<=rE)?daysBetween(todayD,rS):null;
-        if(r.downD&&r.upD){
-          var first=r.downD<=r.upD?r.downD:r.upD, last=r.downD<=r.upD?r.upD:r.downD;
-          var firstIdx=Math.max(0, daysBetween(first,rS));
-          var lastIdx=Math.min(dArr.length-1, daysBetween(last,rS));
-          var before=firstIdx, width=lastIdx-firstIdx+1, after=dArr.length-lastIdx-1;
-          var label='▼ '+md(r.downD)+(width>5?'     ▲ '+md(r.upD):'');
-          var html=spacer(before);
-          if(todayIdx!=null && todayIdx>firstIdx && todayIdx<=lastIdx){
-            var past=todayIdx-firstIdx;
-            var future=lastIdx-todayIdx+1;
-            html+=segment(past,lc,label);
-            html+=segment(future,sc,width>5?'▲ '+md(r.upD):'');
-          }else{
-            html+=segment(width,(last<todayD?lc:sc),label);
-          }
-          html+=spacer(after);
-          return html;
-        }
-        var markerD=r.downD||r.upD;
-        var idx=Math.max(0, Math.min(dArr.length-1, daysBetween(markerD,rS)));
-        var color=r.downD?'#e53935':'#43a047';
-        var symbol=r.downD?'▼':'▲';
-        return spacer(idx)+segment(1, markerD<todayD?'#9fb4c8':color, symbol)+spacer(dArr.length-idx-1);
-      }
-      var rows=selected.map(function(r,idx){
-        var sc=secC[r.task.section]||'#1565c0', lc=lightC[r.task.section]||'#9fc5f8';
-        var parentLabel=r.parent ? r.parent.task : (r.task.section||'System');
-        var label='<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.id)+' <span style="color:#f0c040;">'+esc(parentLabel)+'</span></div>'+
-          '<div style="font-size:10px;font-weight:bold;color:#fff;line-height:1.2;white-space:nowrap;">'+esc(r.task.task||'')+'</div>';
-        return '<tr><td style="width:360px;background:'+(idx%2?'#17304a':'#102841')+';border-left:5px solid '+sc+';border-right:2px solid #405a75;border-bottom:1px solid #203a55;padding:4px 8px;">'+label+'</td>'+
-          '<td style="width:'+totalW+'px;background:#0f2236;border-bottom:1px solid #203a55;padding:0;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+totalW+'px;"><tr>'+timelineCells(r,sc,lc)+'</tr></table></td></tr>';
-      }).join('');
-      var legend='<div style="padding:6px 8px;background:#0f2236;color:#cde;font-size:10px;">▼ Down &nbsp; ▲ Start-Up &nbsp; Bars use section colors; past dates use lighter color.</div>';
-      return panel('System Down / Start-Up Timeline', '<div style="background:#0f2236;padding:8px;overflow-x:auto;max-width:100%;"><table role="presentation" cellspacing="0" cellpadding="0" style="border-collapse:collapse;table-layout:fixed;width:'+(360+totalW)+'px;min-width:900px;">'+header+rows+'</table>'+legend+'</div>');
-    }
-    async function ensureHtml2Canvas(){
-      if(window.html2canvas) return window.html2canvas;
-      return await new Promise((resolve,reject)=>{
-        const existing=document.querySelector('script[data-huddle-html2canvas="1"]');
-        if(existing){
-          existing.addEventListener('load',()=>resolve(window.html2canvas), {once:true});
-          existing.addEventListener('error',()=>reject(new Error('html2canvas load failed')), {once:true});
-          return;
-        }
-        const script=document.createElement('script');
-        script.src='https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
-        script.async=true;
-        script.dataset.huddleHtml2canvas='1';
-        script.onload=()=>resolve(window.html2canvas);
-        script.onerror=()=>reject(new Error('html2canvas load failed'));
-        document.head.appendChild(script);
-      });
-    }
-
-    function canvasToPngBlob(canvas){
-      return new Promise((resolve,reject)=>{
-        canvas.toBlob(blob=>blob?resolve(blob):reject(new Error('PNG render failed')), 'image/png');
-      });
-    }
-
-    async function renderDailyHuddleHtmlToPngBlob(html){
-      setExportStatus('Rendering dashboard PNG...');
-      const width=1400;
-      const parser=new DOMParser();
-      const doc=parser.parseFromString(html, 'text/html');
-      const wrap=document.createElement('div');
-      wrap.style.position='fixed';
-      wrap.style.left='-10000px';
-      wrap.style.top='0';
-      wrap.style.width=width+'px';
-      wrap.style.background='#eef2f6';
-      wrap.style.zIndex='-1';
-      wrap.innerHTML=doc.body ? doc.body.innerHTML : html;
-      document.body.appendChild(wrap);
-      try{
-        await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
-        const height=Math.max(800, Math.ceil(wrap.scrollHeight || wrap.offsetHeight || 1200));
-        try{
-          const h2c=await ensureHtml2Canvas();
-          if(typeof h2c==='function'){
-            const canvas=await h2c(wrap, {backgroundColor:'#eef2f6', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height});
-            return await canvasToPngBlob(canvas);
-          }
-        }catch(primaryErr){
-          console.warn('html2canvas PNG render failed; trying SVG fallback', primaryErr);
-        }
-        const clone=wrap.cloneNode(true);
-        clone.setAttribute('xmlns','http://www.w3.org/1999/xhtml');
-        clone.style.position='static';
-        clone.style.left='auto';
-        clone.style.top='auto';
-        clone.style.zIndex='auto';
-        const xhtml=new XMLSerializer().serializeToString(clone);
-        const svg='<svg xmlns="http://www.w3.org/2000/svg" width="'+width+'" height="'+height+'"><foreignObject x="0" y="0" width="100%" height="100%">'+xhtml+'</foreignObject></svg>';
-        const svgBlob=new Blob([svg], {type:'image/svg+xml;charset=utf-8'});
-        const url=URL.createObjectURL(svgBlob);
-        try{
-          const img=new Image();
-          const loaded=new Promise((resolve,reject)=>{ img.onload=resolve; img.onerror=reject; });
-          img.src=url;
-          await loaded;
-          const canvas=document.createElement('canvas');
-          canvas.width=width;
-          canvas.height=height;
-          const ctx=canvas.getContext('2d');
-          ctx.fillStyle='#eef2f6';
-          ctx.fillRect(0,0,width,height);
-          ctx.drawImage(img,0,0);
-          return await canvasToPngBlob(canvas);
-        }finally{
-          URL.revokeObjectURL(url);
-        }
-      }finally{
-        wrap.remove();
-      }
-    }
-
-    function blobToBase64(blob){
-      return new Promise(function(resolve,reject){
-        var reader=new FileReader();
-        reader.onload=function(){
-          var result=String(reader.result||'');
-          resolve(result.indexOf(',')>=0 ? result.split(',')[1] : result);
-        };
-        reader.onerror=function(){ reject(reader.error || new Error('Could not read dashboard PNG.')); };
-        reader.readAsDataURL(blob);
-      });
-    }
-
-    async function saveDashboardPngToPowerAutomateOrDownload(blob, filename){
-      var key='sd26_power_automate_dashboard_endpoint_v1';
-      var defaultEndpoint='https://default48a554d384034f70b3609b01ba297b.36.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/b9cad4ea38a2450a872d41ac4ae1eb51/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=aDAb8pYxG-Sm8A0x-mAxK2sawP0NKuKchFpNv-GW6WE';
-      var endpoint='';
-      try{ endpoint=localStorage.getItem(key)||''; }catch(e){}
-      endpoint=String(endpoint||defaultEndpoint||'').trim();
-      if(endpoint.indexOf('sig=')<0) endpoint=defaultEndpoint;
-      try{ if(endpoint) localStorage.setItem(key, endpoint); }catch(e){}
-      try{
-        if(!endpoint) throw new Error('Power Automate endpoint is not configured.');
-        setExportStatus('Sending dashboard PNG to Power Automate...');
-        var fileContentBase64=await blobToBase64(blob);
-        var res=await fetch(endpoint, {
-          method:'POST',
-          mode:'cors',
-          headers:{'Content-Type':'application/json'},
-          body:JSON.stringify({
-            fileName:filename,
-            contentType:blob.type || 'image/png',
-            fileContentBase64:fileContentBase64,
-            generatedAt:new Date().toISOString(),
-            source:'shutdown-dashboard'
-          })
-        });
-        if(res.ok || res.status===200 || res.status===201 || res.status===202 || res.status===204){
-          setExportStatus('Dashboard PNG saved through Power Automate');
-          setTimeout(function(){setExportStatus('');}, 3000);
-          return true;
-        }
-        var errText='';
-        try{ errText=await res.text(); }catch(readErr){}
-        throw new Error('Power Automate save failed: HTTP '+res.status+(errText ? ' - '+errText.slice(0,240) : ''));
-      }catch(e){
-        console.warn(e);
-        setExportStatus('Power Automate save failed; check Flow run history');
-        setTimeout(function(){setExportStatus('');}, 5000);
-        alert('Dashboard PNG was not downloaded locally. Power Automate save failed. Check the Flow run history and browser console for details.');
-      }
-      return false;
     }
 
     function emailDate(v){
