@@ -596,6 +596,20 @@ tr.editing{background:#fffceb}
 .dash-mode-weekly .huddle-table td{font-size:16px;line-height:1.45}
 .huddle-middle-layout.weekly-status-layout{grid-template-columns:minmax(0,2fr) minmax(280px,.8fr)}
 .weekly-note{font-size:11px;color:#9fb4c8;font-weight:800}
+.weekly-plan-execution-card{--wpe-color:#39b968;--wpe-soft:#143d2a;--wpe-border:#4fbf78;--wpe-glow:rgba(57,185,104,.24);display:grid;grid-template-columns:minmax(220px,1.15fr) repeat(2,minmax(105px,.42fr)) minmax(220px,.8fr);align-items:center;gap:14px;background:linear-gradient(105deg,var(--wpe-soft),#132b43 72%);border:1px solid var(--wpe-border);border-left:10px solid var(--wpe-color);border-radius:10px;padding:14px 18px;margin-bottom:14px;box-shadow:0 6px 18px rgba(0,0,0,.18);color:#fff;break-inside:avoid;page-break-inside:avoid}
+.weekly-plan-execution-card.state-yellow{--wpe-color:#f0b429;--wpe-soft:#4a3513;--wpe-border:#d99a19;--wpe-glow:rgba(240,180,41,.24)}
+.weekly-plan-execution-card.state-red{--wpe-color:#ff6b61;--wpe-soft:#4b1f24;--wpe-border:#e05247;--wpe-glow:rgba(255,107,97,.24)}
+.weekly-plan-execution-title{font-size:15px;font-weight:900;letter-spacing:.07em;text-transform:uppercase}
+.weekly-plan-execution-week{font-size:11px;color:#cde;font-weight:800;margin-top:4px}
+.weekly-plan-execution-metric{border-left:1px solid rgba(255,255,255,.17);padding-left:14px}
+.weekly-plan-execution-label{font-size:10px;color:#cde;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.weekly-plan-execution-value{font-size:30px;line-height:1;font-weight:900;color:#fff}
+.weekly-plan-execution-status{display:flex;align-items:center;gap:12px;justify-content:flex-end;min-width:0}
+.weekly-plan-execution-signal{width:22px;height:22px;flex:0 0 22px;border-radius:50%;background:var(--wpe-color);box-shadow:0 0 0 7px var(--wpe-glow)}
+.weekly-plan-execution-state{font-size:20px;line-height:1.05;font-weight:950;color:var(--wpe-color);text-transform:uppercase}
+.weekly-plan-execution-gap{font-size:11px;color:#d8e8f8;font-weight:800;margin-top:4px}
+.dash-mode-morning>.shared-report-card,.dash-mode-weekly>.shared-report-card{display:none!important}
+@media(max-width:900px){.weekly-plan-execution-card{grid-template-columns:1fr 1fr}.weekly-plan-execution-status{justify-content:flex-start}.weekly-plan-execution-metric{border-left:0;padding-left:0}}
 .morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
 .morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
 .morning-export-capture .morning-title{font-size:26px!important;letter-spacing:.06em!important}
@@ -3830,6 +3844,12 @@ APPENDIX 6.5B)</div>
         <button id="tl-edit-btn" onclick="toggleTlEdit()" style="font-size:12px;font-weight:700;padding:5px 16px;border-radius:6px;cursor:pointer;border:1.5px solid rgba(255,255,255,0.4);background:rgba(255,255,255,0.1);color:#fff">✏ Edit Mode: Off</button>
       </div>
     </div>
+    <div class="weekly-plan-execution-card timeline-report-card state-green">
+      <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
+    </div>
     <div style="display:flex;gap:14px;font-size:11px;color:#cde;flex-wrap:wrap">
       <span>■ <span style="color:#1565c0">Pending</span></span>
       <span>■ <span style="color:#f57f17">In Progress</span></span>
@@ -3888,9 +3908,21 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
+  <div class="weekly-plan-execution-card shared-report-card state-green">
+    <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
+  </div>
 
   <!-- Morning Brief: Today-focused communication, no Upcoming Next 7 Days -->
   <div class="morning-section" id="morningBriefPanel">
+    <div class="weekly-plan-execution-card state-green">
+      <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
+    </div>
     <div class="morning-hero">
       <div class="morning-title">Daily Shutdown Morning Brief</div>
       <div class="morning-sub" id="morningBriefMeta">Date: — | Time: —</div>
@@ -3923,6 +3955,12 @@ APPENDIX 6.5B)</div>
 
   <!-- Weekly Executive Summary: auto-generated, editable, and saved to shared data -->
   <div class="weekly-section" id="weeklyExecutiveSummaryPanel">
+    <div class="weekly-plan-execution-card state-green">
+      <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week" data-weekly-plan-week>Week of —</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value" data-weekly-plan>—%</div></div>
+      <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value" data-weekly-actual>—%</div></div>
+      <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state" data-weekly-state>On Track</div><div class="weekly-plan-execution-gap" data-weekly-gap>Calculating schedule variance…</div></div></div>
+    </div>
     <div class="morning-hero">
       <div class="morning-title">Shutdown Weekly Executive Summary</div>
       <div class="morning-sub" id="weeklySummaryMeta">Week ending —</div>
@@ -6290,6 +6328,68 @@ function taskDateInRange(t, range){
   return candidates.some(iso => iso >= range.start && iso <= range.end);
 }
 
+function weeklyExecutionState(behind){
+  return behind <= 5
+    ? {key:'green', label:'On Track'}
+    : behind <= 15
+      ? {key:'yellow', label:'Watch'}
+      : {key:'red', label:'Critical Behind'};
+}
+
+function weeklyPlanExecutionData(asOfIso){
+  const selectedIso = normalizeDateValue(asOfIso) || document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+  const nowIso = new Date().toISOString().slice(0,10);
+  const asOf = selectedIso === nowIso ? new Date() : workPointGlobal(selectedIso, 16);
+  const active = tasks.filter(t=>!t.isParent && (statusMap[t.id]||t.status||'Pending')!=='N/A');
+  const planPoints = active.reduce((sum,t)=>{
+    const startIso = normalizeDateValue(t.start);
+    const endIso = normalizeDateValue(t.end) || startIso;
+    if(!startIso) return sum;
+    if(asOf < workPointGlobal(startIso, 7)) return sum;
+    const total = Math.max(1, scheduledWorkMsGlobal(startIso, endIso));
+    const elapsed = Math.max(0, Math.min(total, scheduledWorkMsGlobal(startIso, endIso, asOf)));
+    return sum + Math.round((elapsed / total) * 100);
+  }, 0);
+  const actualPoints = active.reduce((sum,t)=>sum + calculateTaskProgressPct(t), 0);
+  const planPct = active.length ? Math.round(planPoints / active.length) : 0;
+  const actualPct = active.length ? Math.round(actualPoints / active.length) : 0;
+  const behind = planPct - actualPct;
+  const state = weeklyExecutionState(behind);
+  const range = getWeekRange(selectedIso);
+  const gapText = behind > 0 ? `${behind} pts behind plan` : (behind < 0 ? `${Math.abs(behind)} pts ahead of plan` : 'Actual matches plan');
+  return {planPct, actualPct, behind, state, range, gapText, activeCount:active.length};
+}
+
+function weeklyPlanExecutionCardHtml(extraClass){
+  const d = weeklyPlanExecutionData();
+  return `<div class="weekly-plan-execution-card ${extraClass||''} state-${d.state.key}">
+    <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Plan</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
+    <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div></div></div>
+  </div>`;
+}
+
+function renderWeeklyPlanExecutionCards(){
+  const d = weeklyPlanExecutionData();
+  document.querySelectorAll('.weekly-plan-execution-card').forEach(card=>{
+    card.classList.remove('state-green','state-yellow','state-red');
+    card.classList.add(`state-${d.state.key}`);
+    const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
+    set('[data-weekly-plan]', `${d.planPct}%`);
+    set('[data-weekly-actual]', `${d.actualPct}%`);
+    set('[data-weekly-state]', d.state.label);
+    set('[data-weekly-gap]', d.gapText);
+    set('[data-weekly-plan-week]', `Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}`);
+    card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, ${d.state.label}`);
+  });
+  return d;
+}
+window.weeklyExecutionState = weeklyExecutionState;
+window.weeklyPlanExecutionData = weeklyPlanExecutionData;
+window.weeklyPlanExecutionCardHtml = weeklyPlanExecutionCardHtml;
+window.renderWeeklyPlanExecutionCards = renderWeeklyPlanExecutionCards;
+
 // Monday huddle cumulative completion baseline, split using the 7/6 report:
 // 52 total completed = 12 tracker tasks + 40 work orders.
 const WEEKLY_DONE_BASELINES = {
@@ -6686,6 +6786,7 @@ function renderDashboard(){
   const progressTotal = activeLeaf.length;
   const progressDone = statusCounts.Complete || 0;
   const progressPct = progressTotal ? Math.round(activeLeaf.reduce((sum,t)=>sum + taskProgressPct(t), 0) / progressTotal) : 0;
+  renderWeeklyPlanExecutionCards();
   const overdueTasks = activeLeaf.filter(t=>{
     const endIso = normalizeDateValue(t.end);
     return endIso && new Date(endIso+'T00:00:00') < todayDate && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
@@ -7572,6 +7673,7 @@ function initTimelineFilter(){
 }
 
 function renderTimeline(){
+  renderWeeklyPlanExecutionCards();
   try{
     const container=document.getElementById('tl-container');
     if(!container) return;
@@ -10929,7 +11031,7 @@ function handleDailyHuddleUrlParams(){
     section.style.padding='18px 22px 22px';
     section.style.width=width+'px';
     section.style.boxSizing='border-box';
-    section.innerHTML='<div style="background:#1a3a5c;padding:13px 18px;border-radius:8px 8px 0 0;border-bottom:3px solid #f0c040;font-size:18px;font-weight:800;letter-spacing:.10em;text-transform:uppercase">System Down / Start-Up Timeline</div>';
+    section.innerHTML='<div style="background:#1a3a5c;padding:13px 18px;border-radius:8px;border-bottom:3px solid #f0c040;font-size:18px;font-weight:800;letter-spacing:.10em;text-transform:uppercase;margin-bottom:14px">System Down / Start-Up Timeline</div>'+window.weeklyPlanExecutionCardHtml('timeline-export-weekly-plan');
     var wrap=document.createElement('div');
     wrap.style.background='#0f2236';
     wrap.style.borderRadius='0 0 8px 8px';
