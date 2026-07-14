@@ -6522,6 +6522,11 @@ function businessDaysInclusive(startIso,endIso){
 
 function weeklyPlanExecutionData(asOfIso){
   const selectedIso = normalizeDateValue(asOfIso) || document.getElementById('todayInput')?.value || localDateIsoGlobal();
+  const now = new Date();
+  const nowIso = localDateIsoGlobal(now);
+  const asOf = selectedIso === nowIso
+    ? new Date(Math.min(now.getTime(), workPointGlobal(selectedIso, 16).getTime()))
+    : workPointGlobal(selectedIso, 16);
   const active = tasks.filter(t=>!t.isParent && (statusMap[t.id]||t.status||'Pending')!=='N/A');
   const range = getWeekRange(selectedIso);
   const targetEnd = t=>normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
@@ -6555,11 +6560,27 @@ function weeklyPlanExecutionData(asOfIso){
   const overallPct = overallTotal ? Number((overallDone/overallTotal*100).toFixed(1)) : 0;
   const overallStartIso = normalizeDateValue(document.getElementById('projectStartInput')?.value || projectStartDate || getProjectStartFromTasks() || '2026-07-06');
   const overallEndIso = normalizeDateValue(document.getElementById('projectEndInput')?.value || projectEndDate || getProjectEndFromTasks() || '2026-08-28');
-  const overallScope = active.filter(t=>targetEnd(t));
-  const overallPlanDone = overallScope.filter(t=>targetEnd(t) <= selectedIso).length;
-  const overallActualDone = overallScope.filter(isComplete).length;
-  const overallPlanPct = overallScope.length ? Math.round(overallPlanDone/overallScope.length*100) : 0;
-  const overallExecutionPct = overallScope.length ? Math.round(overallActualDone/overallScope.length*100) : 0;
+  // Overall scope includes Tracker Tasks + CAL work orders + PM work orders.
+  // Work orders do not have individual target dates, so their planned completion
+  // follows the approved project workday baseline. Actual always uses Done/Complete.
+  const overallScopeCount = overallTotal;
+  const overallActualDone = overallDone;
+  const overallPlanTotalDays = businessDaysInclusive(overallStartIso,overallEndIso);
+  const overallPlanElapsedDays = !overallStartIso || selectedIso < overallStartIso ? 0 : (()=>{
+    const cappedIso = selectedIso > overallEndIso ? overallEndIso : selectedIso;
+    const daysBeforeSelected = Math.max(0, businessDaysInclusive(overallStartIso, cappedIso) - 1);
+    const selectedDate = new Date(cappedIso+'T00:00:00');
+    if(selectedIso > overallEndIso || selectedDate.getDay()===0 || selectedDate.getDay()===6){
+      return businessDaysInclusive(overallStartIso,cappedIso);
+    }
+    const dayStart = workPointGlobal(cappedIso, 7).getTime();
+    const dayEnd = workPointGlobal(cappedIso, 16).getTime();
+    const fraction = Math.max(0, Math.min(1, (asOf.getTime()-dayStart)/(dayEnd-dayStart)));
+    return daysBeforeSelected + fraction;
+  })();
+  const overallPlanPct = overallPlanTotalDays ? Math.min(100,Math.round(overallPlanElapsedDays/overallPlanTotalDays*100)) : 0;
+  const overallPlanDone = Math.round(overallScopeCount*overallPlanPct/100);
+  const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
   const behind = planPct - actualPct;
   const state = weeklyExecutionState(behind);
   const overallBehind = overallPlanPct - overallExecutionPct;
@@ -6579,20 +6600,20 @@ function weeklyPlanExecutionData(asOfIso){
   return {selectedIso, planPct, actualPct, behind, state, range, activeCount:active.length,
     weeklyScopeCount:weeklyScope.length, weeklyPlanDone, weeklyActualDone, gapText,
     risk, explanation, overallExplanation, overallPlanPct, overallPct:overallExecutionPct,
-    overallDone, overallTotal, overallScopeCount:overallScope.length, overallPlanDone, overallActualDone,
+    overallDone, overallTotal, overallScopeCount, overallPlanDone, overallActualDone,
     overallBehind, overallState, overallGapText, overallStartIso, overallEndIso};
 }
 
 function weeklyPlanExecutionCardHtml(extraClass){
   const d = weeklyPlanExecutionData();
   return `<div class="plan-execution-scoreboard"><div class="weekly-plan-execution-card weekly-scope-card ${extraClass||''} state-${d.state.key}" data-execution-scope="weekly">
-    <div><div class="weekly-plan-execution-title">Weekly Plan vs Execution</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
+    <div><div class="weekly-plan-execution-title">Weekly Task Plan vs Completion</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Due by Date</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Completed</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
-    <div><div class="weekly-plan-execution-title">Overall Plan vs Execution</div><div class="weekly-plan-execution-week">Project ${displayDate(d.overallStartIso)} – ${displayDate(d.overallEndIso)}</div></div>
-    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Due by Date</div><div class="weekly-plan-execution-value">${d.overallPlanPct}%</div></div>
+    <div><div class="weekly-plan-execution-title">Overall Plan vs Completion</div><div class="weekly-plan-execution-week">Tasks + CAL + PM Work Orders</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Baseline Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Completed</div><div class="weekly-plan-execution-value">${d.overallPct}%</div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.overallState.label}</div><div class="weekly-plan-execution-gap">${d.overallGapText}</div>${d.overallExplanation.driver?`<div class="weekly-plan-execution-driver">${d.overallExplanation.driver}</div>`:''}${d.overallExplanation.action?`<div class="weekly-plan-execution-action">${d.overallExplanation.action}</div>`:''}</div></div>
   </div></div>`;
@@ -6639,6 +6660,7 @@ function renderWeeklyPlanExecutionCards(){
     card.classList.remove('state-green','state-yellow','state-red');
     card.classList.add(`state-${d.state.key}`);
     const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
+    set('.weekly-plan-execution-title', 'Weekly Task Plan vs Completion');
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
     if(metricLabels[0]) metricLabels[0].textContent = 'Due by Date';
     if(metricLabels[1]) metricLabels[1].textContent = 'Completed';
@@ -6654,15 +6676,16 @@ function renderWeeklyPlanExecutionCards(){
     card.classList.remove('state-green','state-yellow','state-red');
     card.classList.add(`state-${d.overallState.key}`);
     const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
+    set('.weekly-plan-execution-title', 'Overall Plan vs Completion');
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
-    if(metricLabels[0]) metricLabels[0].textContent = 'Due by Date';
+    if(metricLabels[0]) metricLabels[0].textContent = 'Baseline Plan';
     if(metricLabels[1]) metricLabels[1].textContent = 'Completed';
     set('[data-overall-plan]', `${d.overallPlanPct}%`);
     set('[data-overall-actual]', `${d.overallPct}%`);
     set('[data-overall-state]', d.overallState.label);
     set('[data-overall-gap]', d.overallGapText);
     setExplanation(card, 'overall', d.overallExplanation, d.overallState);
-    set('[data-overall-plan-range]', `Scheduled tasks · ${d.overallActualDone}/${d.overallScopeCount} complete`);
+    set('[data-overall-plan-range]', `Tasks + CAL + PM · ${d.overallActualDone}/${d.overallScopeCount} complete`);
     card.setAttribute('aria-label', `Overall Plan ${d.overallPlanPct} percent, Actual ${d.overallPct} percent, ${d.overallState.label}. ${d.overallGapText}${d.overallExplanation.driver ? `. ${d.overallExplanation.driver}` : ''}${d.overallExplanation.action ? `. ${d.overallExplanation.action}` : ''}`);
   });
   return d;
