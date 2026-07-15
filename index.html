@@ -7393,22 +7393,24 @@ function renderDashboard(){
         ${opStatusOptions.map(v=>`<option value="${v}"${v===current?' selected':''}>${v}</option>`).join('')}
       </select>`;
     }
-    // Task 3: Systems Status = OOS만 표시
+    // Task 3: Systems Status = OOS만 표시 (인라인 드롭다운 없음)
     const oosSystems = huddleSystems.filter(s=>s.status==='OOS' || s.status==='Breakdown');
+    systemStatusEl.innerHTML = (oosSystems.length ? oosSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) 60px">
+      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
+      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
+      <div class="system-pill oos">OOS</div>
+    </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>');
+    // SET OPERATIONAL STATUS: 전용 컨테이너에 항상 펼쳐진 상태로 렌더링
     const allRows = huddleSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) auto">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       ${opStatusDropdown(s.def.system, s.status)}
     </div>`).join('');
-    systemStatusEl.innerHTML = (oosSystems.length ? oosSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) 60px auto">
-      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
-      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill oos">OOS</div>
-      ${opStatusDropdown(s.def.system, s.status)}
-    </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>');
-    // SET OPERATIONAL STATUS는 그리드 완전히 밖의 전용 컨테이너에 렌더링
     const opContainer = document.getElementById('d-op-status-container');
-    if(opContainer) opContainer.innerHTML = `<details class="op-status-details huddle-panel tight" style="margin-bottom:14px"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em;list-style:none">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px">${allRows}</div></details>`;
+    if(opContainer){
+      const isOpen = opContainer.querySelector('details')?.open;
+      opContainer.innerHTML = `<details class="op-status-details huddle-panel tight" style="margin-bottom:14px"${isOpen?' open':''}><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em;list-style:none;display:list-item">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px">${allRows}</div></details>`;
+    }
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
