@@ -8172,6 +8172,7 @@ function renderTimeline(){
       }
       svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
     }
+    const NEW_FULL_H=16;
     function appendNewDateBar(r,y,connectorY){
       if(!r.newStartD && !r.newEndD) return;
       const ns=r.newStartD||r.newEndD;
@@ -8181,12 +8182,15 @@ function renderTimeline(){
       const bx=rangeStartX(first);
       const ex=rangeEndX(last);
       const bw=Math.max(ex-bx,DW);
+      const newColor='#26C6DA';
       const labelEndX=LW-12;
       const connectorEndX=Math.max(labelEndX+6,bx-6);
-      if(connectorEndX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${connectorY}" x2="${connectorEndX}" y2="${connectorY}" stroke="rgba(240,192,64,0.28)" stroke-width="1" stroke-dasharray="2,4"/>`;
-      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_BAR_H}" rx="3" fill="#f0c040" opacity="0.22" stroke="#f0c040" stroke-width="1.5" stroke-dasharray="4,3"/>`;
-      svg+=`<text x="${bx+5}" y="${y+9}" fill="#ffe082" font-size="8" font-weight="900">NEW ${md(ns)}</text>`;
-      if(bw>74 && r.newStartD && r.newEndD) svg+=`<text x="${bx+bw-5}" y="${y+9}" fill="#ffe082" font-size="8" font-weight="900" text-anchor="end">${md(ne)}</text>`;
+      if(connectorEndX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${y+NEW_FULL_H/2}" x2="${connectorEndX}" y2="${y+NEW_FULL_H/2}" stroke="rgba(38,198,218,0.4)" stroke-width="1" stroke-dasharray="2,4"/>`;
+      svg+=`<rect x="${bx+1}" y="${y+1}" width="${bw}" height="${NEW_FULL_H}" rx="3" fill="rgba(0,0,0,0.2)"/>`;
+      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_FULL_H}" rx="3" fill="${newColor}" opacity="0.9"/>`;
+      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_FULL_H*0.4}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
+      svg+=`<text x="${bx+5}" y="${y+11}" fill="#fff" font-size="9" font-weight="900">NEW ${md(ns)}</text>`;
+      if(bw>74 && r.newStartD && r.newEndD) svg+=`<text x="${bx+bw-5}" y="${y+11}" fill="#fff" font-size="9" font-weight="900" text-anchor="end">${md(ne)}</text>`;
     }
 
     let y=PAD;
