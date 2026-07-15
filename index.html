@@ -7110,8 +7110,8 @@ function renderDashboard(){
 
   const progressTotal = activeLeaf.length;
   const progressDone = statusCounts.Complete || 0;
-  const progressPct = progressTotal ? Math.round(activeLeaf.reduce((sum,t)=>sum + taskProgressPct(t), 0) / progressTotal) : 0;
-  renderWeeklyPlanExecutionCards();
+  // Progress % = Complete tasks / Total tasks (honest, date-independent)
+  const progressPct = progressTotal ? Math.round(progressDone / progressTotal * 100) : 0;
   const overdueTasks = activeLeaf.filter(t=>{
     const endIso = normalizeDateValue(t.end);
     return endIso && new Date(endIso+'T00:00:00') < todayDate && (statusMap[t.id]||t.status||'Pending') !== 'Complete';
