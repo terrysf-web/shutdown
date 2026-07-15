@@ -7310,8 +7310,18 @@ function renderDashboard(){
   }
 
   function huddleStatus(items, def){
-    // Operational Status는 수동 설정값 사용 (OOS 자동 계산 제거)
-    return operationalStatusMap[(def||{}).system] || 'Normal';
+    // 수동 override가 있으면 우선
+    const manual = operationalStatusMap[(def||{}).system];
+    if(manual) return manual;
+    // 자동: Pending·Complete·N/A·Scheduled 제외하고 활성 태스크 확인
+    const activeItems = items.filter(t=>{
+      const st = taskStatus(t);
+      return st!=='Pending' && st!=='Complete' && st!=='N/A' && st!=='Scheduled';
+    });
+    if(!activeItems.length) return 'Normal';
+    if(items.some(isFullRelTask) && items.some(isComplete)) return 'FUL REL';
+    if(items.some(isCondRelTask) && items.some(isComplete)) return 'Cond. REL';
+    return 'OOS';
   }
   function huddleReason(items, status){
     if(!items.length) return 'No active outage scope';
