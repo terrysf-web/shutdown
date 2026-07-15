@@ -4157,7 +4157,10 @@ APPENDIX 6.5B)</div>
     <div class="huddle-panel tight">
       <div class="system-status-head">
         <div class="huddle-panel-title">Systems Status</div>
-        <div class="system-status-legend"><b>OOS</b> = Out of Service &nbsp; | &nbsp; <b>RTS</b> = Returning to Service</div>
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="system-status-legend"><b>OOS</b> = Out of Service &nbsp; | &nbsp; <b>RTS</b> = Returning to Service</div>
+          <button onclick="document.getElementById('op-status-modal').style.display='flex'" class="op-status-btn no-print" style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:4px;border:1px solid #f0c040;background:transparent;color:#f0c040;cursor:pointer;white-space:nowrap">⚙ Override</button>
+        </div>
       </div>
       <div id="d-system-status" class="system-status-grid compact"></div>
     </div>
@@ -4170,8 +4173,16 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
-  <!-- SET OPERATIONAL STATUS: 그리드 밖 전용 컨테이너 -->
-  <div id="d-op-status-container" class="huddle-section"></div>
+  <!-- SET OPERATIONAL STATUS 모달 -->
+  <div id="op-status-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center" onclick="if(event.target===this)this.style.display='none'">
+    <div style="background:#1a3a5c;border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:20px;max-width:700px;width:92%;max-height:80vh;overflow-y:auto">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <div style="font-size:13px;font-weight:900;color:#f0c040;text-transform:uppercase;letter-spacing:.08em">Set Operational Status (Override)</div>
+        <button onclick="document.getElementById('op-status-modal').style.display='none'" style="background:transparent;border:none;color:#9fb4c8;font-size:18px;cursor:pointer;line-height:1">✕</button>
+      </div>
+      <div id="d-op-status-container" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px"></div>
+    </div>
+  </div>
 
   <!-- Daily Huddle Delay Detail -->
   <div class="huddle-delay-layout huddle-section">
@@ -7400,17 +7411,13 @@ function renderDashboard(){
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       <div class="system-pill oos">OOS</div>
     </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>');
-    // SET OPERATIONAL STATUS: 전용 컨테이너에 항상 펼쳐진 상태로 렌더링
-    const allRows = huddleSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) auto">
+    // SET OPERATIONAL STATUS 모달 컨텐츠 렌더링
+    const opContainer = document.getElementById('d-op-status-container');
+    if(opContainer) opContainer.innerHTML = huddleSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) auto">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
       ${opStatusDropdown(s.def.system, s.status)}
     </div>`).join('');
-    const opContainer = document.getElementById('d-op-status-container');
-    if(opContainer){
-      const isOpen = opContainer.querySelector('details')?.open;
-      opContainer.innerHTML = `<details class="op-status-details huddle-panel tight" style="margin-bottom:14px"${isOpen?' open':''}><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em;list-style:none;display:list-item">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px">${allRows}</div></details>`;
-    }
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
