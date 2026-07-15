@@ -6577,7 +6577,7 @@ function weeklyPlanExecutionData(asOfIso){
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
   const weeklyActualPoints = weeklyScope.reduce((sum,t)=>sum + calculateTaskProgressPct(t, false, asOf), 0);
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
-  const actualPct = weeklyScope.length ? Math.round(weeklyActualPoints/weeklyScope.length) : 0;
+  const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
