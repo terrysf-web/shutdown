@@ -8089,7 +8089,7 @@ function renderTimeline(){
 
     // ── Layout constants ─────────────────────────────────────────────────────
     const DW=26, LW=430, MH=24, DH=22, HDR=MH+DH, PAD=8;
-    const ROW_H=58, GROUP_GAP=8, BAR_H=22, NEW_BAR_H=14;
+    const ROW_H=76, GROUP_GAP=8, BAR_H=22, NEW_BAR_H=14;
     const days=Math.ceil((rE-rS)/86400000)+1;
     const TW=LW+days*DW;
     function off(d){ return Math.floor((d-rS)/86400000); }
@@ -8172,7 +8172,6 @@ function renderTimeline(){
       }
       svg+=`<rect x="${x}" y="${y}" width="${w}" height="${h*0.45}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
     }
-    const NEW_FULL_H=16;
     function appendNewDateBar(r,y,connectorY){
       if(!r.newStartD && !r.newEndD) return;
       const ns=r.newStartD||r.newEndD;
@@ -8185,12 +8184,12 @@ function renderTimeline(){
       const newColor='#26C6DA';
       const labelEndX=LW-12;
       const connectorEndX=Math.max(labelEndX+6,bx-6);
-      if(connectorEndX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${y+NEW_FULL_H/2}" x2="${connectorEndX}" y2="${y+NEW_FULL_H/2}" stroke="rgba(38,198,218,0.4)" stroke-width="1" stroke-dasharray="2,4"/>`;
-      svg+=`<rect x="${bx+1}" y="${y+1}" width="${bw}" height="${NEW_FULL_H}" rx="3" fill="rgba(0,0,0,0.2)"/>`;
-      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_FULL_H}" rx="3" fill="${newColor}" opacity="0.9"/>`;
-      svg+=`<rect x="${bx}" y="${y}" width="${bw}" height="${NEW_FULL_H*0.4}" rx="3" fill="rgba(255,255,255,0.22)"/>`;
-      svg+=`<text x="${bx+5}" y="${y+11}" fill="#fff" font-size="9" font-weight="900">NEW ${md(ns)}</text>`;
-      if(bw>74 && r.newStartD && r.newEndD) svg+=`<text x="${bx+bw-5}" y="${y+11}" fill="#fff" font-size="9" font-weight="900" text-anchor="end">${md(ne)}</text>`;
+      if(connectorEndX>labelEndX) svg+=`<line x1="${labelEndX}" y1="${y+BAR_H/2}" x2="${connectorEndX}" y2="${y+BAR_H/2}" stroke="rgba(38,198,218,0.4)" stroke-width="1" stroke-dasharray="2,4"/>`;
+      svg+=`<rect x="${bx+1}" y="${y+1}" width="${bw}" height="${BAR_H}" rx="3" fill="rgba(0,0,0,0.22)"/>`;
+      // 과거/미래 동일한 어둡기 처리
+      appendTimelineRangeBar(bx, y, bw, BAR_H, newColor, false);
+      svg+=`<text x="${bx+5}" y="${y+13}" fill="#fff" font-size="9" font-weight="900">NEW ${md(ns)}</text>`;
+      if(bw>74 && r.newStartD && r.newEndD) svg+=`<text x="${bx+bw-5}" y="${y+13}" fill="#fff" font-size="9" font-weight="900" text-anchor="end">${md(ne)}</text>`;
     }
 
     let y=PAD;
@@ -8203,12 +8202,12 @@ function renderTimeline(){
         const rowY=y+idx*ROW_H;
         const taskLabel=(r.task.task||'').length>46?(r.task.task||'').slice(0,44)+'…':(r.task.task||'');
         const parentLabel=r.parent ? ((r.parent.task||'').length>32?(r.parent.task||'').slice(0,30)+'…':r.parent.task) : (r.task.section||'System');
-        svg+=`<text x="14" y="${rowY+20}" fill="#fff" font-size="13" font-weight="900">${esc(r.task.id)}</text>`;
-        svg+=`<text x="74" y="${rowY+19}" fill="#f0c040" font-size="12" font-weight="800">${esc(parentLabel)}</text>`;
-        svg+=`<text x="74" y="${rowY+43}" fill="#fff" font-size="12" font-weight="700">${esc(taskLabel)}</text>`;
+        svg+=`<text x="14" y="${rowY+16}" fill="#fff" font-size="13" font-weight="900">${esc(r.task.id)}</text>`;
+        svg+=`<text x="74" y="${rowY+15}" fill="#f0c040" font-size="12" font-weight="800">${esc(parentLabel)}</text>`;
+        svg+=`<text x="74" y="${rowY+32}" fill="#fff" font-size="12" font-weight="700">${esc(taskLabel)}</text>`;
 
-        const barY=rowY+(ROW_H-BAR_H)/2;
-        const newBarY=rowY+ROW_H-NEW_BAR_H-4;
+        const barY=rowY+4;
+        const newBarY=rowY+BAR_H+8;
         const status=statusMap[r.task.id]||r.task.status||'Pending';
         const isDelayed=status==='Delayed';
         const labelEndX=LW-12;
