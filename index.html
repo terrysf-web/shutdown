@@ -7319,8 +7319,8 @@ function renderDashboard(){
       return st!=='Pending' && st!=='Complete' && st!=='N/A' && st!=='Scheduled';
     });
     if(!activeItems.length) return 'Normal';
-    if(items.some(isFullRelTask) && items.some(isComplete)) return 'FUL REL';
-    if(items.some(isCondRelTask) && items.some(isComplete)) return 'Cond. REL';
+    if(items.some(t=>isFullRelTask(t) && isComplete(t))) return 'FUL REL';
+    if(items.some(t=>isCondRelTask(t) && isComplete(t))) return 'Cond. REL';
     return 'OOS';
   }
   function huddleReason(items, status){
