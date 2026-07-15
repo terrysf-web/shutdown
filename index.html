@@ -4532,6 +4532,17 @@ let {statusMap, notesMap} = buildMapsFromTasks();
 let endImpactMap = {};
 function loadEndImpact(){ try{ const s=localStorage.getItem('sd26_endImpact'); if(s) endImpactMap=JSON.parse(s); }catch(e){} }
 
+// ── Operational Status: 시스템별 수동 설정 ──
+let operationalStatusMap = {};
+function loadOperationalStatus(){ try{ const s=localStorage.getItem('sd26_opStatus_v1'); if(s) operationalStatusMap=JSON.parse(s); }catch(e){} }
+function saveOperationalStatus(){ try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){} }
+function setOperationalStatus(systemId, val){
+  if(val==='Normal') delete operationalStatusMap[systemId]; else operationalStatusMap[systemId]=val;
+  saveOperationalStatus();
+  if(typeof renderDashboard==='function') renderDashboard();
+}
+loadOperationalStatus();
+
 // ── Down/Up maps: childTaskId → date value (excel serial) ──
 let downMap = {};
 let startupMap = {};
@@ -7290,23 +7301,9 @@ function renderDashboard(){
     return null;
   }
 
-  function huddleStatus(items){
-    if(!items.length) return 'Normal';
-    const fullRelComplete = items.find(t=>isFullRelTask(t) && isComplete(t));
-    const condRelComplete = items.find(t=>isCondRelTask(t) && isComplete(t));
-    const breakdownActive = items.find(t=>isBreakdownTask(t) && (isInProgress(t) || isDelayed(t)));
-    const trackerOosActive = taskTrackerOosWindow(items);
-    const oosActive = items.find(t=>isInProgress(t));
-
-    // Task Tracker Mark Down / Start-Up controls drive date-based OOS.
-    // OOS starts on the checked Down date and clears on the checked Start-Up date.
-    // Timeline edit-list selections only drive timeline display and do not set these maps.
-    if(breakdownActive) return 'Breakdown';
-    if(trackerOosActive) return 'OOS';
-    if(fullRelComplete) return 'FUL REL';
-    if(condRelComplete) return 'Cond. REL';
-    if(oosActive) return 'OOS';
-    return 'Normal';
+  function huddleStatus(items, def){
+    // Operational Status는 수동 설정값 사용 (OOS 자동 계산 제거)
+    return operationalStatusMap[(def||{}).system] || 'Normal';
   }
   function huddleReason(items, status){
     if(!items.length) return 'No active outage scope';
@@ -7351,7 +7348,7 @@ function renderDashboard(){
   }
   const huddleSystems = huddleSystemDefs.map(def=>{
     const items = huddleTasksFor(def);
-    const status = huddleStatus(items);
+    const status = huddleStatus(items, def);
     const complete = items.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
     const pct = items.length ? Math.round(complete/items.length*100) : 0;
     return {def, items, status, pct, reason:huddleReason(items,status), sortStart:huddleEarliestStart(items)};
@@ -7359,33 +7356,35 @@ function renderDashboard(){
   const statusOrder = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
   const systemStatusEl = document.getElementById('d-system-status');
   if(systemStatusEl){
-    function executiveSystemStatus(status){
-      if(status === 'OOS' || status === 'Breakdown') return 'OOS';
-      if(status === 'Cond. REL' || status === 'FUL REL') return 'Returning to Service';
-      return 'Normal';
-    }
-    function executiveSystemClass(status){
-      const st = executiveSystemStatus(status);
-      return st === 'OOS' ? 'oos' : st === 'Returning to Service' ? 'returning' : 'normal';
-    }
-    function executiveSystemLabel(status){
-      return executiveSystemStatus(status) === 'Returning to Service' ? 'RTS' : executiveSystemStatus(status);
-    }
-    const executiveSystems = huddleSystems.map(s=>Object.assign({}, s, {execStatus: executiveSystemStatus(s.status)}));
-    const normalCount = executiveSystems.filter(s=>s.execStatus==='Normal').length;
-    const oosCount = executiveSystems.filter(s=>s.execStatus==='OOS').length;
-    const rtsCount = executiveSystems.filter(s=>s.execStatus==='Returning to Service').length;
+    const normalCount = huddleSystems.filter(s=>s.status==='Normal').length;
+    const oosCount = huddleSystems.filter(s=>s.status==='OOS' || s.status==='Breakdown').length;
+    const rtsCount = huddleSystems.filter(s=>s.status==='Cond. REL' || s.status==='FUL REL').length;
     setText('d-systems-summary', oosCount ? oosCount + ' OOS' : 'Normal');
     setText('d-systems-summary-sub', normalCount + ' Normal / ' + oosCount + ' OOS / ' + rtsCount + ' RTS');
     setText('d-systems-normal', normalCount);
     setText('d-systems-oos', oosCount);
     setText('d-systems-returning', rtsCount);
-    const visibleSystems = executiveSystems.filter(s=>s.execStatus !== 'Normal');
-    systemStatusEl.innerHTML = visibleSystems.length ? visibleSystems.map(s=>`<div class="system-status-row">
+    // Operational Status 드롭다운
+    const opStatusOptions = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
+    function opStatusDropdown(sysId, current){
+      return `<select onchange="setOperationalStatus('${sysId}',this.value)" style="font-size:11px;padding:2px 5px;border:1px solid rgba(255,255,255,0.25);border-radius:4px;background:#0d2137;color:#fff;cursor:pointer;max-width:115px">
+        ${opStatusOptions.map(v=>`<option value="${v}"${v===current?' selected':''}>${v}</option>`).join('')}
+      </select>`;
+    }
+    // Task 3: Systems Status = OOS만 표시
+    const oosSystems = huddleSystems.filter(s=>s.status==='OOS' || s.status==='Breakdown');
+    const allRows = huddleSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) auto">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill ${executiveSystemClass(s.status)}">${executiveSystemLabel(s.status)}</div>
-    </div>`).join('') : '<div class="progress-empty">All systems normal. No OOS or RTS systems.</div>';
+      ${opStatusDropdown(s.def.system, s.status)}
+    </div>`).join('');
+    systemStatusEl.innerHTML = (oosSystems.length ? oosSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) 60px auto">
+      <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
+      <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
+      <div class="system-pill oos">OOS</div>
+      ${opStatusDropdown(s.def.system, s.status)}
+    </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>')
+    + `<details style="margin-top:8px"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:6px;display:grid;gap:5px">${allRows}</div></details>`;
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
@@ -9024,6 +9023,7 @@ function exportSnapshot(){
   }catch(e){}
   try{ if(typeof saveLocal === 'function') saveLocal(); }catch(e){}
   try{ if(typeof saveEndImpact === 'function') saveEndImpact(); }catch(e){}
+  try{ if(typeof saveOperationalStatus === 'function') saveOperationalStatus(); }catch(e){}
   try{ if(typeof saveAll === 'function') saveAll(); }catch(e){}
 
   var keys = Object.keys(localStorage).filter(function(k){ return k.indexOf('sd26_') === 0; });
