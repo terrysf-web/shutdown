@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>2026 Summer Shutdown Plan – Task Tracker</title>
+
+
+<script>
+function showTab(tab, btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+tab).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(tab==='dashboard') renderDashboard();
+  if(tab==='scope') renderScope();
+  if(tab==='timeline') renderTimeline();
+    if(tab === 'resource') initResourceCalendar();
+    if(tab === 'printschedule') initPrintSchedule();
+}
+function inferCategory(task){
+  const s=String(task||'').toLowerCase();
+  if(s.includes('calibration')||s==='cal') return 'CAL';
+  if(s.includes('repair')||s.includes('change')||s.includes('install')||s.includes('modification')) return 'CM';
+  if(s.includes('sampling')||s.includes('em')) return 'EM';
+  if(s.includes('project')||s.includes('upgrade')) return 'PROJ';
+  return 'PM';
+}
+function getColor(cat){
+  return {PM:'RoyalBlue', CAL:'SeaGreen', CM:'DarkKhaki', EM:'Sienna', PROJ:'DarkSlateBlue'}[cat]||'SlateGray';
+}
+function psISO(v){ return typeof normalizeDateValue==='function' ? normalizeDateValue(v) : (v||''); }
+function psDate(v){ return new Date(psISO(v)+'T00:00:00'); }
+function psFmt(v){ const iso=psISO(v); if(!iso) return 'TBD'; const [y,m,d]=iso.split('-'); return Number(m)+'/'+Number(d); }
+function psDiffDays(a,b){ return Math.round((psDate(b)-psDate(a))/86400000); }
+function psAssignees(t){ return (typeof rcAssignees==='function') ? rcAssignees(t) : String(t.assigned||'Unassigned').split(/[\/;,]+/).map(x=>x.trim()).filter(Boolean); }
+function psCategory(t){ return t.category || (typeof inferCategory==='function' ? inferCategory(t.task) : 'PROJ'); }
+function psTasks(){
+  return (tasks||[]).filter(t=>!t.isParent && psISO(t.start) && psISO(t.end)).map(t=>({
+    id:t.id, task:t.task||'', start:psISO(t.start), end:psISO(t.end), category:psCategory(t), section:t.section||'Other',
+    assigned:psAssignees(t), vendor:t.vendor||'', status:t.status||'Pending', notes:t.notes||''
+  }));
+}
+function psProjectStart(items){ return (projectStartDate || (typeof getProjectStartFromTasks==='function' && getProjectStartFromTasks()) || items.map(t=>t.start).sort()[0] || '2026-07-06'); }
+function psProjectEnd(items){ return (projectEndDate || (typeof getProjectEndFromTasks==='function' && getProjectEndFromTasks()) || items.map(t=>t.end).sort().slice(-1)[0] || '2026-08-28'); }
+function psWeeks(start,end){
+  const out=[]; let cur=psDate(start); cur.setDate(cur.getDate()-cur.getDay()+1);
+  const last=psDate(end); let i=1;
+  while(cur<=last){ const ws=new Date(cur), we=new Date(cur); we.setDate(we.getDate()+6); out.push({i:i++, start:ws.toISOString().slice(0,10), end:we.toISOString().slice(0,10), label:'W'+(i-1)}); cur.setDate(cur.getDate()+7); }
+  return out;
+}
+function initPrintSchedule(){
+  const sel=document.getElementById('psResource');
+  if(sel){
+    const cur=sel.value; sel.innerHTML='<option value="">All</option>';
+    [...new Set(psTasks().flatMap(t=>t.assigned).filter(Boolean))].sort().forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; sel.appendChild(o); });
+    sel.value=cur;
+  }
+  renderPrintSchedule();
+}
+function psFiltered(items, start, end){
+  const cat=document.getElementById('psCategory')?.value||'';
+  const res=document.getElementById('psResource')?.value||'';
+  const q=(document.getElementById('psSearch')?.value||'').toLowerCase();
+  return items
+    // Only tasks that overlap the selected project date range are shown.
+    // Tasks completely before project start, like 6/22–6/28 when range starts 7/6, are hidden.
+    .filter(t=>t.end >= start && t.start <= end)
+    .filter(t=>!cat || t.category===cat)
+    .filter(t=>!res || t.assigned.includes(res))
+    .filter(t=>!q || [t.id,t.task,t.section,t.vendor,t.assigned.join(' '),t.category,t.status].join(' ').toLowerCase().includes(q));
+}
+function psGroupKey(t, mode){
+  if(mode==='resource') return t.groupResource || t.assigned.join(', ') || 'Unassigned';
+  if(mode==='category') return t.category || 'Uncategorized';
+  if(mode==='vendor') return t.vendor || 'No Vendor';
+  return t.section || 'Other';
+}
+function renderPrintSchedule(){
+  const all=psTasks();
+  const start=psProjectStart(all), end=psProjectEnd(all);
+  const weeks=psWeeks(start,end);
+  let items=psFiltered(all,start,end).sort((a,b)=>(a.start===b.start?String(a.id).localeCompare(String(b.id),undefined,{numeric:true}):a.start.localeCompare(b.start)));
+  const groupMode=document.getElementById('psGroup')?.value||'section';
+  const selectedResource=document.getElementById('psResource')?.value||'';
+  if(groupMode==='resource'){
+    items = items.flatMap(t=>{
+      const assignees=(t.assigned||[]).length?t.assigned:['Unassigned'];
+      return assignees.map(r=>Object.assign({},t,{groupResource:r}));
+    });
+    if(selectedResource) items = items.filter(t=>t.groupResource===selectedResource);
+  }
+  const chart=document.getElementById('psChart'); if(!chart) return;
+  chart.style.setProperty('--ps-weeks', weeks.length);
+  const meta=document.getElementById('psPrintMeta');
+  if(meta) meta.textContent = `Project range: ${psFmt(start)} to ${psFmt(end)} · ${weeks.length} weeks · ${items.length} scheduled tasks · Group: ${groupMode} · Resource: ${selectedResource||'All'} · Generated ${new Date().toLocaleDateString()}`;
+  if(!items.length){ chart.innerHTML='<div class="ps-empty">No scheduled tasks found for the selected filters.</div>'; return; }
+  const header = `<div class="ps-week-row"><div class="ps-left-head">Task / Activity</div>${weeks.map(w=>`<div class="ps-week-cell"><b>${w.label}</b><span>${psFmt(w.start)}–${psFmt(w.end)}</span></div>`).join('')}</div>`;
+  const by={}; items.forEach(t=>{ const k=psGroupKey(t,groupMode); (by[k] ||= []).push(t); });
+  const body = Object.keys(by).sort().map(group=>{
+    const rows = by[group].map(t=>{
+      const row=`<div class="ps-task-row"><div class="ps-left"><b>${t.id}</b> ${t.task}<span>${t.category} · ${t.assigned.join(', ')||'Unassigned'}${t.vendor?' · '+t.vendor:''}</span></div>${weeks.map(w=>{
+        const overlap=t.end>=w.start && t.start<=w.end;
+        if(!overlap) return '<div class="ps-week-cell"></div>';
+        const s=t.start>w.start?t.start:w.start, e=t.end<w.end?t.end:w.end;
+        const days=Math.max(1, psDiffDays(s,e)+1);
+        return `<div class="ps-week-cell"><div class="ps-bar ${String(t.category).toLowerCase()}" style="--ps-days:${days}" title="${psFmt(t.start)}-${psFmt(t.end)} · ${t.status}">${psFmt(t.start)}–${psFmt(t.end)}</div></div>`;
+      }).join('')}</div>`;
+      return row;
+    }).join('');
+    return `<div class="ps-group"><div class="ps-group-title">${group}</div>${rows}</div>`;
+  }).join('');
+  chart.innerHTML = header + body;
+}
+function printPrintSchedule(){
+  try{ initPrintSchedule(); }catch(e){ try{ renderPrintSchedule(); }catch(err){} }
+  document.body.classList.add('ps-print-mode');
+  const cleanup = function(){ document.body.classList.remove('ps-print-mode'); window.removeEventListener('afterprint', cleanup); };
+  window.addEventListener('afterprint', cleanup);
+  setTimeout(function(){
+    try { window.print(); }
+    finally { setTimeout(cleanup, 700); }
+  }, 50);
+}
+</script>
+
+<style>
+*{box-sizing:border-box} body{margin:0;font-family:Arial,Helvetica,sans-serif;background:#f2f4f6;color:#222;font-size:13px} #sticky-top{position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+header{background:#1a3a5c;color:white;padding:12px 18px;display:flex;justify-content:space-between;align-items:center} header h1{margin:0;font-size:20px}
+.app-version{font-size:10px;background:#f0c040;color:#102943;border-radius:999px;padding:2px 8px;margin-left:8px;font-weight:800;letter-spacing:.03em;vertical-align:middle;display:inline-block}
+.firebase-sync-status{font-size:10px;border-radius:999px;padding:2px 8px;margin-left:6px;font-weight:800;letter-spacing:.03em;vertical-align:middle;display:inline-block;border:1px solid rgba(255,255,255,.35)}
+.firebase-sync-status.off{background:#455a64;color:#e5edf2}.firebase-sync-status.on{background:#1f6b42;color:#d7ffe5}.firebase-sync-status.warn{background:#8a5a08;color:#fff0bd}.firebase-sync-status.err{background:#8b1e1e;color:#ffd5d5}
+.tab-nav{display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:#102943}.tab-btn{border:0;background:#d6dde6;color:#102943;border-radius:6px;padding:8px 14px;font-weight:700;white-space:nowrap;cursor:pointer}.tab-btn.active{background:#f0c040}.page{display:none;height:calc(100vh - 98px);overflow:auto}.page.active{display:block}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;padding:10px;background:white;border-bottom:1px solid #ddd;position:sticky;top:98px;z-index:500}.toolbar input,.toolbar select{padding:6px;border:1px solid #bbb;border-radius:5px}.toolbar button{padding:6px 10px;border:1px solid #888;background:#fff;border-radius:5px;cursor:pointer}.toolbar button.primary{background:#1a3a5c;color:#fff;border-color:#1a3a5c}
+table{border-collapse:collapse;width:100%;background:white} th,td{border:1px solid #ddd;padding:6px 8px;vertical-align:top} th{background:#e9eef5;position:sticky;top:0;z-index:5;font-size:12px;text-align:left} tr.parent-row td{background:#16395f;color:white;font-weight:800} tr.child-row:hover td{background:#fffdeb}
+.idcell{font-weight:700;color:#1a3a5c;white-space:nowrap}.status{font-weight:700;border-radius:4px;padding:3px 7px;display:inline-block}.Pending{background:#eee}.Scheduled{background:#d8e8ff}.InProgress,.In\ Progress{background:#fff0b3}.Complete{background:#d7f0d8}.Delayed{background:#ffd5d5;color:#9a0000}.NA{background:#ddd;color:#777}
+.gantt-wrap{padding:14px}.gantt{display:grid;grid-auto-rows:34px;border:1px solid #ddd;background:white;min-width:1400px}.gantt-row{display:grid;grid-template-columns:280px repeat(64,22px);border-bottom:1px solid #eee;align-items:center}.gantt-label{padding:6px;font-weight:700;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}.day{height:34px;border-left:1px solid #eee;text-align:center;font-size:10px;background:#fafafa}.bar{height:18px;border-radius:4px;color:white;font-size:10px;display:flex;align-items:center;justify-content:center;overflow:hidden;white-space:nowrap}.bar.PM{background:RoyalBlue}.bar.CAL{background:SeaGreen}.bar.CM{background:DarkKhaki}.bar.EM{background:Sienna}.bar.PROJ{background:DarkSlateBlue}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;padding:14px}.card{background:white;border-radius:8px;box-shadow:0 1px 5px #ccc;padding:14px}.card h3{margin:0 0 8px}.big{font-size:34px;font-weight:800;color:#1a3a5c}
+.timeline-box{padding:12px}.timeline-svg{background:#102943;border-radius:8px;width:100%;height:auto;min-height:600px}.legend{display:flex;gap:12px;flex-wrap:wrap;margin:8px 0;color:#444}.legend span{display:flex;align-items:center;gap:4px}.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.section-title{background:#1a3a5c;color:#fff;padding:8px 12px;font-weight:800;margin-top:12px}.note{font-size:11px;color:#666}.mini{font-size:11px}.right{text-align:right}.center{text-align:center}.nowrap{white-space:nowrap}.editable{cursor:text}.danger{color:#c62828;font-weight:800}.ok{color:#2e7d32;font-weight:800}
+.dash-bar{height:18px;border-radius:4px;color:#fff;font-size:11px;text-align:center;line-height:18px;min-width:2px}.dash-row{display:flex;align-items:center;gap:10px;margin:8px 0}.dash-label{width:130px;font-weight:700}.dash-track{flex:1;background:#e8edf3;border-radius:4px;overflow:hidden}.vendor-progress{display:flex;align-items:flex-end;gap:12px;height:190px}.vbar{width:42px;border-radius:5px 5px 0 0;background:#4a90d9;display:flex;align-items:flex-start;justify-content:center;color:#fff;font-size:10px;padding-top:4px}.vlabel{font-size:10px;text-align:center;margin-top:4px;width:54px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-edit-table input{width:100%;font-size:11px}.tl-edit-table select{width:100%;font-size:11px}.tl-check{transform:scale(1.2)}
+.action-comment{width:100%;min-height:32px;font-size:11px}.status-select{width:100%;font-size:11px}.date-input{width:128px;font-size:11px}.num-input{width:56px}.filter-chip{background:#e8edf3;border-radius:16px;padding:5px 9px;font-size:12px}.status-filter{display:flex;gap:6px;align-items:center;flex-wrap:wrap}.status-filter label{font-size:12px;background:#f2f2f2;border-radius:14px;padding:4px 8px;cursor:pointer}.status-filter input{vertical-align:middle}
+.section-filter{min-width:170px}.btn-small{font-size:11px;padding:4px 7px}.muted{color:#777}.week-badge{font-size:10px;background:#eef;border-radius:4px;padding:2px 5px}.overdue{background:#fff2f2!important}.todaymark{outline:2px solid #ff9800}.hidden{display:none!important}
+
+/* ========== SCOPE OF WORK VISUAL ========== */
+.sow-page{padding:14px;background:#eef2f6;min-height:100%;overflow:auto}.sow-header{display:flex;align-items:center;justify-content:space-between;gap:12px;background:#183a5c;color:#fff;border-radius:8px;padding:12px 16px;margin-bottom:14px}.sow-title{font-size:22px;font-weight:900;letter-spacing:.02em}.sow-subtitle{font-size:12px;color:#cfe1f2;margin-top:2px}.sow-actions{display:flex;gap:8px;flex-wrap:wrap}.sow-actions button,.sow-scope-edit-btn,.sow-scope-undo-btn{border:0;border-radius:5px;padding:7px 10px;font-weight:800;cursor:pointer}.sow-actions button{background:#f0c040;color:#102943}.sow-actions .secondary{background:#dfe7ef;color:#102943}.sow-scope-edit-btn{background:#f0c040;color:#102943;font-size:12px}.sow-scope-undo-btn{background:#dfe7ef;color:#102943;font-size:12px}.sow-scope-undo-btn:disabled{opacity:.45;cursor:not-allowed}.sow-tbl-wrap{background:#fff;border-radius:8px;box-shadow:0 1px 6px rgba(0,0,0,.15);overflow:auto;margin-bottom:18px}.sow-tbl-title{background:#16395f;color:#fff;font-size:15px;font-weight:900;text-align:center;padding:10px 12px;letter-spacing:.04em}.sow-tbl{width:100%;border-collapse:collapse;min-width:1100px}.sow-tbl th{position:static;background:#2b5277;color:#fff;border:1px solid #9eb4c8;text-align:center;font-size:12px;padding:8px}.sow-tbl td{border:1px solid #b7c6d6;padding:8px;text-align:center;vertical-align:middle;background:#fff}.sow-sys-cell{background:#e8eef5!important;font-weight:900;color:#102943;text-align:center;min-width:110px}.sow-flow{display:flex;align-items:center;justify-content:flex-start;gap:7px;min-height:54px}.sow-arrow{font-size:18px;color:#666;font-weight:900}.sow-node-date{min-width:48px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;font-size:12px;box-shadow:0 1px 3px rgba(0,0,0,.25);white-space:nowrap}.sow-node-date.red{background:#c62828}.sow-node-date.blue{background:#1565c0}.sow-node-date.teal{background:#00897b}.sow-node-date.green{background:#2e7d32}.sow-node-rect{background:#eaf2fb;border:2px solid #5c7fa3;border-radius:6px;min-width:120px;padding:7px 8px;font-weight:800;font-size:11px;line-height:1.2;color:#102943}.sow-node-release{background:#e0f2f1;border:2px solid #00897b;border-radius:6px;min-width:100px;padding:7px 8px;font-weight:900;font-size:11px;line-height:1.2;color:#004d40}.sow-node-full{background:#e3f2fd;border:2px solid #1565c0;border-radius:6px;min-width:86px;padding:7px 8px;font-weight:900;font-size:11px;line-height:1.2;color:#0d47a1}.sow-impact{font-size:12px;line-height:1.25;text-align:left;min-width:150px}.sow-rooms{font-size:12px;text-align:left;line-height:1.35}.sow-edit-mode .sow-node-date,.sow-edit-mode .sow-node-rect,.sow-edit-mode .sow-node-release,.sow-edit-mode .sow-node-full,.sow-edit-mode .sow-impact,.sow-edit-mode .sow-rooms,.sow-edit-mode .sow-sys-cell{cursor:pointer;outline:1px dashed rgba(240,192,64,.6)}.sow-edit-input{width:100%;min-height:54px;font-size:12px;font-family:Arial;border:2px solid #f0c040;border-radius:5px;padding:6px}.sow-row-btn{border:1px solid #9bb2c8;background:#fff;border-radius:4px;padding:3px 7px;font-size:11px;font-weight:800;cursor:pointer}.sow-row-btn.add{background:#e8f5e9;color:#1b5e20;border-color:#81c784}.sow-row-btn.del{background:#ffebee;color:#b71c1c;border-color:#ef9a9a}.sow-edit-ctrl{display:none}.sow-edit-mode .sow-edit-ctrl{display:inline-flex}.sow-edit-mode .sow-edit-ctrl-row{display:block}.sow-edit-ctrl-row{display:none}.sow-qc-label{font-size:10px;line-height:1.1;color:#425466;font-weight:700;min-width:54px;white-space:pre-line}.sow-qc-inline-input{width:80px;min-height:38px;font-size:10px;border:2px solid #f0c040;border-radius:4px;padding:3px}.sow-fac-elevated-flow{display:flex;align-items:flex-start;gap:7px;width:100%}.sow-fac-elevated-col{display:flex;flex-direction:column;align-items:center;gap:4px}.sow-fac-elevated-col.elevated{margin-top:22px}.sow-fac-label{font-size:10px;font-weight:800;color:#34495e;line-height:1.15;white-space:pre-line;min-width:58px}.sow-fac-label-input{width:90px;min-height:36px;font-size:10px;border:2px solid #f0c040;border-radius:4px;padding:3px}@media print{#sticky-top,.toolbar,.sow-actions,.sow-scope-edit-btn,.sow-scope-undo-btn,.sow-edit-ctrl,.sow-edit-ctrl-row{display:none!important}.page{display:block;height:auto;overflow:visible}.sow-page{background:#fff;padding:0}.sow-tbl-wrap{box-shadow:none;border-radius:0;page-break-inside:avoid}.sow-tbl{min-width:0;font-size:9px}.sow-node-rect{min-width:80px;font-size:8px;padding:4px}.sow-node-date{min-width:34px;height:34px;font-size:8px}.sow-node-release,.sow-node-full{min-width:70px;font-size:8px;padding:4px}.sow-arrow{font-size:12px}.sow-tbl th,.sow-tbl td{padding:4px}.sow-title{font-size:16px}}
+
+/* ========== Dashboard v5 condensed daily huddle ========== */
+.huddle-section{margin-bottom:14px}.huddle-top-layout{display:grid;grid-template-columns:2.5fr 1fr;gap:12px}.huddle-middle-layout{display:grid;grid-template-columns:1fr 1.4fr;gap:12px}.huddle-bottom-layout{display:grid;grid-template-columns:1.1fr 1.4fr;gap:12px}.progress-brief,.huddle-panel{background:#1a3a5c;border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:12px}.huddle-panel.tight{padding:10px}.progress-brief-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}.progress-brief-title,.huddle-panel-title{font-size:12px;font-weight:900;color:#f0c040;letter-spacing:.08em;text-transform:uppercase}.progress-brief-date{font-size:11px;color:#cde;font-weight:700}.progress-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.progress-kpi{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:9px;min-height:90px}.progress-kpi-label{font-size:10px;color:#cde;font-weight:900;text-transform:uppercase;letter-spacing:.05em}.progress-kpi-value{font-size:28px;font-weight:900;color:#fff;margin-top:5px}.progress-kpi-sub{font-size:11px;color:#aecaE7;margin-top:4px}.progress-meter{height:7px;background:#395975;border-radius:999px;margin-top:7px;overflow:hidden}.progress-meter span{display:block;height:100%;background:#f0c040;border-radius:999px}.progress-grid{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:8px;margin-top:10px}.progress-panel{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px;min-height:105px}.progress-panel-title{font-size:10px;color:#cde;font-weight:900;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}.progress-row{display:grid;grid-template-columns:82px 38px 1fr 52px;gap:6px;align-items:center;font-size:11px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,.06)}.progress-row:last-child{border-bottom:0}.progress-row-name{font-weight:800;color:#e8f1fb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.progress-row-pct{font-weight:900;color:#f0c040;text-align:right}.progress-mini-meter{height:6px;background:#395975;border-radius:999px;overflow:hidden}.progress-mini-meter span{display:block;height:100%;border-radius:999px}.progress-row-meta{font-size:10px;color:#b8cde0;text-align:right;white-space:nowrap}.progress-list{display:grid;gap:5px}.progress-item{display:grid;grid-template-columns:40px 1fr 74px;gap:6px;align-items:center;font-size:11px;background:#173653;border-radius:5px;padding:5px}.progress-id{font-weight:900;color:#f0c040}.progress-task{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}.progress-tag{font-size:10px;text-align:center;border-radius:4px;background:#274d76;color:#dff;padding:2px 4px}.progress-empty{font-size:11px;color:#9fb4c8;font-style:italic;padding:6px 2px}.system-status-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.system-status-grid.compact{grid-template-columns:1fr}.system-status-row{display:grid;grid-template-columns:92px 1fr 78px;gap:7px;align-items:center;background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:7px 8px}.system-status-id{font-size:11px;font-weight:900;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.system-status-name{font-size:11px;color:#cde;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.system-pill{font-size:10px;border-radius:999px;padding:3px 7px;font-weight:900;text-align:center;white-space:nowrap}.system-pill.normal{background:#1f6b42;color:#d7ffe5}.system-pill.oos{background:#a33224;color:#ffe1dc}.system-pill.cond{background:#8a5a08;color:#fff0bd}.system-pill.full{background:#1a5d89;color:#d9f0ff}.system-pill.breakdown{background:#7a1a1a;color:#ffcdd2}.system-pill.na{background:#3b4754;color:#d6dde6}.system-rollup-table{width:100%;background:transparent;border-collapse:collapse;font-size:11px}.system-rollup-table td{border:0;border-bottom:1px solid rgba(255,255,255,.08);padding:6px;color:#dbe7f2}.system-attention-list{display:grid;gap:5px}.system-attention-item{display:grid;grid-template-columns:92px 1fr 1.4fr;gap:6px;background:#102943;border-radius:5px;padding:6px}.system-attention-id{font-size:11px;font-weight:900;color:#f0c040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.system-attention-name,.system-attention-reason{font-size:11px;color:#dbe7f2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.gowning-list{display:grid;gap:8px}.gowning-list.dashboard{gap:10px}.gowning-list.dashboard .gowning-row{grid-template-columns:120px 1fr;padding:12px}.gowning-row{background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:8px 9px;display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}.gowning-area{font-size:12px;font-weight:900;color:#fff;white-space:nowrap}.gowning-select{width:100%;min-width:0;background:#173653;color:#fff;border:1px solid rgba(255,255,255,.2);border-radius:6px;padding:5px 7px;font-size:12px;font-weight:800}.gowning-select.suspend{background:#80520e;color:#ffe6ae}.gowning-select.full{background:#1f6b42;color:#d7ffe5}.huddle-table{width:100%;border-collapse:collapse;font-size:12px}.huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px}.huddle-table td{border:0;border-bottom:1px solid rgba(255,255,255,.08);background:#102943;color:#e8f1fb;padding:7px 9px;vertical-align:middle}.huddle-table.small{font-size:11px}.huddle-table.small th{font-size:9px;padding:6px}.huddle-table.small td{font-size:11px;padding:6px}.huddle-status{font-size:10px;font-weight:900;border-radius:999px;padding:3px 7px;white-space:nowrap}.huddle-status.oos{background:#a33224;color:#ffe1dc}.huddle-status.cond{background:#8a5a08;color:#fff0bd}.huddle-status.full{background:#1a5d89;color:#d9f0ff}.huddle-status.normal{background:#1f6b42;color:#d7ffe5}.huddle-status.breakdown{background:#7a1a1a;color:#ffcdd2}.huddle-status.na{background:#3b4754;color:#d6dde6}
+
+/* ========== Executive Dashboard V2 ========== */
+.exec-kpi-grid{display:grid;grid-template-columns:repeat(6,minmax(130px,1fr));gap:12px;margin-bottom:14px}
+.exec-kpi-card{background:linear-gradient(180deg,#1f4b78,#18385c);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px 15px;min-height:128px;box-shadow:0 6px 18px rgba(0,0,0,.18)}
+.exec-kpi-label{font-size:10px;font-weight:900;letter-spacing:.09em;text-transform:uppercase;color:#d8e8f8;white-space:nowrap}
+.exec-kpi-value{font-size:34px;font-weight:900;line-height:1;margin-top:12px;color:#fff;white-space:nowrap}
+.exec-kpi-value.small{font-size:27px}.exec-kpi-value.warn{color:#ffd36a}.exec-kpi-value.bad{color:#ff9a9a}.exec-kpi-value.ok{color:#82e4a3}
+.exec-kpi-sub{font-size:12px;font-weight:800;color:#f0c040;margin-top:8px;line-height:1.25}
+.exec-kpi-detail{font-size:11px;color:#c9d9e8;margin-top:6px;line-height:1.25}
+.exec-progress-meter{height:8px;background:rgba(255,255,255,.17);border-radius:999px;margin-top:10px;overflow:hidden}.exec-progress-meter span{display:block;height:100%;background:#f0c040;border-radius:999px}
+.exec-ops-grid{display:grid;grid-template-columns:1.1fr 1.1fr .9fr;gap:12px;margin-bottom:14px}
+.exec-mini-list{display:grid;gap:6px}.exec-mini-row{display:flex;justify-content:space-between;gap:8px;background:#102943;border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:7px 9px;font-size:12px;color:#e8f1fb}.exec-mini-row b{color:#f0c040}
+@media(max-width:1200px){.exec-kpi-grid{grid-template-columns:repeat(3,1fr)}.exec-ops-grid{grid-template-columns:1fr}}
+@media(max-width:800px){.exec-kpi-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* ========== Daily Huddle Export / Power Automate Support ========== */
+.dashboard-export-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}.dashboard-export-btn{background:#f0c040;color:#102943;border:none;border-radius:6px;padding:7px 10px;font-size:12px;font-weight:900;cursor:pointer;white-space:nowrap}.dashboard-export-btn.secondary{background:#173653;color:#d9e8f7;border:1px solid rgba(255,255,255,.22)}.dashboard-export-btn:hover{filter:brightness(.96)}.dash-mode-kpi .huddle-section,.dash-mode-kpi .dashboard-export-actions,.dash-mode-kpi #dashboardModeMeta{display:none!important}.dash-mode-kpi .kpi-section,.dash-mode-kpi #d-delayed-alert{display:block}.dash-mode-huddle .kpi-section{display:none!important}.dash-mode-huddle #d-delayed-alert{display:none!important}.dash-delayed-alert{display:none;background:#fff;border:2px solid #e53935;border-radius:8px;overflow:hidden}.dash-delayed-alert.has-delayed{display:block}.dash-delayed-alert-header{display:flex;align-items:center;gap:10px;background:#e53935;color:#fff;padding:10px 14px}.dash-delayed-alert-title{font-weight:900;letter-spacing:.08em;text-transform:uppercase}.dash-delayed-badge{background:#fff;color:#e53935;border-radius:999px;padding:2px 10px;font-weight:900}.delayed-table{width:100%;border-collapse:collapse;font-size:12px}.delayed-table th{background:#fff3f3;color:#8b0000;position:static}.delayed-table td{background:#fff;border-color:#f4c7c7;color:#222}@media print{body.dashboard-printing *{visibility:hidden!important}body.dashboard-printing #sticky-top,body.dashboard-printing .tab-nav,body.dashboard-printing header,body.dashboard-printing .dashboard-export-actions{display:none!important}body.dashboard-printing #page-dashboard,body.dashboard-printing #page-dashboard *{visibility:visible!important}body.dashboard-printing #page-dashboard{display:block!important;position:absolute!important;left:0!important;top:0!important;width:100%!important;height:auto!important;overflow:visible!important;background:#0d2137!important}body.dashboard-printing #dashboardPanel{display:block!important;position:relative!important;width:100%!important;height:auto!important;overflow:visible!important;padding:6px!important;background:#0d2137!important;color:#fff!important;font-size:9px!important;line-height:1.15!important}body.dashboard-printing #dashboardTitle{font-size:15px!important;letter-spacing:.08em!important}body.dashboard-printing #dashboardDateTime{font-size:8px!important}body.dashboard-printing .huddle-section{margin-bottom:6px!important}body.dashboard-printing .progress-brief,body.dashboard-printing .huddle-panel{padding:6px!important;border-radius:4px!important;break-inside:avoid!important}body.dashboard-printing .progress-kpis{gap:4px!important}body.dashboard-printing .progress-kpi{padding:5px!important;min-height:52px!important}body.dashboard-printing .progress-kpi-value{font-size:18px!important;margin-top:2px!important}body.dashboard-printing .progress-kpi-label,body.dashboard-printing .progress-kpi-sub,body.dashboard-printing .progress-brief-date,body.dashboard-printing .huddle-panel-title,body.dashboard-printing .progress-brief-title{font-size:7px!important}body.dashboard-printing .progress-grid{gap:4px!important;margin-top:4px!important}body.dashboard-printing .progress-panel{padding:4px!important;min-height:52px!important}body.dashboard-printing .progress-row{font-size:7px!important;grid-template-columns:50px 26px 1fr 32px!important;gap:3px!important;padding:2px 0!important}body.dashboard-printing .progress-row-meta{font-size:6px!important}body.dashboard-printing .progress-mini-meter{height:4px!important}body.dashboard-printing .huddle-table.small th,body.dashboard-printing .huddle-table.small td{font-size:7px!important;padding:3px!important}body.dashboard-printing .system-status-row{grid-template-columns:58px 1fr 42px!important;padding:3px!important;gap:3px!important}body.dashboard-printing .system-status-id,body.dashboard-printing .system-status-name,body.dashboard-printing .system-pill{font-size:6px!important}body.dashboard-printing .gowning-row{padding:4px!important;grid-template-columns:70px 1fr!important}body.dashboard-printing .gowning-area,body.dashboard-printing .gowning-select{font-size:7px!important;padding:2px!important}body.dashboard-printing .dash-delayed-alert.has-delayed{display:block!important}body.dashboard-printing .delayed-table th,body.dashboard-printing .delayed-table td{font-size:7px!important;padding:3px!important}.dash-mode-kpi .huddle-section,.dash-mode-kpi .dashboard-export-actions,.dash-mode-kpi #dashboardModeMeta{display:none!important}.dash-mode-kpi .kpi-section,.dash-mode-kpi #d-delayed-alert{display:block!important}}
+
+@media(max-width:1100px){.huddle-top-layout,.huddle-middle-layout,.huddle-bottom-layout{grid-template-columns:1fr}.progress-kpis{grid-template-columns:repeat(2,1fr)}.progress-grid{grid-template-columns:1fr}}
+
+</style>
+<style id="sow-narrow-fix">
+.sow-tbl{min-width:0!important;table-layout:auto!important;width:100%!important}.sow-tbl-wrap{overflow-x:hidden!important}.sow-tbl th,.sow-tbl td{padding:5px!important}.sow-flow{gap:4px!important;flex-wrap:nowrap!important}.sow-node-rect{min-width:72px!important;max-width:112px!important;font-size:9px!important;padding:5px 5px!important}.sow-node-date{min-width:36px!important;width:36px!important;height:36px!important;font-size:10px!important}.sow-node-release,.sow-node-full{min-width:64px!important;max-width:90px!important;font-size:9px!important;padding:5px!important}.sow-arrow{font-size:13px!important}.sow-qc-label,.sow-fac-label{font-size:8px!important;min-width:42px!important}.sow-impact,.sow-rooms{font-size:10px!important}.sow-sys-cell{min-width:80px!important}.sow-tbl th:first-child{width:90px!important}.sow-tbl th:last-child{width:125px!important}.sow-tbl-title{font-size:13px!important}.sow-fac-elevated-flow{gap:4px!important}.sow-fac-elevated-col.elevated{margin-top:16px!important}@media print{.sow-tbl{width:100%!important;min-width:0!important}.sow-tbl th,.sow-tbl td{padding:3px!important}.sow-node-rect{min-width:58px!important;max-width:82px!important;font-size:7px!important}.sow-node-date{min-width:28px!important;width:28px!important;height:28px!important;font-size:7px!important}.sow-node-release,.sow-node-full{min-width:48px!important;max-width:65px!important;font-size:7px!important}.sow-arrow{font-size:9px!important}.sow-impact,.sow-rooms{font-size:7px!important}}
+</style>
+<style id="timeline-overlap-fix">
+.tl-wrap{display:flex;flex-direction:column;min-height:0;height:100%;overflow:hidden}.tl-header-sticky{flex:0 0 auto;position:sticky;top:0;z-index:20;background:#102943;box-shadow:0 2px 4px rgba(0,0,0,.25)}.tl-scroll{flex:1 1 auto;min-height:0;overflow:auto}.timeline-svg{display:block}.tl-edit-table input[type="text"],.tl-edit-table input[type="date"],.tl-edit-table select{min-width:0}.tl-edit-table th,.tl-edit-table td{font-size:11px;padding:5px}.tl-edit-table .date-input{width:112px}.tl-edit-table .num-input{width:48px}
+</style>
+<style id="timeline-toolbar-fix">
+#page-timeline .toolbar{position:relative!important;top:auto!important;z-index:100!important;flex-shrink:0!important;align-items:center!important}#page-timeline{overflow:hidden!important;display:none;flex-direction:column;height:calc(100vh - 98px)}#page-timeline.active{display:flex!important}#page-timeline .timeline-box{flex:1 1 auto;min-height:0;overflow:hidden;padding:12px}.tl-wrap{height:100%;min-height:0}.tl-scroll{height:100%;overflow:auto}.timeline-svg{min-height:600px}
+</style>
+<style id="timeline-print-compact-fix">
+@media print{#page-timeline{display:block!important;height:auto!important;overflow:visible!important}.tl-wrap,.tl-scroll,.timeline-box{height:auto!important;overflow:visible!important}.tl-header-sticky{position:relative!important;box-shadow:none!important}.timeline-svg{width:100%!important;max-width:100%!important;min-height:0!important;height:auto!important}.tl-edit-panel,.toolbar,#sticky-top{display:none!important}}
+</style>
+<style id="timeline-extra-fix">
+/* Timeline extra UX: sticky header alignment + safer overflow */
+#tl-header-sticky svg{display:block}.tl-scroll svg{display:block}.tl-wrap{border:1px solid rgba(255,255,255,.12);border-radius:8px;background:#102943}.tl-header-sticky{border-radius:8px 8px 0 0;overflow:hidden}.tl-scroll{border-radius:0 0 8px 8px}#page-timeline .toolbar label{display:flex;align-items:center;gap:5px;font-size:12px}#page-timeline .toolbar input[type="checkbox"]{transform:translateY(1px)}
+</style>
+<style id="timeline-phase-5-fix">
+/* Phase 5: make timeline lanes readable and prevent child bars from hiding each other */
+.tl-wrap{background:#0e2843}.tl-header-sticky{background:#0e2843}.tl-scroll{background:#102943}.timeline-svg text{paint-order:stroke;stroke:rgba(0,0,0,.25);stroke-width:.4px;stroke-linejoin:round}.tl-edit-table{background:#fff}.tl-edit-panel{max-height:38vh;overflow:auto;border-top:1px solid #cfd8e3}.tl-edit-table th{position:sticky;top:0;z-index:2;background:#e9eef5}.tl-edit-table input,.tl-edit-table select{font-size:11px;padding:3px 4px}.tl-edit-table .btn-small{padding:3px 6px}
+</style>
+<style id="timeline-phase-7-fix">
+/* Phase 7: restore full timeline height and make body scrollable */
+#page-timeline.active{display:flex!important;flex-direction:column!important;height:calc(100vh - 98px)!important;overflow:hidden!important}#page-timeline .toolbar{flex:0 0 auto!important}#page-timeline .timeline-box{flex:1 1 auto!important;min-height:0!important;overflow:hidden!important;display:flex!important;flex-direction:column!important}.tl-wrap{flex:1 1 auto!important;min-height:0!important;height:100%!important;display:flex!important;flex-direction:column!important}.tl-scroll{flex:1 1 auto!important;min-height:0!important;overflow:auto!important}.timeline-svg{min-height:600px!important}
+</style>
+<style id="timeline-phase-8-fix">
+/* Phase 8: robust sticky header + horizontal alignment */
+#tl-header-sticky{overflow:hidden!important;background:#102943!important}#tl-header-sticky svg{min-width:max-content}.tl-scroll{overflow:auto!important}.tl-scroll .timeline-svg{min-width:max-content}.tl-wrap{contain:layout paint}.tl-scroll::-webkit-scrollbar{height:12px;width:12px}.tl-scroll::-webkit-scrollbar-thumb{background:#4d6f8e;border-radius:8px}.tl-scroll::-webkit-scrollbar-track{background:#0b2035}
+</style>
+<style id="dashboard-phase-10-fix">
+/* Dashboard Phase 10: compact executive daily huddle */
+.dash-mode-huddle .huddle-section{margin-bottom:10px}.dash-mode-huddle .progress-brief,.dash-mode-huddle .huddle-panel{padding:9px}.dash-mode-huddle .progress-kpis{gap:6px}.dash-mode-huddle .progress-kpi{min-height:72px;padding:7px}.dash-mode-huddle .progress-kpi-value{font-size:23px}.dash-mode-huddle .progress-kpi-label{font-size:9px}.dash-mode-huddle .progress-kpi-sub{font-size:10px}.dash-mode-huddle .progress-grid{gap:6px;margin-top:8px}.dash-mode-huddle .progress-panel{min-height:86px;padding:6px}.dash-mode-huddle .progress-row{grid-template-columns:70px 34px 1fr 44px;gap:5px;font-size:10px;padding:3px 0}.dash-mode-huddle .progress-row-meta{font-size:9px}.dash-mode-huddle .huddle-table.small th{font-size:8px;padding:5px}.dash-mode-huddle .huddle-table.small td{font-size:10px;padding:5px}.dash-mode-huddle .huddle-panel-title,.dash-mode-huddle .progress-brief-title{font-size:11px}.dash-mode-huddle .system-status-row{grid-template-columns:84px 1fr 58px;padding:5px}.dash-mode-huddle .system-status-id,.dash-mode-huddle .system-status-name{font-size:10px}.dash-mode-huddle .system-pill{font-size:9px;padding:2px 5px}.dash-mode-huddle .gowning-list.dashboard .gowning-row{grid-template-columns:105px 1fr;padding:8px}.dash-mode-huddle .gowning-area,.dash-mode-huddle .gowning-select{font-size:11px}.dash-mode-huddle .system-status-grid.compact{max-height:128px;overflow:auto}.dash-mode-huddle #dashboardPanel{padding:14px 18px!important}.dash-mode-huddle .huddle-middle-layout{grid-template-columns:.9fr 1.5fr}.dash-mode-huddle .huddle-bottom-layout{grid-template-columns:1.05fr 1.45fr}
+</style>
+<style id="print-schedule-style">
+/* ========== Print Schedule Executive Weekly Gantt ========== */
+.ps-page{padding:12px 16px;flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:#f5f5f5}.ps-toolbar{display:grid;grid-template-columns:repeat(3,minmax(120px,.7fr)) minmax(190px,1fr) auto;align-items:end;gap:8px;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px 10px;margin-bottom:8px;flex-shrink:0}.ps-titlebox{display:none}.ps-title{font-size:16px;font-weight:800;color:#1a3a5c}.ps-subtitle{font-size:11px;color:#666;margin-top:2px}.ps-toolbar label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase;letter-spacing:.04em;display:flex;flex-direction:column;gap:3px}.ps-toolbar select,.ps-toolbar input{font-size:12px;padding:5px 8px;border:1px solid #bbb;border-radius:6px;background:#fff;min-height:29px;width:100%;min-width:0}.ps-toolbar input{min-width:0}.ps-btn{background:#1a3a5c;color:#fff;border:0;border-radius:6px;padding:7px 12px;font-weight:800;cursor:pointer;white-space:nowrap;height:31px}.ps-print-area{background:#fff;border:1px solid #ddd;border-radius:8px;overflow:auto;flex:1;min-height:0}.ps-print-header{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:12px 14px;border-bottom:2px solid #1a3a5c}.ps-print-header h2{margin:0;color:#1a3a5c;font-size:18px}.ps-print-meta{font-size:11px;color:#555;margin-top:4px}.ps-legend{display:flex;gap:9px;flex-wrap:wrap;font-size:10px;font-weight:800}.ps-dot{width:10px;height:10px;border-radius:50%;display:inline-block;margin-right:3px}.ps-dot.pm{background:RoyalBlue}.ps-dot.cal{background:SeaGreen}.ps-dot.cm{background:DarkKhaki}.ps-dot.em{background:Sienna}.ps-dot.proj{background:DarkSlateBlue}.ps-chart{min-width:1200px}.ps-week-row,.ps-task-row{display:grid;grid-template-columns:240px repeat(var(--ps-weeks),minmax(86px,1fr));min-height:34px;border-bottom:1px solid #e5e8ec}.ps-left-head{background:#1a3a5c;color:#fff;padding:8px 10px;font-size:11px;font-weight:900;position:sticky;left:0;z-index:2}.ps-week-cell{border-left:1px solid #edf0f3;padding:5px 5px;min-width:0}.ps-week-row .ps-week-cell{background:#e9eef5;font-size:10px;text-align:center;color:#1a3a5c;font-weight:800}.ps-week-row .ps-week-cell span{display:block;font-size:9px;color:#666;font-weight:600}.ps-group-title{background:#dfe7ef;color:#1a3a5c;font-size:11px;font-weight:900;letter-spacing:.05em;text-transform:uppercase;padding:6px 10px;border-bottom:1px solid #cfd8e3;position:sticky;left:0;z-index:1}.ps-left{background:#fff;position:sticky;left:0;z-index:1;padding:6px 8px;font-size:11px;font-weight:700;color:#222;overflow:hidden;text-overflow:ellipsis}.ps-left span{display:block;font-size:9px;color:#666;font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.ps-bar{height:20px;line-height:20px;border-radius:999px;color:#fff;font-size:9px;font-weight:800;text-align:center;overflow:hidden;white-space:nowrap;min-width:22px;box-shadow:0 1px 3px rgba(0,0,0,.25)}.ps-bar.pm{background:RoyalBlue}.ps-bar.cal{background:SeaGreen}.ps-bar.cm{background:#9a8b2e}.ps-bar.em{background:Sienna}.ps-bar.proj{background:DarkSlateBlue}.ps-empty{padding:24px;color:#666;font-style:italic}@media print{body.ps-print-mode #sticky-top,body.ps-print-mode .toolbar,body.ps-print-mode .tab-nav,body.ps-print-mode header,body.ps-print-mode .ps-toolbar{display:none!important}body.ps-print-mode .page{display:none!important}body.ps-print-mode #page-printschedule{display:block!important;height:auto!important;overflow:visible!important}body.ps-print-mode .ps-page{padding:0!important;background:#fff!important;height:auto!important;overflow:visible!important}body.ps-print-mode .ps-print-area{border:0!important;border-radius:0!important;overflow:visible!important}body.ps-print-mode .ps-chart{min-width:0!important}body.ps-print-mode .ps-week-row,body.ps-print-mode .ps-task-row{grid-template-columns:190px repeat(var(--ps-weeks),1fr)!important;min-height:24px!important;page-break-inside:avoid}body.ps-print-mode .ps-left,body.ps-print-mode .ps-left-head,body.ps-print-mode .ps-group-title{position:static!important}body.ps-print-mode .ps-left{font-size:8px!important;padding:3px 4px!important}body.ps-print-mode .ps-left span{font-size:7px!important}body.ps-print-mode .ps-week-cell{padding:2px!important}.ps-bar{font-size:7px!important;height:14px!important;line-height:14px!important}.ps-print-header{padding:8px!important}.ps-print-header h2{font-size:14px!important}.ps-print-meta,.ps-legend{font-size:8px!important}}
+</style>
+<style id="resource-calendar-style">
+/* ========== Resource Calendar ========== */
+.resource-page{padding:12px;display:flex;flex-direction:column;gap:10px;height:100%;background:#eef2f6}.rc-toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;background:#fff;border:1px solid #ddd;border-radius:8px;padding:8px}.rc-toolbar label{font-size:11px;font-weight:800;color:#555;text-transform:uppercase}.rc-toolbar input,.rc-toolbar select{font-size:12px;padding:5px 8px;border:1px solid #bbb;border-radius:6px;background:#fff}.rc-btn{background:#1a3a5c;color:#fff;border:0;border-radius:6px;padding:6px 10px;font-weight:800;cursor:pointer}.rc-layout{display:grid;grid-template-columns:1fr 270px;gap:10px;min-height:0;flex:1}.rc-main{background:#fff;border:1px solid #d7dde5;border-radius:8px;overflow:auto}.rc-side{background:#fff;border:1px solid #d7dde5;border-radius:8px;overflow:auto;padding:10px}.rc-title{font-size:15px;font-weight:900;color:#1a3a5c;margin-bottom:8px}.rc-table{width:100%;border-collapse:collapse;font-size:11px}.rc-table th{position:sticky;top:0;background:#1a3a5c;color:#fff;z-index:3;text-align:left;padding:6px}.rc-table td{border:1px solid #e2e6eb;padding:5px;background:#fff;vertical-align:top}.rc-date-head{background:#dfe7ef!important;color:#1a3a5c!important}.rc-task{border-radius:6px;padding:4px 5px;margin:3px 0;color:#fff;font-size:10px;font-weight:700;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.2)}.rc-task.pm{background:RoyalBlue}.rc-task.cal{background:SeaGreen}.rc-task.cm{background:#9a8b2e}.rc-task.em{background:Sienna}.rc-task.proj{background:DarkSlateBlue}.rc-task small{display:block;font-size:9px;opacity:.9;font-weight:600}.rc-loadbar{height:8px;background:#edf1f5;border-radius:999px;overflow:hidden;margin-top:3px}.rc-loadbar span{display:block;height:8px;background:#4a90d9}.rc-side-row{display:grid;grid-template-columns:1fr 44px;gap:6px;align-items:center;font-size:11px;padding:5px 0;border-bottom:1px solid #eef2f6}.rc-side-row b{color:#1a3a5c}.rc-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:2000;align-items:center;justify-content:center}.rc-modal.show{display:flex}.rc-modal-card{background:#fff;border-radius:10px;padding:16px;width:min(520px,92vw);box-shadow:0 10px 35px rgba(0,0,0,.3)}.rc-modal-card h3{margin:0 0 10px;color:#1a3a5c}.rc-form{display:grid;grid-template-columns:110px 1fr;gap:8px;align-items:center}.rc-form label{font-size:12px;font-weight:800;color:#555}.rc-form input,.rc-form select,.rc-form textarea{padding:6px;border:1px solid #bbb;border-radius:6px;font-size:12px;width:100%}.rc-form textarea{min-height:70px}.rc-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:12px}.rc-actions button{padding:7px 11px;border-radius:6px;border:0;font-weight:800;cursor:pointer}.rc-actions .save{background:#1a3a5c;color:#fff}.rc-actions .cancel{background:#e5e9ef;color:#333}@media(max-width:900px){.rc-layout{grid-template-columns:1fr}.rc-side{max-height:220px}}
+</style>
+<style id="resource-calendar-fix-v2">
+#page-resource{overflow:hidden!important;display:none;flex-direction:column;height:calc(100vh - 98px)}#page-resource.active{display:flex!important}.resource-page{min-height:0;overflow:hidden}.rc-main{min-height:0}.rc-table th{top:0}.rc-task{word-break:break-word}.rc-table td:first-child,.rc-table th:first-child{position:sticky;left:0;z-index:2}.rc-table th:first-child{z-index:4}.rc-table td:first-child{background:#f8fafc;font-weight:800;color:#1a3a5c}.rc-side{min-height:0}.rc-toolbar{flex-shrink:0}.rc-layout{overflow:hidden}.rc-main{overflow:auto}.rc-side{overflow:auto}
+</style>
+<style id="resource-calendar-phase10">
+/* Phase 10 Resource Calendar polish */
+.rc-task{transition:transform .08s ease, filter .08s ease}.rc-task:hover{transform:translateY(-1px);filter:brightness(1.06)}.rc-table tr:hover td{background:#fbfdff}.rc-table tr:hover td:first-child{background:#eef5ff}.rc-side-row{grid-template-columns:1fr 54px}.rc-side-row span:last-child{text-align:right;font-weight:800;color:#1a3a5c}.rc-loadbar span{background:linear-gradient(90deg,#4a90d9,#f0c040)}.rc-modal-card{border:1px solid #d6dde6}.rc-form input:focus,.rc-form select:focus,.rc-form textarea:focus{outline:2px solid rgba(74,144,217,.35);border-color:#4a90d9}
+</style>
+</head><body>
+<div id="sticky-top">
+<header>
+  <h1>2026 Summer Shutdown Plan – Task Tracker</h1>
+  <span>Revance Therapeutics &nbsp;|&nbsp; Last saved: <span id="lastSaved">9:02:48 AM</span><span class="app-version">Version 2026.06.24 Firebase Sync v12</span><span id="firebaseSyncStatus" class="firebase-sync-status off" title="Firebase shared sync status">Firebase: connecting</span></span>
+</header>
+<div class="tab-nav">
+  <button class="tab-btn active" onclick="showTab('tracker',this)">📋 Task Tracker</button>
+  <button class="tab-btn" onclick="setDashboardMode('huddle');showTab('dashboard',this)">📊 Dashboard</button>
+  <button class="tab-btn" onclick="setDashboardMode('kpi');showTab('dashboard',this)">📈 KPI</button>
+  <button class="tab-btn" onclick="showTab('scope',this)">🧭 Scope</button>
+  <button class="tab-btn" onclick="showTab('timeline',this)">🗓 Timeline</button>
+  <button class="tab-btn" onclick="showTab('resource',this)">👥 Resource Calendar</button>
+  <button class="tab-btn" onclick="showTab('printschedule',this)">🖨 Print Schedule</button>
+  <button class="tab-btn" onclick="showTab('workorders',this)">🧾 Work Orders</button>
+</div>
+</div>
+
+<div id="page-tracker" class="page active">
+  <div class="toolbar">
+    <input id="searchBox" placeholder="Search task / vendor / assignee" oninput="render()">
+    <select id="sectionFilter" class="section-filter" onchange="render()"><option value="">All Sections</option></select>
+    <select id="catFilter" onchange="render()"><option value="">All Categories</option><option>PM</option><option>CAL</option><option>CM</option><option>EM</option><option>PROJ</option></select>
+    <select id="statusFilter" onchange="render()"><option value="">All Status</option><option>Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>N/A</option></select>
+    <span class="status-filter" id="quickStatus"></span>
+    <input type="date" id="todayInput" onchange="render();renderDashboard();">
+    <button class="primary" onclick="exportCSV()">Export CSV</button>
+    <button onclick="saveLocal()">Save</button>
+    <button onclick="resetLocal()">Reset</button>
+    <button onclick="saveSharedDataFile()" title="Download current tracker state as shutdown-tracker-data.json">💾 Save Shared Data</button>
+    <label class="btn-small" style="border:1px solid #888;border-radius:5px;background:#fff;padding:6px 10px;cursor:pointer">📂 Load Shared Data<input type="file" accept="application/json" style="display:none" onchange="loadSharedDataFromInput(this)"></label>
+    <span class="filter-chip" id="summaryChip">—</span>
+  </div>
+  <div id="tableWrap"></div>
+</div>
+
+<div id="page-dashboard" class="page">
+<div id="dashboardPanel" class="dash-mode-huddle" style="background:#0d2137;overflow-y:auto;flex:1;padding:18px 22px;color:#fff;min-height:0">
+
+  <!-- Title -->
+  <div style="background:#1a3a5c;padding:13px 18px;border-radius:8px;margin-bottom:14px;border-bottom:3px solid #f0c040;display:flex;align-items:center;justify-content:space-between;gap:14px">
+    <span id="dashboardTitle" style="font-size:20px;font-weight:800;letter-spacing:0.12em;text-transform:uppercase">2026 Shutdown Daily Huddle</span>
+    <div class="dashboard-export-actions">
+      <span id="dashboardModeMeta" style="font-size:13px;color:#cde;font-weight:800">Date: — | Time: —</span>
+      <button class="dashboard-export-btn" id="btnSaveHuddlePdf" type="button" onclick="exportDailyHuddlePDF(event)" title="Print or Save the dashboard as PDF for Power Automate email attachment">📄 Save PDF</button>
+      <button class="dashboard-export-btn secondary" id="btnDownloadHuddleSummary" type="button" onclick="downloadDailyHuddleSummary(event)" title="Download an Outlook-ready dashboard HTML email body with no attachment required">⬇ Email Body Dashboard v8</button>
+      <span id="huddleExportStatus" style="font-size:11px;color:#f0c040;font-weight:800;white-space:nowrap"></span>
+    </div>
+  </div>
+
+  <!-- Executive Dashboard V2: KPI Command Center -->
+  <div class="huddle-section">
+    <div class="progress-brief-head" style="margin-bottom:10px">
+      <div>
+        <div class="progress-brief-title">Executive Dashboard V2</div>
+        <div class="progress-brief-date" id="d-progress-asof">As of —</div>
+      </div>
+      <div class="progress-brief-date" id="d-progress-summary">—</div>
+    </div>
+
+    <div class="exec-kpi-grid">
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Shutdown Status</div>
+        <div class="exec-kpi-value small" id="d-shutdown-status">—</div>
+        <div class="exec-kpi-sub" id="d-shutdown-status-sub">—</div>
+        <div class="exec-kpi-detail" id="d-shutdown-range">—</div>
+      </div>
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Overall Progress</div>
+        <div class="exec-kpi-value" id="d-progress-pct">—</div>
+        <div class="exec-progress-meter"><span id="d-progress-meter" style="width:0%"></span></div>
+        <div class="exec-kpi-sub" id="d-progress-done">—</div>
+      </div>
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Today's Work</div>
+        <div class="exec-kpi-value" id="d-today-due">—</div>
+        <div class="exec-kpi-sub"><span id="d-today-complete">—</span> complete</div>
+        <div class="exec-kpi-detail"><span id="d-today-remaining">—</span> remaining</div>
+      </div>
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Schedule Risk</div>
+        <div class="exec-kpi-value bad" id="d-risk-late">—</div>
+        <div class="exec-kpi-sub">Late / delayed</div>
+        <div class="exec-kpi-detail"><span id="d-risk-at-risk">—</span> overdue</div>
+      </div>
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Systems Status</div>
+        <div class="exec-kpi-value warn" id="d-systems-oos">—</div>
+        <div class="exec-kpi-sub">OOS systems</div>
+        <div class="exec-kpi-detail"><span id="d-systems-normal">—</span> normal · <span id="d-systems-returning">—</span> returning</div>
+      </div>
+      <div class="exec-kpi-card">
+        <div class="exec-kpi-label">Resource Readiness</div>
+        <div class="exec-kpi-value" id="d-resource-pending">—</div>
+        <div class="exec-kpi-sub">pending</div>
+        <div class="exec-kpi-detail"><span id="d-resource-inprogress">—</span> in progress · <span id="d-resource-complete">—</span> complete</div>
+      </div>
+    </div>
+
+    <div class="exec-ops-grid">
+      <div class="progress-panel"><div class="progress-panel-title">Progress by System</div><div id="d-progress-system"></div></div>
+      <div class="progress-panel"><div class="progress-panel-title">Progress by Category</div><div id="d-progress-category"></div></div>
+      <div class="huddle-panel tight" style="margin:0">
+        <div class="huddle-panel-title">Gowning Status</div>
+        <div id="d-gowning-status" class="gowning-list dashboard">
+          <div class="gowning-row">
+            <div class="gowning-area">DP MFG Area</div>
+            <select id="gowningDp" class="gowning-select" onchange="setGowningStatus('dp',this.value)">
+              <option value="Suspending - Blue scrub only">Suspending - Blue scrub only</option>
+              <option value="Full Gowning">Full Gowning</option>
+            </select>
+          </div>
+          <div class="gowning-row">
+            <div class="gowning-area">DS MFG Area</div>
+            <select id="gowningDs" class="gowning-select" onchange="setGowningStatus('ds',this.value)">
+              <option value="Suspending - Blue scrub only">Suspending - Blue scrub only</option>
+              <option value="Full Gowning">Full Gowning</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="progress-panel" style="margin-bottom:14px"><div class="progress-panel-title">Critical Tasks / Today's Priority</div><div id="d-progress-focus"></div></div>
+  </div>
+
+  <!-- Daily Huddle Middle: Abnormal Systems + Return to Service -->
+  <div class="huddle-middle-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Systems / Utilities Status</div>
+      <div id="d-system-status" class="system-status-grid compact"></div>
+    </div>
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Return to Service / Delay Description</div>
+      <table class="huddle-table small">
+        <thead><tr><th>Progress</th><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead>
+        <tbody id="d-rts-rows"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Daily Huddle Bottom: Active Work + Next 7 Days -->
+  <div class="huddle-bottom-layout huddle-section">
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Maintenance Activities</div>
+      <table class="huddle-table small">
+        <thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead>
+        <tbody id="d-maint-activities"></tbody>
+      </table>
+    </div>
+    <div class="huddle-panel tight">
+      <div class="huddle-panel-title">Upcoming Schedule - Next 7 Days</div>
+      <table class="huddle-table small">
+        <thead><tr><th>Start</th><th>Target</th><th>System ID</th><th>Event</th><th>Owner / Resource</th><th>Status</th></tr></thead>
+        <tbody id="d-upcoming-schedule"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Delayed Alert -->
+  <div id="d-delayed-alert" class="dash-delayed-alert kpi-section" style="margin-bottom:14px">
+    <div class="dash-delayed-alert-header">
+      <span style="font-size:20px">⚠</span>
+      <span class="dash-delayed-alert-title">Delayed Tasks</span>
+      <span class="dash-delayed-badge" id="d-delayed-count">0</span>
+    </div>
+    <table class="delayed-table">
+      <thead><tr><th>ID</th><th>Task</th><th>Assigned</th><th>Vendor</th><th>Start</th><th>End</th><th>Wk</th><th>Comment</th></tr></thead>
+      <tbody id="d-delayed-rows"></tbody>
+    </table>
+  </div>
+
+  <!-- Row 1: Total | By Area | By Resource -->
+  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr 1.3fr;gap:12px;margin-bottom:12px">
+
+    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px;text-align:center;display:flex;flex-direction:column;justify-content:center">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;margin-bottom:10px">TOTAL WORK ORDERS</div>
+      <div style="font-size:72px;font-weight:800;line-height:1;color:#fff" id="d-total-num">—</div>
+      <div style="font-size:22px;font-weight:700;color:#f0c040;margin-top:10px;font-style:italic" id="d-total-sub">—</div>
+      <div id="d-delayed-badge-card" style="display:none;margin-top:10px">
+        <span style="background:#e53935;color:#fff;font-size:12px;font-weight:700;padding:3px 12px;border-radius:12px">⚠ <span id="d-delayed-badge-num">0</span> Delayed</span>
+      </div>
+    </div>
+
+    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY AREA</div>
+      <div id="d-by-area" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
+        <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">50%</span>
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">0%</span>
+        </div>
+        <div style="position:absolute;right:38px;top:0;bottom:20px;left:0;border-right:1px dashed rgba(200,220,240,0.15)">
+          <div style="position:absolute;top:0;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:4px">WORK ORDER BY RESOURCE</div>
+      <div id="d-by-resource" style="display:flex;align-items:flex-end;justify-content:space-around;height:150px;position:relative">
+        <div style="position:absolute;right:0;top:0;bottom:20px;width:40px;display:flex;flex-direction:column;justify-content:space-between;text-align:right">
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">100%</span>
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">50%</span>
+          <span style="font-size:9px;color:rgba(200,220,240,0.5)">0%</span>
+        </div>
+        <div style="position:absolute;right:38px;top:0;bottom:20px;left:0">
+          <div style="position:absolute;top:0;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+          <div style="position:absolute;top:50%;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+          <div style="position:absolute;bottom:0;left:0;right:0;border-top:1px dashed rgba(200,220,240,0.12)"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Row 2: Category | Vendor -->
+  <div class="kpi-section" style="display:grid;grid-template-columns:1fr 2fr;gap:12px;margin-bottom:12px">
+    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:8px">BY CATEGORY</div>
+      <div id="d-by-category"></div>
+    </div>
+    <div style="background:#1a3a5c;border-radius:8px;padding:16px 20px">
+      <div style="font-size:10px;font-weight:700;letter-spacing:0.12em;color:#cde;text-align:center;margin-bottom:8px">VENDOR LOAD</div>
+      <div style="display:flex;justify-content:center;gap:18px;margin-bottom:8px">
+        <span style="font-size:11px;color:#f0c040">● CAL</span>
+        <span style="font-size:11px;color:#5db3e8">● CM</span>
+        <span style="font-size:11px;color:#e07840">● PM</span>
+      </div>
+      <div id="d-by-vendor" class="vendor-progress"></div>
+    </div>
+  </div>
+
+</div>
+</div>
+<script>
+// ── Portable Data Seed ──────────────────────────────────────────────────────
+// This block ensures the tracker loads with the correct data on any computer.
+(function(){
+  var seed = {
+    "sd26_assignees": "[\"DP MFG\",\"DS MFG\",\"HS\",\"Hector\",\"Irene\",\"JC\",\"Jason\",\"Jingfu\",\"LW\",\"Lance\",\"MC\",\"MV\",\"Marco\",\"Michael\",\"NP\",\"Nhan\",\"QCEM\",\"RC\",\"RN\",\"Romulo\",\"TS\",\"TS_DP\",\"Terry\",\"Yelena\"]",
+    "sd26_projectStart_v1": "2026-07-06",
+    "sd26_startup_v2": "{\"2.09\":\"2026-07-26\",\"3.06\":\"2026-07-22\",\"4.04\":\"2026-07-17\",\"6.05\":\"2026-07-21\",\"7.07\":\"2026-07-28\",\"9.01\":\"2026-08-08\",\"10.02a\":\"2026-07-17\",\"10.02c\":\"2026-07-17\",\"10.02d\":\"2026-07-22\",\"10.02f\":\"2026-07-20\",\"13.01.03\":\"2026-08-04\",\"13.02.03\":\"2026-08-26\",\"1.11\":\"2026-07-22\",\"10.02g\":\"2026-07-27\",\"10.02h\":\"2026-07-27\",\"11.01\":\"2026-08-07\",\"11.04\":\"2026-08-14\",\"11.05\":\"2026-07-27\",\"11.06\":\"2026-07-28\",\"11.07\":\"2026-07-28\",\"12.01\":\"2026-07-28\",\"8.01\":\"2026-07-23\"}",
+    "sd26_vscope_v7": "{\"scope1\":[{\"system\":\"PURW\\nSYSTEM\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Invasive PM\\n2.Chemical Sani.\\n3.Filters change\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/22\",\"7/23\",\"7/24\"],\"qcLabels\":[\"Day 1\\nSample\",\"Day 2\\nSample\",\"Day 3\\nSample\"],\"condDate\":\"7/24\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\nDay 1 Results\",\"fullDate\":\"8/04\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\",\"impact\":\"WFI SYSTEM, CLEAN SYSTEM, AUTOCLAVE, LYO, TFFS, LABs, Vial washer, FERM and CLEANING\"},{\"system\":\"WFI\\nSYSTEM\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Invasive PM\\n2.Filter change\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/23\",\"7/24\",\"7/25\"],\"qcLabels\":[\"Day 1\\nSample\",\"Day 2\\nSample\",\"Day 3\\nSample\"],\"condDate\":\"7/25\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\nDay 1 Results\",\"fullDate\":\"8/04\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\",\"impact\":\"Part Washers, LYO, TFFS, LABs, Vial washer\"},{\"system\":\"CLEAN\\nSTEAM\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Invasive PM\\n2.Filters change\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/23\",\"7/24\",\"7/25\"],\"qcLabels\":[\"Day 1\\nSample\",\"Day 2\\nSample\",\"Day 3\\nSample\"],\"condDate\":\"7/25\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"7/28\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\",\"impact\":\"WFI, Autoclaves, LYO, TFFS,\"},{\"system\":\"CLEAN DRY\\nAIR SYSTEM\",\"startDate\":\"7/15\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Invasive PM\\n2.Filters change\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/17\"],\"qcLabels\":[\"1 day\\nSample\"],\"condDate\":\"7/18\",\"condColor\":\"blue\",\"condLabel\":\"Full Release w/\\nRequired\\nResults\",\"fullDate\":\"\",\"fullColor\":\"\",\"fullLabel\":\"\",\"impact\":\"All equipment and all point of use drops\"}],\"scope2\":[{\"system\":\"NITROGEN\\nGAS\\nSYSTEM\",\"startDate\":\"7/23\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Invasive PM\\n2.Filters change\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/25\"],\"qcLabels\":[\"1 day\\nSampling\"],\"condDate\":\"7/28\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"8/04\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\",\"impact\":\"Fermenter, Lyo and Labs\"},{\"system\":\"HVAC\\nSYSTEM\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Annual PMs\\n2.HEPA CERTs\\n3.AIR Balancing\\n4.BIBO PMs\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"},{\"text\":\"Area 3x\\nCleaning\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"7/30\",\"7/31\",\"8/06\",\"8/08\"],\"qcLabels\":[\"\",\"\",\"\",\"\"],\"condDate\":\"8/04\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"8/11\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\",\"impact\":\"DP MFG area\\nLabs (7/22)\\nDS MFG area\"},{\"system\":\"PLANT\\nSTEAM\\nSYSTEM\",\"startDate\":\"7/17\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.Boiler Annual PM\\n2.Boiler Annual Permit\",\"cls\":\"sow-node-rect\"},{\"text\":\"7/18\\nFunctional\\nTest /\\nVerification\",\"cls\":\"sow-node-rect\"}],\"qcDates\":[\"8/04\",\"8/05\"],\"qcLabels\":[\"\",\"\"],\"condDate\":\"\",\"condColor\":\"teal\",\"condLabel\":\"\",\"fullDate\":\"\",\"fullColor\":\"\",\"fullLabel\":\"\",\"impact\":\"Utility Systems, Part washers, Fermenter and room temperature\"}],\"scope3\":[{\"system\":\"SMART\\nFILLER\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.SEMI-ANNUAL PM\\n2.REPLACEMENT PARTS\",\"cls\":\"sow-node-rect\"}],\"rtBoxes\":[{\"text\":\"Pre-run check\",\"cls\":\"sow-node-rect\"},{\"text\":\"Functional\\nverification\\nRun 3 full trays\",\"cls\":\"sow-node-rect\"},{\"text\":\"1x Full\\nCleaning\",\"cls\":\"sow-node-rect\"}],\"returnDate\":\"7/25\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nservice\"},{\"system\":\"LYO\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.SEMI-ANNUAL PM\\n2.ANNUAL PM\\n3.CALIBRATION\",\"cls\":\"sow-node-rect\"}],\"rtBoxes\":[{\"text\":\"TEST CYCLE\\nCIP CYCLE\",\"cls\":\"sow-node-rect\"},{\"text\":\"VISUAL\\nINSPECTION\",\"cls\":\"sow-node-rect\"},{\"text\":\"LEAK TEST\\nBELLOW TEST\",\"cls\":\"sow-node-rect\"}],\"returnDate\":\"7/18\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nservice\"},{\"system\":\"FERMENTER\",\"startDate\":\"7/27\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"ANNUAL PM\\n(Modify PM tasks\\nthrough CR)\",\"cls\":\"sow-node-rect\"},{\"text\":\"7/28\\nCALIBRATION\",\"cls\":\"sow-node-rect\"}],\"rtBoxes\":[{\"text\":\"\",\"cls\":\"sow-node-rect\"}],\"returnDate\":\"8/01\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nservice\"},{\"system\":\"TFFS\",\"startDate\":\"8/10\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"ANNUAL PM\\n(Modify PM tasks\\nthrough CR)\",\"cls\":\"sow-node-rect\"},{\"text\":\"7/28\\nCALIBRATION\",\"cls\":\"sow-node-rect\"}],\"rtBoxes\":[{\"text\":\"\",\"cls\":\"sow-node-rect\"}],\"returnDate\":\"8/01\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nservice\"},{\"system\":\"STERIS 7\\nEQUIPMENT\",\"startDate\":\"7/06\",\"startColor\":\"red\",\"facBoxes\":[{\"text\":\"1.ANNUAL PM\",\"cls\":\"sow-node-rect\"},{\"text\":\"FUNCTIONAL TEST\",\"cls\":\"sow-node-rect\"}],\"rtBoxes\":[{\"text\":\"EQ Down time:\",\"cls\":\"sow-node-rect\"},{\"text\":\"ACLE-001 7/06-7/07\",\"cls\":\"sow-node-rect\"},{\"text\":\"CWAS-001 7/08\\n\",\"cls\":\"sow-node-rect\"},{\"text\":\"ACLE-002 7/09-7/10\",\"cls\":\"sow-node-rect\"},{\"text\":\"DECA-001 7/13-14\\n\",\"cls\":\"sow-node-rect\"},{\"text\":\"ACLE-003 7/15-16\\n\",\"cls\":\"sow-node-rect\"}],\"returnDate\":\"8/01\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nservice\"}],\"scope4\":[{\"system\":\"DP MFG\\nASEPTIC ROOMS\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"rooms\":\"ROOMS 1231, 1233A, 1233B and 1235\",\"returnDate\":\"7/28\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nclean\"},{\"system\":\"DP MFG\\nNON-ASEPTIC\\nROOMS\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"rooms\":\"ROOMS 1202, 1203, 1204, 1207, 1210, 1211, 1213, 1214, 1215, 1217, 1220, 1221, 1222, 1226, 1227, 1228, 1230, 1265, 1231, 1233A, 1233B, 1234, and 1235\",\"returnDate\":\"7/24\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nclean\"},{\"system\":\"DS MFG\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"rooms\":\"1340, 1341, 1342, 1344, 1345, 1350, 1351, 1352, 1353, 1355, 1356, 1357, 1358, 1359, 1362, 1364, 1365, 1366, 1368, 1369, 1370, 1371, 1372, 1373, 1380, 1381 and 1383.\",\"returnDate\":\"7/24\",\"returnColor\":\"blue\",\"returnLabel\":\"Return to\\nclean\"}],\"scope5\":[{\"system\":\"DP MFG ROOMS\\n1213, 1231, 1233A,\\n1233B AND 1235\\n(SOP_EQ_0297 V2.1\\nAPPENDIX 7.5)\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"facBoxes\":[{\"date\":\"7/07\",\"label\":\"3x room\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"},{\"date\":\"7/28\",\"label\":\"BSC/cRAB\\nCleaning\",\"cls\":\"sow-node-date red\",\"style\":\"elevated\"},{\"date\":\"7/29\",\"label\":\"3x room\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"}],\"qcDates\":[\"7/30\"],\"qcLabels\":[\"Viable &\\nNon-viable\\nsamples\"],\"condDate\":\"8/04\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"8/11\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\"},{\"system\":\"DS MFG ROOMS\\n1351, 1352 and 1353\\n(SOP_EQ_0297 V2.1\\nAPPENDIX 6.5B)\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"facBoxes\":[{\"date\":\"8/04\",\"label\":\"3x rooms\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"},{\"date\":\"8/05\",\"label\":\"BSCs\\nCleaning\",\"cls\":\"sow-node-date red\",\"style\":\"elevated\"},{\"date\":\"8/05\",\"label\":\"3x room\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"}],\"qcDates\":[\"8/06\"],\"qcLabels\":[\"Viable &\\nNon-viable\\nsamples\"],\"condDate\":\"8/12\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"8/18\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\"},{\"system\":\"DS MFG ROOMS\\n1356, 1357, 1358,\\n1373, 1380 and 1381\\n(SOP_EQ_0297 V2.1\\nAPPENDIX 6.5B)\",\"startDate\":\"7/07\",\"startColor\":\"red\",\"facBoxes\":[{\"date\":\"8/04\",\"label\":\"3x rooms\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"},{\"date\":\"8/05\",\"label\":\"BSCs\\nCleaning\",\"cls\":\"sow-node-date red\",\"style\":\"elevated\"},{\"date\":\"8/05\",\"label\":\"3x room\\ncleaning\",\"cls\":\"sow-node-date red\",\"style\":\"normal\"}],\"qcDates\":[\"8/06\"],\"qcLabels\":[\"Viable &\\nNon-viable\\nsamples\"],\"condDate\":\"8/12\",\"condColor\":\"teal\",\"condLabel\":\"Conditional\\nRelease w/\\n1day Results\",\"fullDate\":\"8/18\",\"fullColor\":\"blue\",\"fullLabel\":\"Full\\nRelease\"}]}"
+  };
+  Object.keys(seed).forEach(function(k){
+    // Do not overwrite saved edits when reopening the same local file.
+    // If a key is missing, initialize it from the embedded seed.
+    if(localStorage.getItem(k) === null) localStorage.setItem(k, seed[k]);
+  });
+})();
+// ── End Portable Data Seed ──────────────────────────────────────────────────
+const BASE = new Date(1900,0,1);
+function excelSerialToDateValue(n){
+  if(n === null || n === undefined || n === '') return null;
+  const num = Number(n);
+  if(!Number.isFinite(num)) return null;
+  const d = new Date(BASE);
+  d.setDate(d.getDate() + num - 2);
+  return d;
+}
+function pad2(n){ return String(n).padStart(2,'0'); }
+function toDateInputValue(v){
+  if(!v) return '';
+  if(typeof v === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  const d = excelSerialToDateValue(v);
+  if(!d) return '';
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+}
+function displayDate(v){
+  const iso = toDateInputValue(v);
+  if(!iso) return '';
+  const [y,m,d] = iso.split('-');
+  return `${Number(m)}/${Number(d)}/${y}`;
+}
+function normalizeDateValue(v){
+  const iso = toDateInputValue(v);
+  return iso || null;
+}
+function diffDaysInclusive(startVal, endVal){
+  const s = normalizeDateValue(startVal), e = normalizeDateValue(endVal);
+  if(!s || !e) return null;
+  const sd = new Date(`${s}T00:00:00`);
+  const ed = new Date(`${e}T00:00:00`);
+  if(ed < sd) return null;
+  let count = 0;
+  const cur = new Date(sd);
+  while(cur <= ed){
+    const day = cur.getDay();
+    if(day !== 0 && day !== 6) count++;
+    cur.setDate(cur.getDate() + 1);
+  }
+  return count;
+}
+function weekOfYear(d){
+  const date = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  date.setUTCDate(date.getUTCDate() + 4 - (date.getUTCDay()||7));
+  const yearStart = new Date(Date.UTC(date.getUTCFullYear(),0,1));
+  return Math.ceil((((date-yearStart)/86400000)+1)/7);
+}
+function getWeek(v){
+  const iso = normalizeDateValue(v);
+  if(!iso) return '';
+  return weekOfYear(new Date(`${iso}T00:00:00`));
+}
+function escapeHtml(s){return String(s??'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));}
+
+const rawRows = [
+{"id":"1","task":"PURIFIED WATER (01-PURW-001)","assigned":"","vendor":"","start":46209,"end":46238,"days":30,"section":"UTILITIES SYSTEM","isParent":true},
+{"id":"1.01","task":"PW DOWN","assigned":"Hector","vendor":"","start":"2026-07-06","end":"2026-07-06","days":1,"section":"UTILITIES SYSTEM"},
+{"id":"1.02","task":"CALIBRATION","assigned":"Jingfu","vendor":"A&P","start":"2026-07-07","end":"2026-07-08","days":2,"section":"UTILITIES SYSTEM"},
+{"id":"1.03","task":"CHANGE GASKETS/CHECK DIAPHRAGMS","assigned":"Marco","vendor":"","start":"2026-07-06","end":"2026-07-14","days":7,"section":"UTILITIES SYSTEM"},
+{"id":"1.04","task":"CHRIST PM (Q, SA, A)","assigned":"Marco","vendor":"BWT","start":"2026-07-06","end":"2026-07-10","days":5,"section":"UTILITIES SYSTEM"},
+{"id":"1.05","task":"FILTER TEST","assigned":"DP MFG","vendor":"","start":"2026-07-15","end":"2026-07-17","days":3,"section":"UTILITIES SYSTEM"},
+{"id":"1.06","task":"SANITIZE","assigned":"Marco","vendor":"Astro Pak","start":"2026-07-15","end":"2026-07-16","days":2,"section":"UTILITIES SYSTEM"},
+{"id":"1.07","task":"FILL TANK","assigned":"Marco","vendor":"","start":"2026-07-16","end":"2026-07-16","days":1,"section":"UTILITIES SYSTEM"},
+{"id":"1.08","task":"LEAK CHECK","assigned":"Marco","vendor":"","start":"2026-07-16","end":"2026-07-16","days":1,"section":"UTILITIES SYSTEM"},
+{"id":"1.09","task":"Flush PW point use ports (19 ports)","assigned":"Marco","vendor":"","start":"2026-07-17","end":"2026-07-17","days":1,"section":"UTILITIES SYSTEM"},
+...
