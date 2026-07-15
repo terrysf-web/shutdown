@@ -6543,11 +6543,11 @@ function weeklyPlanExecutionData(asOfIso){
   const targetEnd = t=>normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
   const isComplete = t=>(statusMap[t.id]||t.status||'Pending')==='Complete';
 
-  // Use objective completion milestones on both sides of the comparison.
+  // Compare the time-phased plan with actual task progress.
   // Plan = tasks scheduled before today, plus today's milestones earned
   // gradually during the approved 07:00-16:00 workday.
-  // Actual = tasks explicitly marked Complete. In Progress, Delayed and On Hold
-  // never gain "actual" credit merely because time has passed.
+  // Actual = each task's live progress: Scheduled 0%, In Progress earned during
+  // the 07:00-16:00 workday, On Hold frozen, and Complete 100%.
   const weeklyScope = active.filter(t=>{
     const due = targetEnd(t);
     return due && due >= range.start && due <= range.end;
@@ -6564,8 +6564,9 @@ function weeklyPlanExecutionData(asOfIso){
     return sum;
   },0);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
+  const weeklyActualPoints = weeklyScope.reduce((sum,t)=>sum + calculateTaskProgressPct(t, false, asOf), 0);
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
-  const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
+  const actualPct = weeklyScope.length ? Math.round(weeklyActualPoints/weeklyScope.length) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
@@ -6629,9 +6630,9 @@ function weeklyPlanExecutionData(asOfIso){
 function weeklyPlanExecutionCardHtml(extraClass){
   const d = weeklyPlanExecutionData();
   return `<div class="plan-execution-scoreboard"><div class="weekly-plan-execution-card weekly-scope-card ${extraClass||''} state-${d.state.key}" data-execution-scope="weekly">
-    <div><div class="weekly-plan-execution-title">Weekly Task Plan vs Completion</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
+    <div><div class="weekly-plan-execution-title">Weekly Task Plan vs Actual Progress</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Due by Date</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
-    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Completed</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
+    <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual Progress</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
     <div><div class="weekly-plan-execution-title">Overall Plan vs Completion</div><div class="weekly-plan-execution-week">Tasks + CAL + PM Work Orders</div></div>
@@ -6682,10 +6683,10 @@ function renderWeeklyPlanExecutionCards(){
     card.classList.remove('state-green','state-yellow','state-red');
     card.classList.add(`state-${d.state.key}`);
     const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
-    set('.weekly-plan-execution-title', 'Weekly Task Plan vs Completion');
+    set('.weekly-plan-execution-title', 'Weekly Task Plan vs Actual Progress');
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
     if(metricLabels[0]) metricLabels[0].textContent = 'Due by Date';
-    if(metricLabels[1]) metricLabels[1].textContent = 'Completed';
+    if(metricLabels[1]) metricLabels[1].textContent = 'Actual Progress';
     set('[data-weekly-plan]', `${d.planPct}%`);
     set('[data-weekly-actual]', `${d.actualPct}%`);
     set('[data-weekly-state]', d.state.label);
