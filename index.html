@@ -4170,6 +4170,9 @@ APPENDIX 6.5B)</div>
     </div>
   </div>
 
+  <!-- SET OPERATIONAL STATUS: 그리드 밖 전용 컨테이너 -->
+  <div id="d-op-status-container" class="huddle-section"></div>
+
   <!-- Daily Huddle Delay Detail -->
   <div class="huddle-delay-layout huddle-section">
     <div class="huddle-panel tight">
@@ -7403,10 +7406,9 @@ function renderDashboard(){
       <div class="system-pill oos">OOS</div>
       ${opStatusDropdown(s.def.system, s.status)}
     </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>');
-    // details를 grid 밖(부모 패널)에 붙여서 overlap 방지
-    const existingOpDetails = systemStatusEl.parentElement.querySelector('.op-status-details');
-    if(existingOpDetails) existingOpDetails.remove();
-    systemStatusEl.insertAdjacentHTML('afterend', `<details class="op-status-details" style="margin-top:8px"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:6px;display:grid;gap:5px">${allRows}</div></details>`);
+    // SET OPERATIONAL STATUS는 그리드 완전히 밖의 전용 컨테이너에 렌더링
+    const opContainer = document.getElementById('d-op-status-container');
+    if(opContainer) opContainer.innerHTML = `<details class="op-status-details huddle-panel tight" style="margin-bottom:14px"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em;list-style:none">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:8px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px">${allRows}</div></details>`;
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
