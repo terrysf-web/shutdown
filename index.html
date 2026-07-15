@@ -6533,14 +6533,25 @@ function weeklyPlanExecutionData(asOfIso){
   const isComplete = t=>(statusMap[t.id]||t.status||'Pending')==='Complete';
 
   // Use objective completion milestones on both sides of the comparison.
-  // Plan = tasks scheduled to be complete by the selected date.
+  // Plan = tasks scheduled before today, plus today's milestones earned
+  // gradually during the approved 07:00-16:00 workday.
   // Actual = tasks explicitly marked Complete. In Progress, Delayed and On Hold
   // never gain "actual" credit merely because time has passed.
   const weeklyScope = active.filter(t=>{
     const due = targetEnd(t);
     return due && due >= range.start && due <= range.end;
   });
-  const weeklyPlanDone = weeklyScope.filter(t=>targetEnd(t) <= selectedIso).length;
+  const workdayStart = workPointGlobal(selectedIso, 7).getTime();
+  const workdayEnd = workPointGlobal(selectedIso, 16).getTime();
+  const todayPlanFraction = Math.max(0, Math.min(1,
+    (asOf.getTime() - workdayStart) / (workdayEnd - workdayStart)
+  ));
+  const weeklyPlanDone = weeklyScope.reduce((sum,t)=>{
+    const due = targetEnd(t);
+    if(due < selectedIso) return sum + 1;
+    if(due === selectedIso) return sum + todayPlanFraction;
+    return sum;
+  },0);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
