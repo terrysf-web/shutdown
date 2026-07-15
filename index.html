@@ -6577,10 +6577,12 @@ function weeklyPlanExecutionData(asOfIso){
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
   const workdayFraction = Math.max(0, Math.min(1, (asOf.getTime() - workdayStart) / (workdayEnd - workdayStart)));
   const weeklyActualPoints = weeklyScope.reduce((sum,t)=>{
+    const due = targetEnd(t);
     const st = statusMap[t.id]||t.status||'Pending';
+    if(due > selectedIso) return sum; // 마감 미래: 아직 카운트 안함
     if(st==='Complete') return sum+100;
-    if(st==='In Progress') return sum + Math.round(workdayFraction*100);
-    return sum;
+    if(due === selectedIso && st==='In Progress') return sum + Math.round(workdayFraction*100);
+    return sum; // 마감 지났는데 미완료: 0%
   },0);
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualPoints/weeklyScope.length) : 0;
