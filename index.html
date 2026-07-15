@@ -506,6 +506,15 @@ tr.editing{background:#fffceb}
 .wo-add-panel input,.wo-add-panel select{font-size:12px;padding:5px 7px;border:1px solid #ccc;border-radius:5px;min-width:90px}
 .wo-add-panel button{font-size:11px;font-weight:800;border:none;border-radius:5px;padding:5px 9px;cursor:pointer}
 .wo-manual-badge{display:inline-block;font-size:9px;font-weight:800;background:#fff3cd;color:#7a5200;border-radius:8px;padding:1px 5px;margin-left:4px}
+.wo-admin-only{display:none!important}
+body.edit-mode .wo-admin-only{display:inline-flex!important}
+.followup-form{display:grid;grid-template-columns:repeat(4,minmax(140px,1fr));gap:8px;padding:12px;background:#fff8e1;border-bottom:1px solid #e5d6a8}
+.followup-form input,.followup-form select,.followup-form textarea{font:12px Arial,sans-serif;padding:7px 8px;border:1px solid #c8b978;border-radius:5px;box-sizing:border-box;width:100%}
+.followup-form textarea{grid-column:span 2;min-height:56px;resize:vertical}
+.followup-form-actions{grid-column:1/-1;display:flex;align-items:center;gap:8px;justify-content:flex-end}
+.followup-form-actions button{border:0;border-radius:5px;padding:7px 14px;font-size:11px;font-weight:800;cursor:pointer}
+.followup-report-note{margin-right:auto;color:#765c13;font-size:11px;font-weight:700}
+@media(max-width:900px){.followup-form{grid-template-columns:1fr 1fr}.followup-form textarea{grid-column:1/-1}}
 .system-pill.returning{background:#174a7a;color:#cce6ff}
 .system-pill.risk{background:#7a1a1a;color:#ffb4ac}
 .system-pill.ready{background:#1f6b42;color:#d7ffe5}
@@ -5677,7 +5686,9 @@ function changeOnHoldProgress(id, value){
 function updateSaveButton(){ document.getElementById('saveBtn').disabled = !editMode || !dirty; }
 function toggleEditMode(){
   editMode = !editMode;
+  document.body.classList.toggle('edit-mode', editMode);
   document.getElementById('editToggleBtn').textContent = `Edit Mode: ${editMode ? 'On' : 'Off'}`;
+  if(typeof followupAdminVisibility === 'function') followupAdminVisibility();
   render();
 }
 function markDirty(){ dirty = true; updateSaveButton(); }
@@ -8227,12 +8238,14 @@ var WO_CAL_STATUS_KEY = 'sd26_wo_status_v1';
 var WO_CAL_NOTES_KEY  = 'sd26_wo_notes_v1';
 var WO_PM_STATUS_KEY  = 'sd26_wo_pm_status_v1';
 var WO_MANUAL_KEY     = 'sd26_wo_manual_v1';
+var WO_FOLLOWUP_KEY   = 'sd26_wo_followup_v1';
 
 var calStatusMap = {};
 var pmStatusMap  = {};
 var calCompletedMap = {};
 var pmCompletedMap = {};
 var woManualData = [];
+var followupWoData = [];
 var woInitialized = false;
 
 var WO_CAL_COMPLETED_KEY = 'sd26_wo_cal_completed_v1';
@@ -8244,6 +8257,7 @@ function woLoadStorage(){
   try{ var s=localStorage.getItem(WO_CAL_COMPLETED_KEY); if(s) calCompletedMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_PM_COMPLETED_KEY);  if(s) pmCompletedMap=JSON.parse(s); }catch(e){}
   try{ var s=localStorage.getItem(WO_MANUAL_KEY);     woManualData=s?JSON.parse(s):[]; if(!Array.isArray(woManualData)) woManualData=[]; }catch(e){ woManualData=[]; }
+  try{ var s=localStorage.getItem(WO_FOLLOWUP_KEY);   followupWoData=s?JSON.parse(s):[]; if(!Array.isArray(followupWoData)) followupWoData=[]; }catch(e){ followupWoData=[]; }
 }
 function woSaveCAL(){
   try{ localStorage.setItem(WO_CAL_STATUS_KEY, JSON.stringify(calStatusMap)); }catch(e){}
@@ -8256,6 +8270,91 @@ function woSavePM(){
 function woSaveManual(){
   try{ localStorage.setItem(WO_MANUAL_KEY, JSON.stringify(woManualData)); }catch(e){}
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
+
+function followupSave(){
+  try{ localStorage.setItem(WO_FOLLOWUP_KEY, JSON.stringify(followupWoData)); }catch(e){}
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
+
+function followupStatuses(){ return ['Requested','Created','Scheduled','In Progress','Waiting','Done','Cancelled']; }
+function followupImpacts(){ return ['No Impact','Potential Impact','RTS Impact']; }
+function followupFormValue(id){ var el=document.getElementById(id); return el ? String(el.value||'').trim() : ''; }
+function followupClearForm(){
+  ['fu-edit-id','fu-new-wo','fu-source-wo','fu-finding','fu-owner','fu-vendor','fu-raised','fu-target','fu-notes'].forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});
+  var status=document.getElementById('fu-status'); if(status)status.value='Requested';
+  var impact=document.getElementById('fu-impact'); if(impact)impact.value='No Impact';
+  var report=document.getElementById('fu-report'); if(report)report.checked=false;
+  var save=document.getElementById('fu-save-btn'); if(save)save.textContent='Add Follow-up WO';
+}
+function followupUpsert(){
+  if(!editMode){ alert('Turn on Edit Mode to manage Follow-up Work Orders.'); return; }
+  var sourceWo=followupFormValue('fu-source-wo');
+  var finding=followupFormValue('fu-finding');
+  if(!sourceWo){ alert('Please enter the Source WO number.'); return; }
+  if(!finding){ alert('Please enter the finding or corrective scope.'); return; }
+  var editId=followupFormValue('fu-edit-id');
+  var existing=followupWoData.find(function(r){return r.id===editId;});
+  var row=existing||{id:'followup-'+Date.now(),createdAt:new Date().toISOString()};
+  row.newWo=followupFormValue('fu-new-wo');
+  row.sourceWo=sourceWo;
+  row.finding=finding;
+  row.owner=followupFormValue('fu-owner');
+  row.vendor=followupFormValue('fu-vendor');
+  row.raisedDate=followupFormValue('fu-raised')||localDateIsoGlobal();
+  row.targetDate=followupFormValue('fu-target');
+  row.status=followupFormValue('fu-status')||'Requested';
+  row.impact=followupFormValue('fu-impact')||'No Impact';
+  row.notes=followupFormValue('fu-notes');
+  row.includeInReport=!!(document.getElementById('fu-report')||{}).checked;
+  row.updatedAt=new Date().toISOString();
+  if(!existing) followupWoData.unshift(row);
+  followupSave();
+  followupClearForm();
+  followupRender();
+}
+function followupEdit(id){
+  if(!editMode) return;
+  var r=followupWoData.find(function(x){return x.id===id;}); if(!r)return;
+  var values={'fu-edit-id':r.id,'fu-new-wo':r.newWo,'fu-source-wo':r.sourceWo,'fu-finding':r.finding,'fu-owner':r.owner,'fu-vendor':r.vendor,'fu-raised':r.raisedDate,'fu-target':r.targetDate,'fu-status':r.status,'fu-impact':r.impact,'fu-notes':r.notes};
+  Object.keys(values).forEach(function(id){var el=document.getElementById(id);if(el)el.value=values[id]||'';});
+  var report=document.getElementById('fu-report'); if(report)report.checked=!!r.includeInReport;
+  var save=document.getElementById('fu-save-btn'); if(save)save.textContent='Save Changes';
+  var form=document.getElementById('followup-form'); if(form)form.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function followupDelete(id){
+  if(!editMode || !confirm('Delete this Follow-up Work Order?')) return;
+  followupWoData=followupWoData.filter(function(r){return r.id!==id;});
+  followupSave(); followupClearForm(); followupRender();
+}
+function followupRender(){
+  var tbody=document.getElementById('followup-tbody'); if(!tbody)return;
+  var search=followupFormValue('fu-search').toLowerCase();
+  var status=followupFormValue('fu-filter-status');
+  var rows=followupWoData.filter(function(r){
+    if(status && r.status!==status)return false;
+    return !search || [r.newWo,r.sourceWo,r.finding,r.owner,r.vendor,r.notes].join(' ').toLowerCase().indexOf(search)>=0;
+  });
+  tbody.innerHTML=rows.map(function(r){
+    var impactColor=r.impact==='RTS Impact'?'#b71c1c':r.impact==='Potential Impact'?'#9a6700':'#2e7d32';
+    return '<tr style="border-bottom:1px solid #eee">'
+      +'<td style="padding:6px 8px;font-family:monospace;font-weight:800">'+woEsc(r.newWo||'WO Requested')+'</td>'
+      +'<td style="padding:6px 8px;font-family:monospace;color:#365a7a">'+woEsc(r.sourceWo)+'</td>'
+      +'<td style="padding:6px 8px;max-width:260px" title="'+woEsc(r.finding)+'">'+woEsc(r.finding)+'</td>'
+      +'<td style="padding:6px 8px">'+woEsc(r.owner||'')+(r.vendor?' / '+woEsc(r.vendor):'')+'</td>'
+      +'<td style="padding:6px 8px;white-space:nowrap">'+woEsc(r.targetDate||'')+'</td>'
+      +'<td style="padding:6px 8px;font-weight:800;color:'+impactColor+'">'+woEsc(r.impact||'No Impact')+'</td>'
+      +'<td style="padding:6px 8px">'+woEsc(r.status||'Requested')+'</td>'
+      +'<td style="padding:6px 8px;text-align:center">'+(r.includeInReport?'Yes':'—')+'</td>'
+      +'<td style="padding:5px 8px;white-space:nowrap"><button onclick="followupEdit(\''+woEsc(r.id)+'\')" style="font-size:10px;margin-right:4px">Edit</button><button onclick="followupDelete(\''+woEsc(r.id)+'\')" style="font-size:10px;color:#9b1c1c">Delete</button></td></tr>';
+  }).join('')||'<tr><td colspan="9" style="padding:20px;text-align:center;color:#888">No Follow-up Work Orders</td></tr>';
+  var count=document.getElementById('fu-count'); if(count)count.textContent=rows.length+' / '+followupWoData.length+' items';
+}
+function followupAdminVisibility(){
+  if(!editMode){
+    var panel=document.getElementById('wo-panel-followup');
+    if(panel && panel.style.display!=='none') woSwitchPanel('split');
+  }
 }
 
 function woEsc(v){
@@ -8365,6 +8464,7 @@ function woInit(){
   woRefreshFilterOptions();
   calRender();
   pmRender();
+  followupRender();
   woUpdateBadges();
   woSwitchPanel('split');
   woInitialized = true;
@@ -8373,27 +8473,37 @@ function woInit(){
 function woSwitchPanel(mode){
   var cal = document.getElementById('wo-panel-cal');
   var pm  = document.getElementById('wo-panel-pm');
+  var followup = document.getElementById('wo-panel-followup');
   var tbCal   = document.getElementById('wo-tab-cal');
   var tbPm    = document.getElementById('wo-tab-pm');
   var tbSplit = document.getElementById('wo-tab-split');
+  var tbFollowup = document.getElementById('wo-tab-followup');
   if(!cal||!pm) return;
   var activeStyle = 'font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px 6px 0 0;border:1px solid #ddd;border-bottom:none;cursor:pointer;';
   var inactiveStyle = activeStyle + 'background:#fff;color:#555;';
   if(mode==='cal'){
-    cal.style.display='flex'; pm.style.display='none';
+    cal.style.display='flex'; pm.style.display='none'; if(followup)followup.style.display='none';
     tbCal.style.cssText   = activeStyle+'background:#1a3a5c;color:#fff;';
     tbPm.style.cssText    = inactiveStyle;
     tbSplit.style.cssText = inactiveStyle;
+    if(tbFollowup)tbFollowup.style.cssText = inactiveStyle;
   } else if(mode==='pm'){
-    cal.style.display='none'; pm.style.display='flex';
+    cal.style.display='none'; pm.style.display='flex'; if(followup)followup.style.display='none';
     tbCal.style.cssText   = inactiveStyle;
     tbPm.style.cssText    = activeStyle+'background:#2e5c1e;color:#fff;';
     tbSplit.style.cssText = inactiveStyle;
+    if(tbFollowup)tbFollowup.style.cssText = inactiveStyle;
+  } else if(mode==='followup' && editMode){
+    cal.style.display='none'; pm.style.display='none'; if(followup)followup.style.display='flex';
+    tbCal.style.cssText=inactiveStyle; tbPm.style.cssText=inactiveStyle; tbSplit.style.cssText=inactiveStyle;
+    if(tbFollowup)tbFollowup.style.cssText=activeStyle+'background:#8a5a00;color:#fff;';
+    followupRender();
   } else {
-    cal.style.display='flex'; pm.style.display='flex';
+    cal.style.display='flex'; pm.style.display='flex'; if(followup)followup.style.display='none';
     tbCal.style.cssText   = inactiveStyle;
     tbPm.style.cssText    = inactiveStyle;
     tbSplit.style.cssText = activeStyle+'background:#333;color:#fff;';
+    if(tbFollowup)tbFollowup.style.cssText = inactiveStyle;
   }
 }
 
@@ -8733,6 +8843,7 @@ function refreshSd26FromLocalStorage(){
   try{ if(typeof woRefreshFilterOptions === 'function') woRefreshFilterOptions(); }catch(e){}
   try{ if(typeof calRender === 'function') calRender(); }catch(e){}
   try{ if(typeof pmRender === 'function') pmRender(); }catch(e){}
+  try{ if(typeof followupRender === 'function') followupRender(); }catch(e){}
   try{ if(typeof renderDashboard === 'function') renderDashboard(); }catch(e){}
   try{ if(typeof renderGowningStatus === 'function') renderGowningStatus(); }catch(e){}
   try{ if(typeof rcRefreshPeopleOptions === 'function') rcRefreshPeopleOptions(); }catch(e){}
@@ -9077,6 +9188,7 @@ function msActive(id) {
       <button id="wo-tab-cal" onclick="woSwitchPanel('cal')" style="font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px 6px 0 0;border:1px solid #ddd;border-bottom:none;background:#1a3a5c;color:#fff;cursor:pointer">🔬 CAL Work Orders <span id="wo-cal-cnt" style="opacity:0.8"></span></button>
       <button id="wo-tab-pm" onclick="woSwitchPanel('pm')" style="font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px 6px 0 0;border:1px solid #ddd;border-bottom:none;background:#fff;color:#555;cursor:pointer">🔧 PM Work Orders <span id="wo-pm-cnt" style="opacity:0.8"></span></button>
       <button id="wo-tab-split" onclick="woSwitchPanel('split')" style="font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px 6px 0 0;border:1px solid #ddd;border-bottom:none;background:#fff;color:#555;cursor:pointer">⬜ Split View</button>
+      <button id="wo-tab-followup" class="wo-admin-only" onclick="woSwitchPanel('followup')" style="font-size:12px;font-weight:700;padding:7px 18px;border-radius:6px 6px 0 0;border:1px solid #ddd;border-bottom:none;background:#fff;color:#555;cursor:pointer">🔒 Follow-up WOs</button>
     </div>
     <div id="wo-global-progress" style="margin-left:auto;display:flex;gap:16px;padding-bottom:6px"></div>
   </div>
@@ -9172,6 +9284,43 @@ function msActive(id) {
             </tr>
           </thead>
           <tbody id="pm-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL: FOLLOW-UP WORK ORDERS -->
+    <div id="wo-panel-followup" class="wo-panel" style="flex:1;display:none;flex-direction:column;background:#fff;border-radius:8px;border:1px solid #d5bd72;overflow:hidden">
+      <div style="background:#76510b;color:#fff;padding:10px 14px;display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <span style="font-size:13px;font-weight:800">🔒 Admin Follow-up Work Orders</span>
+        <span style="font-size:10px;opacity:.85">Separate from PM/CAL plan progress</span>
+        <span id="fu-count" style="margin-left:auto;font-size:11px;background:rgba(255,255,255,.18);padding:2px 8px;border-radius:10px"></span>
+      </div>
+      <div id="followup-form" class="followup-form">
+        <input type="hidden" id="fu-edit-id">
+        <input id="fu-new-wo" placeholder="New WO Number (optional until issued)">
+        <input id="fu-source-wo" placeholder="Source PM/CAL WO *">
+        <input id="fu-owner" placeholder="Owner">
+        <input id="fu-vendor" placeholder="Vendor">
+        <textarea id="fu-finding" placeholder="Finding / Corrective Scope *"></textarea>
+        <textarea id="fu-notes" placeholder="Notes"></textarea>
+        <label style="font-size:10px;font-weight:800;color:#6d5a20">DATE RAISED<input type="date" id="fu-raised"></label>
+        <label style="font-size:10px;font-weight:800;color:#6d5a20">TARGET DATE<input type="date" id="fu-target"></label>
+        <label style="font-size:10px;font-weight:800;color:#6d5a20">STATUS<select id="fu-status"><option>Requested</option><option>Created</option><option>Scheduled</option><option>In Progress</option><option>Waiting</option><option>Done</option><option>Cancelled</option></select></label>
+        <label style="font-size:10px;font-weight:800;color:#6d5a20">SHUTDOWN IMPACT<select id="fu-impact"><option>No Impact</option><option>Potential Impact</option><option>RTS Impact</option></select></label>
+        <div class="followup-form-actions">
+          <span class="followup-report-note"><label><input type="checkbox" id="fu-report"> Include in Report</label> — saved for future reporting; not currently shown in reports.</span>
+          <button type="button" onclick="followupClearForm()" style="background:#e7e0cb;color:#594918">Clear</button>
+          <button type="button" id="fu-save-btn" onclick="followupUpsert()" style="background:#76510b;color:#fff">Add Follow-up WO</button>
+        </div>
+      </div>
+      <div style="padding:8px 10px;border-bottom:1px solid #eee;display:flex;gap:8px;flex-shrink:0">
+        <input id="fu-search" placeholder="Search WO, finding, owner..." oninput="followupRender()" style="flex:1;font-size:12px;padding:6px 8px;border:1px solid #ccc;border-radius:5px">
+        <select id="fu-filter-status" onchange="followupRender()" style="font-size:12px;padding:6px 8px;border:1px solid #ccc;border-radius:5px"><option value="">All Statuses</option><option>Requested</option><option>Created</option><option>Scheduled</option><option>In Progress</option><option>Waiting</option><option>Done</option><option>Cancelled</option></select>
+      </div>
+      <div style="flex:1;overflow:auto">
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <thead><tr style="background:#f3ead0;position:sticky;top:0;z-index:2"><th style="padding:7px 8px;text-align:left">New WO</th><th style="padding:7px 8px;text-align:left">Source WO</th><th style="padding:7px 8px;text-align:left">Finding / Scope</th><th style="padding:7px 8px;text-align:left">Owner / Vendor</th><th style="padding:7px 8px;text-align:left">Target</th><th style="padding:7px 8px;text-align:left">Impact</th><th style="padding:7px 8px;text-align:left">Status</th><th style="padding:7px 8px;text-align:center">Report</th><th style="padding:7px 8px"></th></tr></thead>
+          <tbody id="followup-tbody"></tbody>
         </table>
       </div>
     </div>
