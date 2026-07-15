@@ -7402,7 +7402,7 @@ function renderDashboard(){
       <div class="system-pill oos">OOS</div>
       ${opStatusDropdown(s.def.system, s.status)}
     </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>')
-    + `<details style="margin-top:8px"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:6px;display:grid;gap:5px">${allRows}</div></details>`;
+    + `<details style="margin-top:8px;grid-column:1/-1"><summary style="font-size:11px;color:#f0c040;cursor:pointer;font-weight:700;letter-spacing:0.05em">▼ SET OPERATIONAL STATUS (ALL SYSTEMS)</summary><div style="margin-top:6px;display:grid;gap:5px">${allRows}</div></details>`;
   }
   const rollupEl = document.getElementById('d-system-rollup');
   if(rollupEl){
