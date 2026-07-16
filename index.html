@@ -6597,8 +6597,7 @@ function weeklyPlanExecutionData(asOfIso){
     const st = statusMap[t.id]||t.status||'Pending';
     if(due > selectedIso) return sum; // 마감 미래: 카운트 안함
     if(st==='Complete') return sum+100;
-    if(st==='In Progress') return sum+50; // 고정 50% — 시간대 무관
-    return sum; // 마감 지났는데 미완료: 0%
+    return sum; // Complete만 카운트
   },0);
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualPoints/weeklyScope.length) : 0;
