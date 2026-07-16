@@ -4552,7 +4552,8 @@ let operationalStatusMap = {};
 function loadOperationalStatus(){ try{ const s=localStorage.getItem('sd26_opStatus_v1'); if(s) operationalStatusMap=JSON.parse(s); }catch(e){} }
 function saveOperationalStatus(){ try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){} }
 function setOperationalStatus(systemId, val){
-  if(val==='Normal') delete operationalStatusMap[systemId]; else operationalStatusMap[systemId]=val;
+  // 'Auto'를 선택하면 override 해제, 그 외엔 명시적으로 저장 (Normal 포함)
+  if(val==='Auto') delete operationalStatusMap[systemId]; else operationalStatusMap[systemId]=val;
   saveOperationalStatus();
   if(typeof renderDashboard==='function') renderDashboard();
 }
@@ -7397,10 +7398,13 @@ function renderDashboard(){
     setText('d-systems-oos', oosCount);
     setText('d-systems-returning', rtsCount);
     // Operational Status 드롭다운
-    const opStatusOptions = ['Normal','OOS','Cond. REL','FUL REL','Breakdown'];
+    const opStatusOptions = ['Auto','Normal','OOS','Cond. REL','FUL REL','Breakdown'];
     function opStatusDropdown(sysId, current){
+      // override 없으면 'Auto', 있으면 저장된 값
+      const saved = operationalStatusMap[sysId];
+      const selected = saved || 'Auto';
       return `<select onchange="setOperationalStatus('${sysId}',this.value)" style="font-size:11px;padding:2px 5px;border:1px solid rgba(255,255,255,0.25);border-radius:4px;background:#0d2137;color:#fff;cursor:pointer;max-width:115px">
-        ${opStatusOptions.map(v=>`<option value="${v}"${v===current?' selected':''}>${v}</option>`).join('')}
+        ${opStatusOptions.map(v=>`<option value="${v}"${v===selected?' selected':''}>${v==='Auto'?'Auto (자동)':v}</option>`).join('')}
       </select>`;
     }
     // Task 3: Systems Status = OOS만 표시 (인라인 드롭다운 없음)
