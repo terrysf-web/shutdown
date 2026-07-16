@@ -634,7 +634,7 @@ body.edit-mode .wo-admin-only{display:inline-flex!important}
 @media print{.weekly-plan-execution-edit,.weekly-plan-execution-editor{display:none!important}}
 .dash-mode-morning>.shared-report-scoreboard,.dash-mode-weekly>.shared-report-scoreboard{display:none!important}
 @media(max-width:900px){.weekly-plan-execution-card{grid-template-columns:1fr 1fr}.weekly-plan-execution-status{justify-content:flex-start}.weekly-plan-execution-metric{border-left:0;padding-left:0}}
-.morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px!important;box-sizing:border-box!important}
+.morning-export-capture{display:block!important;width:900px!important;max-width:900px!important;background:#0d2137!important;color:#fff!important;padding:18px 18px 48px 18px!important;box-sizing:border-box!important}
 .morning-export-capture .morning-hero{padding:18px!important;margin-bottom:14px!important}
 .morning-export-capture .morning-title{font-size:26px!important;letter-spacing:.06em!important}
 .morning-export-capture .morning-sub{font-size:15px!important}
@@ -6943,7 +6943,7 @@ async function renderMorningBriefPanelToEmailImage(panel){
       const h2c=await loadHtml2CanvasForMorningBrief();
       if(typeof h2c==='function'){
         const width=Math.ceil(target.scrollWidth || target.offsetWidth || 900);
-        const height=Math.ceil(target.scrollHeight || target.offsetHeight || 900);
+        const height=Math.ceil((target.scrollHeight || target.offsetHeight || 900) + 40);
         return await canvasToMorningBriefEmailBlob(await h2c(target, {backgroundColor:'#0d2137', scale:1, useCORS:true, logging:false, width:width, height:height, windowWidth:width, windowHeight:height}));
       }
     }catch(e){ console.warn('Morning Brief html2canvas failed; trying SVG fallback', e); }
