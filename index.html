@@ -6585,11 +6585,10 @@ function weeklyPlanExecutionData(asOfIso){
   const todayPlanFraction = Math.max(0, Math.min(1,
     (asOf.getTime() - workdayStart) / (workdayEnd - workdayStart)
   ));
-  // 당일 기준: 오늘 마감인 task만 PLAN/ACTUAL 계산
-  const todayScope = weeklyScope.filter(t=>targetEnd(t)===selectedIso);
-  const weeklyPlanDone = todayScope.length;
+  // 월~오늘 누적 기준
+  const weeklyPlanDone = weeklyScope.filter(t=>targetEnd(t)<=selectedIso).length;
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
-  const weeklyActualPoints = todayScope.filter(isComplete).length * 100;
+  const weeklyActualPoints = weeklyScope.filter(t=>targetEnd(t)<=selectedIso && isComplete(t)).length * 100;
   const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualPoints/weeklyScope.length) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
