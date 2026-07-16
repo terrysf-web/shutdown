@@ -284,6 +284,9 @@ tbody tr.category-row-light td .cat-toggle:hover{background:rgba(13,42,69,0.2)}
 tbody tr.category-row-light td .cat-badge{display:inline-block;background:rgba(13,42,69,0.1);color:#0d2a45;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;font-weight:400}
 tbody tr.dup-resource{background:#fffde7}
 tbody tr.dup-resource td{background:#fffde7}
+tbody tr.today-task{background:#e8f4fd!important;border-left:4px solid #1565c0!important}
+tbody tr.today-task td{background:#e8f4fd!important}
+tbody tr.today-task td:first-child{border-left:4px solid #1565c0}
 .dup-badge{display:inline-block;background:#f9a825;color:#4a3000;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;margin:1px 2px 1px 0;white-space:nowrap}
 .col-dup{width:110px}
 td{padding:7px 10px;vertical-align:middle}
@@ -5511,7 +5514,11 @@ function render(){
     const dupIds = dupMap[t.id] || [];
     const isDup = dupIds.length > 0;
     const isDelayed = statusMap[t.id] === 'Delayed';
-    const trClass = isDup ? 'dup-resource' : (editMode ? 'editing' : '');
+    const todayStr = trackerCompletionDate();
+    const taskStart = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+    const taskEnd = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end);
+    const isToday = taskStart && taskEnd && taskStart <= todayStr && todayStr <= taskEnd;
+    const trClass = isDup ? 'dup-resource' : (isToday && !editMode ? 'today-task' : (editMode ? 'editing' : ''));
     const dupCell = isDup
       ? `<td class="col-dup" style="white-space:normal;min-width:90px">${dupIds.map(id=>`<span class="dup-badge">${id}</span>`).join(' ')}</td>`
       : `<td class="col-dup"></td>`;
