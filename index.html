@@ -5552,7 +5552,7 @@ function render(){
       ${editMode ? `<td class="edit-cell"><select data-field="category">${CATEGORIES.map(c=>`<option${(t.category||'PROJ')===c?' selected':''}>${c}</option>`).join('')}</select></td>` : `<td style="white-space:nowrap;font-weight:600;color:${{'PM':'RoyalBlue','CAL':'SeaGreen','CM':'DarkKhaki','EM':'#9b27af','PROJ':'Sienna'}[t.category||inferCategory(t.task)]||'#222'}">${esc(t.category||'—')}</td>`}
       <td style="white-space:nowrap;min-width:110px">${assignedCell(t.id, t.assigned||'')}</td>
       ${dupCell}
-      ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
+      ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}" oninput="changeVendor(this,'${t.id}')"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
       ${vendorOnsiteCell}
       ${onHoldCell}
       ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
@@ -5597,6 +5597,7 @@ function changeStatus(sel){
   if(typeof renderDashboard === 'function') renderDashboard();
 }
 function changeNote(inp){notesMap[inp.dataset.id]=inp.value; updateDerivedFields(); saveLocal();}
+function changeVendor(inp, id){ const task=tasks.find(t=>t.id===id); if(task) task.vendor=inp.value; markDirty(); }
 function toggleCritical(id, checked){
   const task = tasks.find(t=>t.id===id);
   if(!task) return;
