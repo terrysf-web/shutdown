@@ -7667,7 +7667,11 @@ function renderDashboard(){
       return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${impactDate}</td></tr>`;
     }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
 
-    const noteItems = activeLeaf.filter(t=>allDelayedTasks.some(d=>d.id===t.id) || normalizeDateValue(t.newStart) || normalizeDateValue(t.newEnd));
+    const noteItemIds = new Set([
+      ...allDelayedTasks.map(t=>t.id),
+      ...activeLeaf.filter(t=>normalizeDateValue(t.newStart)||normalizeDateValue(t.newEnd)).map(t=>t.id)
+    ]);
+    const noteItems = leaf.filter(t=>noteItemIds.has(t.id));
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
       const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
       const newDateText = delayedNewDate(t);
