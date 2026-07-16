@@ -6587,8 +6587,7 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   const weeklyPlanDone = weeklyScope.reduce((sum,t)=>{
     const due = targetEnd(t);
-    if(due < selectedIso) return sum + 1;
-    if(due === selectedIso) return sum + todayPlanFraction;
+    if(due <= selectedIso) return sum + 1;
     return sum;
   },0);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
