@@ -284,7 +284,8 @@ tbody tr.category-row-light td .cat-toggle:hover{background:rgba(13,42,69,0.2)}
 tbody tr.category-row-light td .cat-badge{display:inline-block;background:rgba(13,42,69,0.1);color:#0d2a45;font-size:11px;padding:1px 8px;border-radius:10px;margin-left:8px;vertical-align:middle;font-weight:400}
 tbody tr.dup-resource{background:#fffde7}
 tbody tr.dup-resource td{background:#fffde7}
-tbody tr.today-task .date-col-highlight{font-weight:900!important;color:#1565c0!important}
+tbody tr .date-col-highlight{font-weight:900!important;color:#1565c0!important}
+tbody tr .date-col-overdue{font-weight:900!important;color:#7b1c3f!important}
 .dup-badge{display:inline-block;background:#f9a825;color:#4a3000;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;margin:1px 2px 1px 0;white-space:nowrap}
 .col-dup{width:110px}
 td{padding:7px 10px;vertical-align:middle}
@@ -5515,8 +5516,12 @@ function render(){
     const todayStr = trackerCompletionDate();
     const taskStart = normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
     const taskEnd = normalizeDateValue(t.newEnd) || normalizeDateValue(t.end);
-    const isToday = taskStart && taskEnd && taskStart <= todayStr && todayStr <= taskEnd;
-    const trClass = isDup ? 'dup-resource' : (editMode ? 'editing' : (isToday ? 'today-task' : ''));
+    const taskStatus = statusMap[t.id] || t.status || 'Pending';
+    const isComplete = taskStatus === 'Complete';
+    const isInProgress = taskStatus === 'In Progress';
+    const isToday = !isComplete && taskStart && taskEnd && taskStart <= todayStr && todayStr <= taskEnd;
+    const isOverdueInProgress = !isComplete && isInProgress && taskEnd && taskEnd < todayStr;
+    const trClass = isDup ? 'dup-resource' : (editMode ? 'editing' : '');
     const dupCell = isDup
       ? `<td class="col-dup" style="white-space:normal;min-width:90px">${dupIds.map(id=>`<span class="dup-badge">${id}</span>`).join(' ')}</td>`
       : `<td class="col-dup"></td>`;
@@ -5524,7 +5529,8 @@ function render(){
     // Calculate overdue days for delayed tasks
     const isImpacted = !!endImpactMap[t.id];
     let endCellHtml;
-    const endDateClass = (!editMode && isToday) ? ' date-col-highlight' : '';
+    const dateCls = !editMode ? (isOverdueInProgress ? 'date-col-overdue' : isToday ? 'date-col-highlight' : '') : '';
+    const endDateClass = dateCls;
     if(editMode){
       endCellHtml = `<td class="edit-cell"><input type="date" data-field="end" value="${esc(toDateInputValue(t.end)||'')}"></td>`;
     } else if(isDelayed && t.end){
@@ -5565,7 +5571,7 @@ function render(){
       ${editMode ? `<td class="edit-cell vendor-col"><input type="text" data-field="vendor" value="${esc(t.vendor||'')}" oninput="changeVendor(this,'${t.id}')"></td>` : `<td class="vendor-col">${esc(t.vendor||'—')}</td>`}
       ${vendorOnsiteCell}
       ${onHoldCell}
-      ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td class="${isToday?'date-col-highlight':''}" style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
+      ${editMode ? `<td class="edit-cell"><input type="date" data-field="start" value="${esc(toDateInputValue(t.start)||'')}"></td>` : `<td class="${dateCls}" style="white-space:nowrap"><div style="display:flex;align-items:center;gap:4px"><span>${displayDate(t.start)||'TBD'}</span>${t.start ? `<label title="▼ Mark as Down start" style="display:inline-flex;align-items:center;gap:2px;cursor:pointer;font-size:10px;font-weight:700;color:#c62828;padding:1px 5px;border-radius:3px;border:1px solid ${downMap[t.id]!=null?'#c62828':'#ddd'};background:${downMap[t.id]!=null?'#fde8e8':'transparent'}"><input type="checkbox" ${downMap[t.id]!=null?'checked':''} onchange="toggleDown('${t.id}','${t.start}',this.checked)" style="accent-color:#c62828;width:11px;height:11px;cursor:pointer">▼</label>` : ''}</div></td>`}
       ${endCellHtml}
       ${newStartCell}
       ${newEndCell}
