@@ -6853,7 +6853,13 @@ function weeklyAutoSummaryData(){
 }
 
 function loadWeeklySummarySaved(){
-  try{ return JSON.parse(localStorage.getItem(WEEKLY_SUMMARY_KEY) || '{}') || {}; }catch(e){ return {}; }
+  try{
+    const saved = JSON.parse(localStorage.getItem(WEEKLY_SUMMARY_KEY) || '{}') || {};
+    const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
+    const currentWeekStart = getWeekRange(todayIso).start;
+    if(saved.weekStart && saved.weekStart !== currentWeekStart) return {};
+    return saved;
+  }catch(e){ return {}; }
 }
 
 function setWeeklyTextarea(id, value){
@@ -6904,7 +6910,9 @@ function renderWeeklyExecutiveSummary(){
 }
 
 function saveWeeklySummary(){
+  const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
   const data = {
+    weekStart: getWeekRange(todayIso).start,
     summary: document.getElementById('weeklySummaryText')?.value || '',
     completed: document.getElementById('weeklyCompletedText')?.value || '',
     changes: document.getElementById('weeklyChangesText')?.value || '',
