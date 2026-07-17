@@ -4818,6 +4818,8 @@ loadLocal();
 migrateBlockedToDelayed();
 migrateOnHoldStatusToColumn();
 normalizeAllTaskIds();
+saveRtsMap();
+saveDownMaps();
 
 function getAllSections(){ return [...new Set(tasks.map(t=>t.section))]; }
 function getAllAssigned(){ return [...new Set(tasks.filter(t=>!t.isParent).flatMap(t=>splitAssignees(t.assigned||'')))].sort(); }
