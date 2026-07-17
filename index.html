@@ -7555,15 +7555,20 @@ function renderDashboard(){
       return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
     }
     const rtsManualTasks = leaf.filter(t=>rtsMap[t.id]);
-    const allRtsRows = [
-      ...rtsSystemItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`),
+    const allRtsEntries = [
+      ...rtsSystemItems.map(s=>{
+        const targetIso = normalizeDateValue(releaseDateForSystem(s)) || '';
+        return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`};
+      }),
       ...rtsManualTasks.map(t=>{
-        const target = displayDate(normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)) || 'TBD';
-        const startup = displayDate(startupMap[t.id]) || '—';
-        return `<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td><td>${startup}</td><td>${esc(t.task)}</td></tr>`;
+        const targetIso = normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const target = displayDate(targetIso) || 'TBD';
+        const tStatus = statusMap[t.id] || t.status || '';
+        const startup = tStatus==='In Progress' ? (displayDate(startupMap[t.id]) || '—') : '—';
+        return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td><td>${startup}</td><td>${esc(t.task)}</td></tr>`};
       })
-    ];
-    rtsEl.innerHTML = allRtsRows.length ? allRtsRows.join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
+    ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
+    rtsEl.innerHTML = allRtsEntries.length ? allRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
   }
   const delayEl = document.getElementById('d-delay-rows');
   if(delayEl){
