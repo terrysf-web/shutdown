@@ -4587,7 +4587,7 @@ function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(r
 function toggleRts(id, checked){
   if(checked) rtsMap[id]=true; else delete rtsMap[id];
   saveRtsMap();
-  renderTable();
+  if(typeof render==='function') render();
   if(typeof renderDashboard==='function') renderDashboard();
 }
 function saveTimelineMarkMaps(){
