@@ -4946,6 +4946,9 @@ function remapTaskIds(idRemap){
     notesMap[newId] = notesMap[oldId];
     delete statusMap[oldId];
     delete notesMap[oldId];
+    if(rtsMap[oldId]){ rtsMap[newId]=rtsMap[oldId]; delete rtsMap[oldId]; }
+    if(downMap[oldId]!=null){ downMap[newId]=downMap[oldId]; delete downMap[oldId]; }
+    if(startupMap[oldId]!=null){ startupMap[newId]=startupMap[oldId]; delete startupMap[oldId]; }
   });
 }
 function reindexSiblingGroup(referenceId){
