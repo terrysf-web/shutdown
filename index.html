@@ -977,12 +977,13 @@ select.msf option:checked{background:#ddeeff}
           <th class="sortable" onclick="\&quot;setSort('critical'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Manually mark this item as critical">Critical <span class="sort-indicator" id="sort-critical" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('notification'," event)\"="" style="white-space:nowrap;text-align:center;font-size:11px" title="Check if notification is needed for this task">Notification <span class="sort-indicator" id="sort-notification" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th class="sortable" onclick="\&quot;setSort('status'," event)\"="">Status <span class="sort-indicator" id="sort-status" title="Click to sort · Shift+click for secondary sort"></span></th>
+          <th style="white-space:nowrap;text-align:center;font-size:11px;color:#c62828" title="Check to mark RTS process started for this task">RTS</th>
           <th class="sortable" onclick="\&quot;setSort('notes'," event)\"="">Notes <span class="sort-indicator" id="sort-notes" title="Click to sort · Shift+click for secondary sort"></span></th>
           <th>Action</th>
         </tr>
       </thead>
-      <tbody id="tbody"><tr class="section-row"><td colspan="21">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
-        <td colspan="21">
+      <tbody id="tbody"><tr class="section-row"><td colspan="22">A &nbsp;&nbsp; UTILITIES SYSTEM</td></tr><tr class="category-row">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('1')">▼</button>
           <span style="margin-right:8px;font-weight:700">1.0</span>
           PURIFIED WATER (01-PURW-001)
@@ -1197,7 +1198,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('2')">▼</button>
           <span style="margin-right:8px;font-weight:700">2.0</span>
           WFI/CLEAN STEAM (01-WFIS-001)
@@ -1378,7 +1379,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('3')">▼</button>
           <span style="margin-right:8px;font-weight:700">3.0</span>
           PMES SYSTEM
@@ -1491,7 +1492,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('4')">▼</button>
           <span style="margin-right:8px;font-weight:700">4.0</span>
           Plant Steam
@@ -1587,7 +1588,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('5')">▼</button>
           <span style="margin-right:8px;font-weight:700">5.0</span>
           HVAC
@@ -1921,7 +1922,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('6')">▼</button>
           <span style="margin-right:8px;font-weight:700">6.0</span>
           CDA (01-CCDA-001)
@@ -2017,7 +2018,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('7')">▼</button>
           <span style="margin-right:8px;font-weight:700">7.0</span>
           COMPRESSED GAS (GSMD-001 &amp; N2GS-001)
@@ -2164,7 +2165,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('8')">▼</button>
           <span style="margin-right:8px;font-weight:700">8.0</span>
           EMERGENCY GENERATOR MAINTENANCE
@@ -2226,7 +2227,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('9')">▼</button>
           <span style="margin-right:8px;font-weight:700">9.0</span>
           VACUUM SYSTEM MAINTENANCE
@@ -2270,8 +2271,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="9.02" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="21">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
-        <td colspan="21">
+    </tr><tr class="section-row"><td colspan="22">B &nbsp;&nbsp; PROCESS EQUIPMENT</td></tr><tr class="category-row">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('10')">▼</button>
           <span style="margin-right:8px;font-weight:700">10.0</span>
           DP MFG Process Equipment
@@ -2469,7 +2470,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('11')">▼</button>
           <span style="margin-right:8px;font-weight:700">11.0</span>
           DS MFG Process Equipment
@@ -2616,7 +2617,7 @@ select.msf option:checked{background:#ddeeff}
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
     </tr><tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('12')">▼</button>
           <span style="margin-right:8px;font-weight:700">12.0</span>
           QC Process Equipment
@@ -2643,8 +2644,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="12.01" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="21">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
-        <td colspan="21">
+    </tr><tr class="section-row"><td colspan="22">C &nbsp;&nbsp; AREA RELEASE</td></tr><tr class="category-row">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('13')">▼</button>
           <span style="margin-right:8px;font-weight:700">13.0</span>
           Area Release
@@ -2790,8 +2791,8 @@ select.msf option:checked{background:#ddeeff}
       <td><select class="status-sel" data-id="13.02.04" onchange="changeStatus(this)"><option selected="">Pending</option><option>Scheduled</option><option>In Progress</option><option>Complete</option><option>Delayed</option><option>On Hold</option><option>N/A</option></select></td>
       <td class="notes-col"><div class="notes-view">—</div></td>
       <td class="col-actions"><div class="action-view">—</div></td>
-    </tr><tr class="section-row"><td colspan="21">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
-        <td colspan="21">
+    </tr><tr class="section-row"><td colspan="22">D &nbsp;&nbsp; PROJECTS</td></tr><tr class="category-row">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('14')">▼</button>
           <span style="margin-right:8px;font-weight:700">14.0</span>
           Projects
@@ -4572,6 +4573,7 @@ let timelineDownMap = {};
 let timelineStartupMap = {};
 let taskTrackerDownOosMap = {};
 let taskTrackerStartupOosMap = {};
+let rtsMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_startup_v2'); if(u) startupMap=JSON.parse(u); }catch(e){}
@@ -4579,6 +4581,14 @@ function loadDownMaps(){
   try{ const u=localStorage.getItem('sd26_timeline_startup_v1'); if(u) timelineStartupMap=JSON.parse(u); }catch(e){}
   try{ const d=localStorage.getItem('sd26_task_tracker_down_oos_v1'); if(d) taskTrackerDownOosMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_task_tracker_startup_oos_v1'); if(u) taskTrackerStartupOosMap=JSON.parse(u); }catch(e){}
+  try{ const r=localStorage.getItem('sd26_rts_v1'); if(r) rtsMap=JSON.parse(r); }catch(e){}
+}
+function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
+function toggleRts(id, checked){
+  if(checked) rtsMap[id]=true; else delete rtsMap[id];
+  saveRtsMap();
+  renderTable();
+  if(typeof renderDashboard==='function') renderDashboard();
 }
 function saveTimelineMarkMaps(){
   try{
@@ -5474,7 +5484,7 @@ function render(){
       sectionCounter++;
       parentIndexInSection = 0;
       const letter = sectionLetters[t.section] || String.fromCharCode(64+sectionCounter);
-      rows+=`<tr class="section-row"><td colspan="21">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
+      rows+=`<tr class="section-row"><td colspan="22">${letter} &nbsp;&nbsp; ${t.section}</td></tr>`;
       lastSection=t.section;
     }
 
@@ -5491,7 +5501,7 @@ function render(){
       const sysDownDate = getSystemDownDate(t.id);
       const sysUpDate   = getSystemUpDate(t.id);
       rows+=`<tr class="category-row">
-        <td colspan="21">
+        <td colspan="22">
           <button class="cat-toggle" onclick="toggleGroup('${t.id}')">${icon}</button>
           <span style="margin-right:8px;font-weight:700">${numLabel}</span>
           ${esc(t.task)}
@@ -5582,11 +5592,12 @@ function render(){
       ${criticalCell}
       ${notificationCell}
       ${editableStatusCell(t.id)}
+      <td style="text-align:center">${t.isParent ? '' : `<input type="checkbox" ${rtsMap[t.id]?'checked':''} onchange="toggleRts('${t.id}',this.checked)" title="RTS process started" style="cursor:pointer;width:15px;height:15px;accent-color:#c62828">`}</td>
       ${editableNotesCell(t.id)}
       ${actionCell(t.id)}
     </tr>`;
   });
-  tbody.innerHTML=rows||'<tr><td colspan="21" class="no-results">No tasks match the current filters.</td></tr>';
+  tbody.innerHTML=rows||'<tr><td colspan="22" class="no-results">No tasks match the current filters.</td></tr>';
   updateStats();
   updateProjectSummary();
   updateSortIndicators();
@@ -7536,14 +7547,23 @@ function renderDashboard(){
   }
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
-    const rtsItems = huddleSystems
+    const rtsSystemItems = huddleSystems
       .filter(s=>s.status==='Cond. REL' || s.status==='FUL REL')
       .sort((a,b)=>a.sortStart.localeCompare(b.sortStart) || a.def.system.localeCompare(b.def.system, undefined, {numeric:true}));
     function releaseDateForSystem(s){
       const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
       return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
     }
-    rtsEl.innerHTML = rtsItems.length ? rtsItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
+    const rtsManualTasks = leaf.filter(t=>rtsMap[t.id]);
+    const allRtsRows = [
+      ...rtsSystemItems.map(s=>`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`),
+      ...rtsManualTasks.map(t=>{
+        const target = displayDate(normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)) || 'TBD';
+        const startup = displayDate(startupMap[t.id]) || '—';
+        return `<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td><td>${startup}</td><td>${esc(t.task)}</td></tr>`;
+      })
+    ];
+    rtsEl.innerHTML = allRtsRows.length ? allRtsRows.join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
   }
   const delayEl = document.getElementById('d-delay-rows');
   if(delayEl){
