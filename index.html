@@ -6857,7 +6857,7 @@ function loadWeeklySummarySaved(){
     const saved = JSON.parse(localStorage.getItem(WEEKLY_SUMMARY_KEY) || '{}') || {};
     const todayIso = document.getElementById('todayInput')?.value || new Date().toISOString().slice(0,10);
     const currentWeekStart = getWeekRange(todayIso).start;
-    if(saved.weekStart && saved.weekStart !== currentWeekStart) return {};
+    if(!saved.weekStart || saved.weekStart !== currentWeekStart) return {};
     return saved;
   }catch(e){ return {}; }
 }
