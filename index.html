@@ -6676,16 +6676,19 @@ function weeklyPlanExecutionData(asOfIso){
     return daysBeforeSelected + fraction;
   })();
   const overallPlanPct = overallPlanTotalDays ? Math.min(100,Math.round(overallPlanElapsedDays/overallPlanTotalDays*100)) : 0;
+  const timeFraction = overallPlanTotalDays ? Math.min(1, overallPlanElapsedDays/overallPlanTotalDays) : 0;
+  const tasksDueByToday = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A' && (normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'9999') <= selectedIso).length;
+  const woDueByToday = Math.round((calData.length + pmData.length) * timeFraction);
+  const itemBasedPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
   const overallPlanDone = Math.round(overallScopeCount*overallPlanPct/100);
   // Alternative: tasks counted by due date, WOs by time fraction
   const timeFraction = overallPlanTotalDays ? Math.min(1, overallPlanElapsedDays/overallPlanTotalDays) : 0;
   const tasksDueByToday = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A' && (normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'9999') <= selectedIso).length;
   const woDueByToday = Math.round((calData.length + pmData.length) * timeFraction);
-  const altOverallPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
   const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
   const behind = planPct - actualPct;
   const state = weeklyExecutionState(behind);
-  const overallBehind = overallPlanPct - overallExecutionPct;
+  const overallBehind = itemBasedPlanPct - overallExecutionPct;
   const overallState = weeklyExecutionState(overallBehind);
   const risk = executionRiskDetails(active, selectedIso);
   const autoExplanation = executionExplanation(state, risk);
@@ -6701,9 +6704,9 @@ function weeklyPlanExecutionData(asOfIso){
   const overallGapText = overallBehind > 0 ? `${overallGap} pts behind plan` : (overallBehind < 0 ? `${overallGap} pts ahead of plan` : 'Actual matches plan');
   return {selectedIso, planPct, actualPct, behind, state, range, activeCount:active.length,
     weeklyScopeCount:weeklyScope.length, weeklyPlanDone, weeklyActualDone, gapText,
-    risk, explanation, overallExplanation, overallPlanPct, overallPct:overallExecutionPct,
+    risk, explanation, overallExplanation, overallPlanPct:itemBasedPlanPct, overallPct:overallExecutionPct,
     overallDone, overallTotal, overallScopeCount, overallPlanDone, overallActualDone,
-    overallBehind, overallState, overallGapText, overallStartIso, overallEndIso, altOverallPlanPct};
+    overallBehind, overallState, overallGapText, overallStartIso, overallEndIso};
 }
 
 function weeklyPlanExecutionCardHtml(extraClass){
