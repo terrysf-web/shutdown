@@ -4575,6 +4575,7 @@ let timelineStartupMap = {};
 let taskTrackerDownOosMap = {};
 let taskTrackerStartupOosMap = {};
 let rtsMap = {};
+let rtsTargetMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_startup_v2'); if(u) startupMap=JSON.parse(u); }catch(e){}
@@ -4583,8 +4584,20 @@ function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_task_tracker_down_oos_v1'); if(d) taskTrackerDownOosMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_task_tracker_startup_oos_v1'); if(u) taskTrackerStartupOosMap=JSON.parse(u); }catch(e){}
   try{ const r=localStorage.getItem('sd26_rts_v1'); if(r) rtsMap=JSON.parse(r); }catch(e){}
+  try{ const t=localStorage.getItem('sd26_rts_target_v1'); if(t) rtsTargetMap=JSON.parse(t); }catch(e){}
 }
 function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
+function saveRtsTargetMap(){ try{ localStorage.setItem('sd26_rts_target_v1', JSON.stringify(rtsTargetMap)); }catch(e){} }
+function editRtsTarget(id, fallbackIso){
+  const current = rtsTargetMap[id] || fallbackIso || '';
+  const val = prompt('Target date (YYYY-MM-DD):', current);
+  if(val === null) return;
+  const trimmed = val.trim();
+  if(trimmed) rtsTargetMap[id] = trimmed;
+  else delete rtsTargetMap[id];
+  saveRtsTargetMap();
+  if(typeof renderDashboard==='function') renderDashboard();
+}
 function editRtsStartup(id){
   const current = startupMap[id] || '';
   const val = prompt('Start-up date (YYYY-MM-DD):', current);
@@ -4830,6 +4843,7 @@ migrateBlockedToDelayed();
 migrateOnHoldStatusToColumn();
 normalizeAllTaskIds();
 saveRtsMap();
+saveRtsTargetMap();
 saveDownMaps();
 
 function getAllSections(){ return [...new Set(tasks.map(t=>t.section))]; }
@@ -4960,6 +4974,7 @@ function remapTaskIds(idRemap){
     delete statusMap[oldId];
     delete notesMap[oldId];
     if(rtsMap[oldId]){ rtsMap[newId]=rtsMap[oldId]; delete rtsMap[oldId]; }
+    if(rtsTargetMap[oldId]){ rtsTargetMap[newId]=rtsTargetMap[oldId]; delete rtsTargetMap[oldId]; }
     if(downMap[oldId]!=null){ downMap[newId]=downMap[oldId]; delete downMap[oldId]; }
     if(startupMap[oldId]!=null){ startupMap[newId]=startupMap[oldId]; delete startupMap[oldId]; }
   });
@@ -7605,16 +7620,18 @@ function renderDashboard(){
         return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`};
       }),
       ...rtsManualTasks.map(t=>{
-        const targetIso = normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const fallbackTargetIso = normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const targetIso = rtsTargetMap[t.id] || fallbackTargetIso;
         const target = displayDate(targetIso) || 'TBD';
+        const targetTd = `<td style="cursor:pointer;color:#fff;text-decoration:underline dotted" onclick="editRtsTarget('${esc(t.id)}','${fallbackTargetIso}')" title="Click to set/edit target date">${target}</td>`;
         const startupIso = startupMap[t.id] || '';
         const startupVal = startupIso ? displayDate(startupIso) : null;
         const startup = startupVal || '—';
         const isDelayed = startupIso && targetIso && startupIso > targetIso;
         const startupColor = isDelayed ? '#f0c040' : (startupVal ? '#fff' : '#9fb4c8');
         const startupTitle = isDelayed ? `Delayed (target: ${displayDate(targetIso)})` : 'Click to set/edit start-up date';
-        const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted${isDelayed?';font-weight:bold':''}" onclick="editRtsStartup('${esc(t.id)}')" title="${startupTitle}">${startup}${isDelayed?' ⚠':''}${startup === '—' ? '' : ''}</td>`;
-        return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td>${startupTd}<td>${esc(t.task)}</td></tr>`};
+        const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted${isDelayed?';font-weight:bold':''}" onclick="editRtsStartup('${esc(t.id)}')" title="${startupTitle}">${startup}${isDelayed?' ⚠':''}</td>`;
+        return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td>${targetTd}${startupTd}<td>${esc(t.task)}</td></tr>`};
       })
     ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
     rtsEl.innerHTML = allRtsEntries.length ? allRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
