@@ -4585,6 +4585,16 @@ function loadDownMaps(){
   try{ const r=localStorage.getItem('sd26_rts_v1'); if(r) rtsMap=JSON.parse(r); }catch(e){}
 }
 function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
+function editRtsStartup(id){
+  const current = startupMap[id] || '';
+  const val = prompt('Start-up date (YYYY-MM-DD):', current);
+  if(val === null) return;
+  const trimmed = val.trim();
+  if(trimmed) startupMap[id] = trimmed;
+  else delete startupMap[id];
+  saveDownMaps();
+  if(typeof renderDashboard==='function') renderDashboard();
+}
 function toggleRts(id, checked){
   if(checked) rtsMap[id]=true; else delete rtsMap[id];
   saveRtsMap();
@@ -7598,8 +7608,11 @@ function renderDashboard(){
         const targetIso = normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
         const target = displayDate(targetIso) || 'TBD';
         const tStatus = statusMap[t.id] || t.status || '';
-        const startup = tStatus==='In Progress' ? (displayDate(startupMap[t.id]) || '—') : '—';
-        return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td><td>${startup}</td><td>${esc(t.task)}</td></tr>`};
+        const startupVal = startupMap[t.id] ? displayDate(startupMap[t.id]) : null;
+        const startup = startupVal || '—';
+        const startupColor = startupVal ? '#fff' : '#9fb4c8';
+        const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted" onclick="editRtsStartup('${esc(t.id)}')" title="Click to set/edit start-up date">${startup}</td>`;
+        return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td>${startupTd}<td>${esc(t.task)}</td></tr>`};
       })
     ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
     rtsEl.innerHTML = allRtsEntries.length ? allRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
