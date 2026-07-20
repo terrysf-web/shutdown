@@ -6619,9 +6619,9 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
-  const weeklyPlanDone = weeklyScope.filter(t=>targetEnd(t)<=selectedIso).length;
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
-  const planPct = weeklyScope.length ? Math.round(weeklyPlanDone/weeklyScope.length*100) : 0;
+  const weeklyPlanDone = weeklyScope.length;
+  const planPct = weeklyScope.length ? 100 : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
@@ -6687,7 +6687,7 @@ function weeklyPlanExecutionCardHtml(extraClass){
   const d = weeklyPlanExecutionData();
   return `<div class="plan-execution-scoreboard"><div class="weekly-plan-execution-card weekly-scope-card ${extraClass||''} state-${d.state.key}" data-execution-scope="weekly">
     <div><div class="weekly-plan-execution-title">Weekly Task Plan vs Actual Progress</div><div class="weekly-plan-execution-week">Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)}</div></div>
-    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Due by Date</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
+    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Weekly Plan</div><div class="weekly-plan-execution-value">${d.planPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Actual Progress</div><div class="weekly-plan-execution-value">${d.actualPct}%</div></div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
@@ -6741,7 +6741,7 @@ function renderWeeklyPlanExecutionCards(){
     const set = (selector,value)=>{ const el=card.querySelector(selector); if(el) el.textContent=value; };
     set('.weekly-plan-execution-title', 'Weekly Task Plan vs Actual Progress');
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
-    if(metricLabels[0]) metricLabels[0].textContent = 'Due by Date';
+    if(metricLabels[0]) metricLabels[0].textContent = 'Weekly Plan';
     if(metricLabels[1]) metricLabels[1].textContent = 'Actual Progress';
     set('[data-weekly-plan]', `${d.planPct}%`);
     set('[data-weekly-actual]', `${d.actualPct}%`);
