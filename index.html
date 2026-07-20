@@ -8930,7 +8930,7 @@ async function tryAutoLoadSharedData(){
     try{ incomingTaskCount = JSON.parse((payload.data && payload.data.sd26_tasks_v3) || '[]').length || 0; }catch(e){}
     if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
     if(payload && payload.data){
-      const LOCAL_ONLY_KEYS = ['sd26_rts_v1'];
+      const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1'];
       Object.keys(payload.data).forEach(k => {
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
       });
