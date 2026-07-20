@@ -6677,6 +6677,11 @@ function weeklyPlanExecutionData(asOfIso){
   })();
   const overallPlanPct = overallPlanTotalDays ? Math.min(100,Math.round(overallPlanElapsedDays/overallPlanTotalDays*100)) : 0;
   const overallPlanDone = Math.round(overallScopeCount*overallPlanPct/100);
+  // Alternative: tasks counted by due date, WOs by time fraction
+  const timeFraction = overallPlanTotalDays ? Math.min(1, overallPlanElapsedDays/overallPlanTotalDays) : 0;
+  const tasksDueByToday = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A' && (normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'9999') <= selectedIso).length;
+  const woDueByToday = Math.round((calData.length + pmData.length) * timeFraction);
+  const altOverallPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
   const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
   const behind = planPct - actualPct;
   const state = weeklyExecutionState(behind);
@@ -6698,7 +6703,7 @@ function weeklyPlanExecutionData(asOfIso){
     weeklyScopeCount:weeklyScope.length, weeklyPlanDone, weeklyActualDone, gapText,
     risk, explanation, overallExplanation, overallPlanPct, overallPct:overallExecutionPct,
     overallDone, overallTotal, overallScopeCount, overallPlanDone, overallActualDone,
-    overallBehind, overallState, overallGapText, overallStartIso, overallEndIso};
+    overallBehind, overallState, overallGapText, overallStartIso, overallEndIso, altOverallPlanPct};
 }
 
 function weeklyPlanExecutionCardHtml(extraClass){
@@ -6710,7 +6715,7 @@ function weeklyPlanExecutionCardHtml(extraClass){
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
     <div><div class="weekly-plan-execution-title">Overall Plan vs Completion</div><div class="weekly-plan-execution-week">Tasks + CAL + PM Work Orders</div></div>
-    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Baseline Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}%</div></div>
+    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Baseline Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}% <span style="font-size:11px;opacity:.7">(alt:${d.altOverallPlanPct}%)</span></div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Completed</div><div class="weekly-plan-execution-value">${d.overallPct}%</div></div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.overallState.label}</div><div class="weekly-plan-execution-gap">${d.overallGapText}</div>${d.overallExplanation.driver?`<div class="weekly-plan-execution-driver">${d.overallExplanation.driver}</div>`:''}${d.overallExplanation.action?`<div class="weekly-plan-execution-action">${d.overallExplanation.action}</div>`:''}</div></div>
   </div></div>`;
