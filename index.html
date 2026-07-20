@@ -6680,11 +6680,7 @@ function weeklyPlanExecutionData(asOfIso){
   const tasksDueByToday = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A' && (normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'9999') <= selectedIso).length;
   const woDueByToday = Math.round((calData.length + pmData.length) * timeFraction);
   const itemBasedPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
-  const overallPlanDone = Math.round(overallScopeCount*overallPlanPct/100);
-  // Alternative: tasks counted by due date, WOs by time fraction
-  const timeFraction = overallPlanTotalDays ? Math.min(1, overallPlanElapsedDays/overallPlanTotalDays) : 0;
-  const tasksDueByToday = allTasks.filter(t=>(statusMap[t.id]||t.status||'Pending')!=='N/A' && (normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'9999') <= selectedIso).length;
-  const woDueByToday = Math.round((calData.length + pmData.length) * timeFraction);
+  const overallPlanDone = Math.round(overallScopeCount*itemBasedPlanPct/100);
   const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
   const behind = planPct - actualPct;
   const state = weeklyExecutionState(behind);
