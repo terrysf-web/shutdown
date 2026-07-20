@@ -925,6 +925,7 @@ select.msf option:checked{background:#ddeeff}
     </select>
     <select id="filterAssigned" onchange="render()"><option value="">All assignees</option><option value="DP MFG">DP MFG</option><option value="DS MFG">DS MFG</option><option value="Hector">Hector</option><option value="Irene">Irene</option><option value="Jason">Jason</option><option value="Jingfu">Jingfu</option><option value="Lance">Lance</option><option value="Marco">Marco</option><option value="Michael">Michael</option><option value="Nhan">Nhan</option><option value="QCEM">QCEM</option><option value="Romulo">Romulo</option><option value="Terry">Terry</option><option value="Yelena">Yelena</option></select>
     <button class="btn secondary more-filters-btn" id="moreFiltersBtn" onclick="toggleAdvancedFilters()">More Filters</button>
+    <button class="btn secondary" id="toggleCompletedBtn" onclick="toggleShowCompleted()" style="background:#1a3a5c;border:1px solid #2e5a8a;color:#8ab4d8">Show Completed</button>
     <div class="actions">
       <button class="btn secondary" onclick="expandAll()">Expand All</button>
       <button class="btn secondary" onclick="collapseAll()">Collapse All</button>
@@ -5407,6 +5408,19 @@ function toggleEndImpact(taskId, checked){
   render();
 }
 
+let showCompleted = false;
+function toggleShowCompleted(){
+  showCompleted = !showCompleted;
+  const btn = document.getElementById('toggleCompletedBtn');
+  if(btn){
+    btn.textContent = showCompleted ? 'Hide Completed' : 'Show Completed';
+    btn.style.background = showCompleted ? '#1b4332' : '#1a3a5c';
+    btn.style.color = showCompleted ? '#6fcf97' : '#8ab4d8';
+    btn.style.borderColor = showCompleted ? '#2d6a4f' : '#2e5a8a';
+  }
+  render();
+}
+
 function render(){
   const search=document.getElementById('search').value.toLowerCase();
   const fSec=document.getElementById('filterSection').value;
@@ -5435,6 +5449,7 @@ function render(){
   // Add parents whose children pass the active filters
   tasks.forEach(t=>{
     if(t.isParent) return;
+    if(!showCompleted && !fStat && (statusMap[t.id]||t.status||'Pending')==='Complete') return;
     if(fSec&&t.section!==fSec) return;
     if(fStat&&statusMap[t.id]!==fStat) return;
     if(fAsn&&!splitAssignees(t.assigned||'').includes(fAsn)) return;
@@ -5457,6 +5472,7 @@ function render(){
 
   const filteredTasks = tasks.filter(t=>{
     if(t.isParent) return visibleParents.has(t.id);
+    if(!showCompleted && !fStat && (statusMap[t.id]||t.status||'Pending')==='Complete') return false;
     if(fSec&&t.section!==fSec) return;
     if(fStat&&statusMap[t.id]!==fStat) return;
     if(fAsn&&!splitAssignees(t.assigned||'').includes(fAsn)) return;
