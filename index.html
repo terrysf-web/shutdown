@@ -6782,7 +6782,8 @@ function renderWeeklyPlanExecutionCards(){
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
     if(metricLabels[0]) metricLabels[0].textContent = 'Baseline Plan';
     if(metricLabels[1]) metricLabels[1].textContent = 'Completed';
-    set('[data-overall-plan]', `${d.overallPlanPct}%`);
+    const planEl = card.querySelector('[data-overall-plan]');
+    if(planEl) planEl.innerHTML = `${d.overallPlanPct}% <span style="font-size:11px;opacity:.65">(alt:${d.altOverallPlanPct}%)</span>`;
     set('[data-overall-actual]', `${d.overallPct}%`);
     set('[data-overall-state]', d.overallState.label);
     set('[data-overall-gap]', d.overallGapText);
