@@ -6715,7 +6715,7 @@ function weeklyPlanExecutionCardHtml(extraClass){
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.state.label}</div><div class="weekly-plan-execution-gap">${d.gapText}</div>${d.explanation.driver?`<div class="weekly-plan-execution-driver">${d.explanation.driver}</div>`:''}${d.explanation.action?`<div class="weekly-plan-execution-action">${d.explanation.action}</div>`:''}</div></div>
   </div><div class="weekly-plan-execution-card overall-scope-card ${extraClass||''} state-${d.overallState.key}" data-execution-scope="overall">
     <div><div class="weekly-plan-execution-title">Overall Plan vs Completion</div><div class="weekly-plan-execution-week">Tasks + CAL + PM Work Orders</div></div>
-    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Baseline Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}% <span style="font-size:11px;opacity:.7">(alt:${d.altOverallPlanPct}%)</span></div></div>
+    <div class="wpe-metrics"><div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Baseline Plan</div><div class="weekly-plan-execution-value">${d.overallPlanPct}%</div></div>
     <div class="weekly-plan-execution-metric"><div class="weekly-plan-execution-label">Completed</div><div class="weekly-plan-execution-value">${d.overallPct}%</div></div></div>
     <div class="weekly-plan-execution-status"><span class="weekly-plan-execution-signal"></span><div><div class="weekly-plan-execution-state">${d.overallState.label}</div><div class="weekly-plan-execution-gap">${d.overallGapText}</div>${d.overallExplanation.driver?`<div class="weekly-plan-execution-driver">${d.overallExplanation.driver}</div>`:''}${d.overallExplanation.action?`<div class="weekly-plan-execution-action">${d.overallExplanation.action}</div>`:''}</div></div>
   </div></div>`;
@@ -6782,8 +6782,7 @@ function renderWeeklyPlanExecutionCards(){
     const metricLabels = card.querySelectorAll('.weekly-plan-execution-label');
     if(metricLabels[0]) metricLabels[0].textContent = 'Baseline Plan';
     if(metricLabels[1]) metricLabels[1].textContent = 'Completed';
-    const planEl = card.querySelector('[data-overall-plan]');
-    if(planEl) planEl.innerHTML = `${d.overallPlanPct}% <span style="font-size:11px;opacity:.65">(alt:${d.altOverallPlanPct}%)</span>`;
+    set('[data-overall-plan]', `${d.overallPlanPct}%`);
     set('[data-overall-actual]', `${d.overallPct}%`);
     set('[data-overall-state]', d.overallState.label);
     set('[data-overall-gap]', d.overallGapText);
