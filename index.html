@@ -7605,13 +7605,15 @@ function renderDashboard(){
         return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${s.def.name}</td></tr>`};
       }),
       ...rtsManualTasks.map(t=>{
-        const targetIso = normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const targetIso = normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
         const target = displayDate(targetIso) || 'TBD';
-        const tStatus = statusMap[t.id] || t.status || '';
-        const startupVal = startupMap[t.id] ? displayDate(startupMap[t.id]) : null;
+        const startupIso = startupMap[t.id] || '';
+        const startupVal = startupIso ? displayDate(startupIso) : null;
         const startup = startupVal || '—';
-        const startupColor = startupVal ? '#fff' : '#9fb4c8';
-        const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted" onclick="editRtsStartup('${esc(t.id)}')" title="Click to set/edit start-up date">${startup}</td>`;
+        const isDelayed = startupIso && targetIso && startupIso > targetIso;
+        const startupColor = isDelayed ? '#f0c040' : (startupVal ? '#fff' : '#9fb4c8');
+        const startupTitle = isDelayed ? `Delayed (target: ${displayDate(targetIso)})` : 'Click to set/edit start-up date';
+        const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted${isDelayed?';font-weight:bold':''}" onclick="editRtsStartup('${esc(t.id)}')" title="${startupTitle}">${startup}${isDelayed?' ⚠':''}${startup === '—' ? '' : ''}</td>`;
         return {targetIso, html:`<tr><td><span style="background:#f57f17;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px">RTS</span></td><td>${huddleSystemForTask(t)}</td><td>${target}</td>${startupTd}<td>${esc(t.task)}</td></tr>`};
       })
     ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
