@@ -9012,7 +9012,7 @@ function applyFirebaseSharedPayload(payload, opts){
   opts = opts || {};
   if(!payload || !payload.data) return false;
   firebaseSharedApplyingRemote = true;
-  const LOCAL_ONLY_KEYS = ['sd26_rts_v1'];
+  const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1'];
   Object.keys(payload.data).forEach(k => {
     if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
   });
