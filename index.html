@@ -6621,7 +6621,10 @@ function weeklyPlanExecutionData(asOfIso){
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
   const weeklyPlanDone = weeklyScope.length;
-  const planPct = weeklyScope.length ? 100 : 0;
+  const selectedDate = new Date(selectedIso+'T00:00:00');
+  const dayOfWeek = selectedDate.getDay(); // 0=Sun,1=Mon,...,5=Fri,6=Sat
+  const weekDayIndex = dayOfWeek === 0 ? 5 : dayOfWeek === 6 ? 5 : Math.min(dayOfWeek, 5); // Mon=1..Fri=5
+  const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
