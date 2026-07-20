@@ -7714,7 +7714,19 @@ function renderDashboard(){
     const commItems = [];
     criticalTasks.forEach(t=>commItems.push({type:'Critical', task:t}));
     notificationTasks.filter(t=>!criticalTasks.some(c=>c.id===t.id)).forEach(t=>commItems.push({type:'Notification', task:t}));
-    setHtml('mb-comm-rows', commItems.length ? commItems.map(item=>{
+    const todayForComm = trackerCompletionDate();
+    const commWeekRange = getWeekRange(todayForComm);
+    const filteredCommItems = commItems.filter(item=>{
+      const t = item.task;
+      const impactIso = normalizeDateValue(t.newStart) || normalizeDateValue(t.start) || normalizeDateValue(t.end) || '';
+      // keep: this week's items (Mon-Fri), drop: past items before this week
+      return !impactIso || impactIso >= commWeekRange.start;
+    }).sort((a,b)=>{
+      const aIso = normalizeDateValue(a.task.newStart) || normalizeDateValue(a.task.start) || normalizeDateValue(a.task.end) || '';
+      const bIso = normalizeDateValue(b.task.newStart) || normalizeDateValue(b.task.start) || normalizeDateValue(b.task.end) || '';
+      return aIso.localeCompare(bIso);
+    });
+    setHtml('mb-comm-rows', filteredCommItems.length ? filteredCommItems.map(item=>{
       const t=item.task;
       const sent = t.notification ? '✓' : '—';
       const impactedArea = huddleAreaForTask(t);
