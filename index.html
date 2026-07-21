@@ -7626,18 +7626,6 @@ function renderDashboard(){
     return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
   }
   const rtsManualTasks = tasks.filter(t=>rtsMap[t.id]);
-  // Morning brief RTS table
-  const mbRtsEntries = [
-    ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
-    ...rtsManualTasks.map(t=>{
-      const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
-      const suIso = startupMap[t.id]||'';
-      const suVal = suIso ? displayDate(suIso) : null;
-      const delayed = suVal && fbIso && suIso > fbIso;
-      return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
-    })
-  ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
-  setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
     const allRtsEntries = [
@@ -7775,6 +7763,18 @@ function renderDashboard(){
     if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>${gowningSuspendTargetDate('dp')}</td></tr>`);
     if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>${gowningSuspendTargetDate('ds')}</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+
+    const mbRtsEntries = [
+      ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
+      ...rtsManualTasks.map(t=>{
+        const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const suIso = startupMap[t.id]||'';
+        const suVal = suIso ? displayDate(suIso) : null;
+        const delayed = suVal && fbIso && suIso > fbIso;
+        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
+      })
+    ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
+    setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
 
     const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
     setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
