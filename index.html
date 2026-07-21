@@ -6674,10 +6674,8 @@ function weeklyPlanExecutionData(asOfIso){
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
-  const weeklyPlanDone = weeklyScope.length;
-  const _selDay = new Date(selectedIso+'T00:00:00').getDay(); // 0=Sun,1=Mon,...,5=Fri,6=Sat
-  const weekDayIndex = _selDay === 0 ? 5 : _selDay === 6 ? 5 : Math.min(_selDay, 5); // Mon=1..Fri=5
-  const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
+  const weeklyPlanDueByToday = weeklyScope.filter(t => (targetEnd(t)||'') <= selectedIso).length;
+  const planPct = weeklyScope.length ? Math.round(weeklyPlanDueByToday / weeklyScope.length * 100) : 0;
   const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
