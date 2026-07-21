@@ -4000,6 +4000,10 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Return to Service</div>
+      <table class="huddle-table small"><thead><tr><th>System ID</th><th>Target</th><th>Start-Up</th><th>Note</th></tr></thead><tbody id="mb-rts-rows"></tbody></table>
+    </div>
+    <div class="huddle-panel tight" style="margin-bottom:14px">
       <div class="huddle-panel-title with-legend"><span>Today's In-Progress Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
       <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
     </div>
@@ -7645,6 +7649,18 @@ function renderDashboard(){
       })
     ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
     rtsEl.innerHTML = allRtsEntries.length ? allRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
+    // Morning brief RTS table (same data, simpler display)
+    const mbRtsEntries = [
+      ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
+      ...rtsManualTasks.map(t=>{
+        const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+        const suIso = startupMap[t.id]||'';
+        const suVal = suIso ? displayDate(suIso) : null;
+        const delayed = suVal && fbIso && suIso > fbIso;
+        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
+      })
+    ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
+    setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
   }
   const delayEl = document.getElementById('d-delay-rows');
   if(delayEl){
