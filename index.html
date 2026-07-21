@@ -7637,7 +7637,7 @@ function renderDashboard(){
         const startupIso = startupMap[t.id] || '';
         const startupVal = startupIso ? displayDate(startupIso) : null;
         const startup = startupVal || '—';
-        const isDelayed = startupIso && targetIso && startupIso > targetIso;
+        const isDelayed = startupVal && targetIso && startupIso > targetIso;
         const startupColor = isDelayed ? '#f0c040' : (startupVal ? '#fff' : '#9fb4c8');
         const startupTitle = isDelayed ? `Delayed (target: ${displayDate(targetIso)})` : 'Click to set/edit start-up date';
         const startupTd = `<td style="cursor:pointer;color:${startupColor};text-decoration:underline dotted${isDelayed?';font-weight:bold':''}" onclick="editRtsStartup('${esc(t.id)}')" title="${startupTitle}">${startup}${isDelayed?' ⚠':''}</td>`;
