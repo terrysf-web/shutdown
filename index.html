@@ -7519,7 +7519,13 @@ function renderDashboard(){
   }
   function huddleSystemForTask(t){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
-    return found ? found.def.system : (t.section||'—');
+    if(found) return found.def.system;
+    // Parent tasks not in activeLeaf: match by ID prefix
+    const tid = String(t.id);
+    for(const def of huddleSystemDefs){
+      if((def.parents||[]).some(p=>tid.startsWith(p+'.'))) return def.system;
+    }
+    return t.section||'—';
   }
   function huddleAreaForTask(t){
     if(t && String(t.impactArea || '').trim()) return String(t.impactArea).trim();
