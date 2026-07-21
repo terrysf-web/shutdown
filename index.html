@@ -7610,9 +7610,9 @@ function renderDashboard(){
       });
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
-      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const newDateText = delayedNewDate(t);
       const progressPct = taskProgressPct(t);
-      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const progressText = (newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       const displayStart = displayDate(t.start) || 'TBD';
@@ -7791,9 +7791,9 @@ function renderDashboard(){
     const morningMaintItems = maintItems.filter(t=>(statusMap[t.id] || t.status || 'Pending') === 'In Progress');
     setHtml('mb-maint-rows', morningMaintItems.length ? morningMaintItems.map(t=>{
       const st = statusMap[t.id] || t.status || 'Pending';
-      const newDateText = st === 'Delayed' ? delayedNewDate(t) : '—';
+      const newDateText = delayedNewDate(t);
       const progressPct = taskProgressPct(t);
-      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
+      const progressText = (newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       const displayStart = displayDate(t.start) || 'TBD';
