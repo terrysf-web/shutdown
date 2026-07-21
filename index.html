@@ -7518,13 +7518,14 @@ function renderDashboard(){
     </div>`).join('') : '<div class="progress-empty">No active OOS or release systems.</div>';
   }
   function huddleSystemForTask(t){
-    const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
-    if(found) return found.def.system;
     const tid = String(t.id);
-    // Parent prefix first (group's main system, e.g. group 2 → WFIS-001)
+    // Check parent prefix first using huddleSystemDefs order (NOT sorted huddleSystems)
+    // huddleSystems is sorted by start date so CSGT may appear before PURW
     for(const def of huddleSystemDefs){
       if((def.parents||[]).some(p=>tid.startsWith(p+'.'))) return def.system;
     }
+    const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
+    if(found) return found.def.system;
     for(const def of huddleSystemDefs){
       if(typeof def.match === 'function' && def.match(t)) return def.system;
     }
