@@ -7520,8 +7520,11 @@ function renderDashboard(){
   function huddleSystemForTask(t){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     if(found) return found.def.system;
-    // Parent tasks not in activeLeaf: match by ID prefix
     const tid = String(t.id);
+    // Prefer specific name match over parent prefix (handles WFIS vs CSGT overlap)
+    for(const def of huddleSystemDefs){
+      if(typeof def.match === 'function' && def.match(t)) return def.system;
+    }
     for(const def of huddleSystemDefs){
       if((def.parents||[]).some(p=>tid.startsWith(p+'.'))) return def.system;
     }
