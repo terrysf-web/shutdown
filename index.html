@@ -7618,16 +7618,28 @@ function renderDashboard(){
       </tr>`;
     }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
   }
+  const rtsSystemItems = huddleSystems
+    .filter(s=>s.status==='Cond. REL' || s.status==='FUL REL')
+    .sort((a,b)=>a.sortStart.localeCompare(b.sortStart) || a.def.system.localeCompare(b.def.system, undefined, {numeric:true}));
+  function releaseDateForSystem(s){
+    const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
+    return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
+  }
+  const rtsManualTasks = tasks.filter(t=>rtsMap[t.id]);
+  // Morning brief RTS table
+  const mbRtsEntries = [
+    ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
+    ...rtsManualTasks.map(t=>{
+      const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
+      const suIso = startupMap[t.id]||'';
+      const suVal = suIso ? displayDate(suIso) : null;
+      const delayed = suVal && fbIso && suIso > fbIso;
+      return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
+    })
+  ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
+  setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
   const rtsEl = document.getElementById('d-rts-rows');
   if(rtsEl){
-    const rtsSystemItems = huddleSystems
-      .filter(s=>s.status==='Cond. REL' || s.status==='FUL REL')
-      .sort((a,b)=>a.sortStart.localeCompare(b.sortStart) || a.def.system.localeCompare(b.def.system, undefined, {numeric:true}));
-    function releaseDateForSystem(s){
-      const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
-      return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
-    }
-    const rtsManualTasks = tasks.filter(t=>rtsMap[t.id]);
     const allRtsEntries = [
       ...rtsSystemItems.map(s=>{
         const targetIso = normalizeDateValue(releaseDateForSystem(s)) || '';
@@ -7649,18 +7661,6 @@ function renderDashboard(){
       })
     ].sort((a,b)=>(a.targetIso||'9999').localeCompare(b.targetIso||'9999'));
     rtsEl.innerHTML = allRtsEntries.length ? allRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No systems returned to service.</td></tr>';
-    // Morning brief RTS table (same data, simpler display)
-    const mbRtsEntries = [
-      ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
-      ...rtsManualTasks.map(t=>{
-        const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.newStart)||normalizeDateValue(t.start)||normalizeDateValue(t.newEnd)||normalizeDateValue(t.end)||'';
-        const suIso = startupMap[t.id]||'';
-        const suVal = suIso ? displayDate(suIso) : null;
-        const delayed = suVal && fbIso && suIso > fbIso;
-        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
-      })
-    ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
-    setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
   }
   const delayEl = document.getElementById('d-delay-rows');
   if(delayEl){
