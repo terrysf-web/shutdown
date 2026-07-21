@@ -7521,13 +7521,9 @@ function renderDashboard(){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     if(found) return found.def.system;
     const tid = String(t.id);
-    // Find all systems whose parent prefix matches
-    const byParentDefs = huddleSystemDefs.filter(def=>(def.parents||[]).some(p=>tid.startsWith(p+'.')));
-    if(byParentDefs.length === 1) return byParentDefs[0].system;
-    if(byParentDefs.length > 1){
-      // Multiple systems share parent — use task name match to distinguish (e.g. WFIS vs CSGT)
-      const byMatch = byParentDefs.find(def=>typeof def.match==='function' && def.match(t));
-      return byMatch ? byMatch.system : byParentDefs[0].system;
+    // Parent prefix first (group's main system, e.g. group 2 → WFIS-001)
+    for(const def of huddleSystemDefs){
+      if((def.parents||[]).some(p=>tid.startsWith(p+'.'))) return def.system;
     }
     for(const def of huddleSystemDefs){
       if(typeof def.match === 'function' && def.match(t)) return def.system;
