@@ -3996,7 +3996,7 @@ APPENDIX 6.5B)</div>
       </div>
       <div class="huddle-panel tight">
         <div class="huddle-panel-title">Critical / Notification Items</div>
-        <table class="huddle-table small"><thead><tr><th>Sent</th><th>System ID</th><th>Task</th><th>Impacted Area</th><th>Impact Date</th></tr></thead><tbody id="mb-comm-rows"></tbody></table>
+        <div id="mb-comm-cards" style="display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:4px 0"></div>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
@@ -7814,13 +7814,21 @@ function renderDashboard(){
       const bIso = normalizeDateValue(b.task.newStart) || normalizeDateValue(b.task.start) || normalizeDateValue(b.task.end) || '';
       return aIso.localeCompare(bIso);
     });
-    setHtml('mb-comm-rows', filteredCommItems.length ? filteredCommItems.map(item=>{
+    setHtml('mb-comm-cards', filteredCommItems.length ? filteredCommItems.map(item=>{
       const t=item.task;
-      const sent = t.notification ? '✓' : '—';
+      const isCritical = item.type==='Critical';
       const impactedArea = huddleAreaForTask(t);
       const impactDate = displayDate(t.newStart) || displayDate(t.start) || displayDate(t.end) || 'TBD';
-      return `<tr><td style="text-align:center;font-weight:900;color:${t.notification?'#d7ffe5':'#9fb4c8'}">${sent}</td><td>${esc(huddleSystemForTask(t))}</td><td>${esc(t.task)}</td><td data-impact-area-edit="1" data-task-id="${esc(t.id)}" title="Click to edit impacted area" style="cursor:pointer;color:${t.impactArea?'#fff':'#cde'};font-weight:${t.impactArea?'900':'700'}">${esc(impactedArea)}</td><td>${impactDate}</td></tr>`;
-    }).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No critical or notification items.</td></tr>');
+      const borderColor = isCritical ? '#e53935' : '#f57f17';
+      const badgeStyle = `background:${borderColor};color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;display:inline-block;margin-bottom:6px`;
+      const sent = t.notification ? '<span style="color:#d7ffe5;font-weight:900;margin-left:6px">✓ Sent</span>' : '';
+      return `<div style="background:#0d2137;border-left:3px solid ${borderColor};border-radius:4px;padding:8px 10px">
+        <div><span style="${badgeStyle}">${isCritical?'CRITICAL':'NOTIFICATION'}</span>${sent}</div>
+        <div style="font-weight:700;color:#fff;font-size:12px;margin-bottom:2px">${esc(t.task)}</div>
+        <div style="color:#9fb4c8;font-size:11px">${esc(huddleSystemForTask(t))}</div>
+        <div style="color:#9fb4c8;font-size:11px">${esc(impactedArea)} · ${impactDate}</div>
+      </div>`;
+    }).join('') : '<div style="color:#9fb4c8;font-style:italic;padding:8px">No critical or notification items.</div>');
 
     const noteItemIds = new Set([
       ...allDelayedTasks.map(t=>t.id),
