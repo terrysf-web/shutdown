@@ -7612,7 +7612,7 @@ function renderDashboard(){
       const st = statusMap[t.id] || t.status || 'Pending';
       const newDateText = delayedNewDate(t);
       const progressPct = taskProgressPct(t);
-      const progressText = (newDateText !== '—') ? '—' : `${progressPct}%`;
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       const displayStart = displayDate(t.start) || 'TBD';
@@ -7793,7 +7793,7 @@ function renderDashboard(){
       const st = statusMap[t.id] || t.status || 'Pending';
       const newDateText = delayedNewDate(t);
       const progressPct = taskProgressPct(t);
-      const progressText = (newDateText !== '—') ? '—' : `${progressPct}%`;
+      const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
       const displayStart = displayDate(t.start) || 'TBD';
