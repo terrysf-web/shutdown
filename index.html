@@ -7771,7 +7771,8 @@ function renderDashboard(){
         const suIso = startupMap[t.id]||'';
         const suVal = suIso ? displayDate(suIso) : null;
         const delayed = suVal && fbIso && suIso > fbIso;
-        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="color:${delayed?'#f0c040':(suVal?'#fff':'#9fb4c8')}">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
+        const suColor = delayed?'#f0c040':(suVal?'#fff':'#9fb4c8');
+        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayDate(fbIso)||'TBD'}</td><td style="cursor:pointer;color:${suColor};text-decoration:underline dotted" onclick="editRtsStartup('${esc(t.id)}')" title="Click to set/edit start-up date">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
       })
     ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
     setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
@@ -8956,7 +8957,7 @@ async function tryAutoLoadSharedData(){
     try{ incomingTaskCount = JSON.parse((payload.data && payload.data.sd26_tasks_v3) || '[]').length || 0; }catch(e){}
     if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
     if(payload && payload.data){
-      const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1'];
+      const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
       Object.keys(payload.data).forEach(k => {
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
       });
@@ -9038,7 +9039,7 @@ function applyFirebaseSharedPayload(payload, opts){
   opts = opts || {};
   if(!payload || !payload.data) return false;
   firebaseSharedApplyingRemote = true;
-  const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1'];
+  const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
   Object.keys(payload.data).forEach(k => {
     if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
   });
