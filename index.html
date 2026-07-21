@@ -7613,8 +7613,8 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
-      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
+      const displayStart = displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.end) || displayStart;
       return `<tr>
         <td>${progressText}</td>
         <td>${huddleSystemForTask(t)}</td>
@@ -7794,8 +7794,8 @@ function renderDashboard(){
       const progressText = (st === 'Delayed' && newDateText !== '—') ? '—' : `${progressPct}%`;
       const vendor = huddleVendor(t);
       const vendorOnsite = isVendorOnsite(t) && vendor !== '—';
-      const displayStart = displayDate(t.newStart) || displayDate(t.start) || 'TBD';
-      const displayTarget = displayDate(t.newEnd) || displayDate(t.end) || displayStart;
+      const displayStart = displayDate(t.start) || 'TBD';
+      const displayTarget = displayDate(t.end) || displayStart;
       return `<tr><td>${progressText}</td><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="${vendorOnsite?'vendor-onsite':''}">${esc(vendor)}</td><td>${displayStart}</td><td>${displayTarget}</td><td>${newDateText}</td><td>${huddleStatusHtml(st)}</td></tr>`;
     }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No in-progress tasks for this morning.</td></tr>');
 
