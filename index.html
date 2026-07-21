@@ -7521,12 +7521,16 @@ function renderDashboard(){
     const found = huddleSystems.find(s=>s.items.some(item=>item.id===t.id));
     if(found) return found.def.system;
     const tid = String(t.id);
-    // Prefer specific name match over parent prefix (handles WFIS vs CSGT overlap)
-    for(const def of huddleSystemDefs){
-      if(typeof def.match === 'function' && def.match(t)) return def.system;
+    // Find all systems whose parent prefix matches
+    const byParentDefs = huddleSystemDefs.filter(def=>(def.parents||[]).some(p=>tid.startsWith(p+'.')));
+    if(byParentDefs.length === 1) return byParentDefs[0].system;
+    if(byParentDefs.length > 1){
+      // Multiple systems share parent — use task name match to distinguish (e.g. WFIS vs CSGT)
+      const byMatch = byParentDefs.find(def=>typeof def.match==='function' && def.match(t));
+      return byMatch ? byMatch.system : byParentDefs[0].system;
     }
     for(const def of huddleSystemDefs){
-      if((def.parents||[]).some(p=>tid.startsWith(p+'.'))) return def.system;
+      if(typeof def.match === 'function' && def.match(t)) return def.system;
     }
     return t.section||'—';
   }
