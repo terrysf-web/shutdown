@@ -4582,7 +4582,7 @@ let rtsMap = {};
 let rtsTargetMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
-  try{ const u=localStorage.getItem('sd26_startup_v2'); if(u) startupMap=JSON.parse(u); }catch(e){}
+  try{ const u=localStorage.getItem('sd26_startup_v2'); if(u){ const raw=JSON.parse(u); Object.keys(raw).forEach(k=>{raw[k]=parseDateInput(raw[k]);}); startupMap=raw; } }catch(e){}
   try{ const d=localStorage.getItem('sd26_timeline_down_v1'); if(d) timelineDownMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_timeline_startup_v1'); if(u) timelineStartupMap=JSON.parse(u); }catch(e){}
   try{ const d=localStorage.getItem('sd26_task_tracker_down_oos_v1'); if(d) taskTrackerDownOosMap=JSON.parse(d); }catch(e){}
@@ -4592,11 +4592,20 @@ function loadDownMaps(){
 }
 function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
 function saveRtsTargetMap(){ try{ localStorage.setItem('sd26_rts_target_v1', JSON.stringify(rtsTargetMap)); }catch(e){} }
+function parseDateInput(s){
+  s = (s||'').trim();
+  if(!s) return '';
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  // M/D/YYYY or MM/DD/YYYY
+  const m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return `${m[3]}-${m[1].padStart(2,'0')}-${m[2].padStart(2,'0')}`;
+  return s;
+}
 function editRtsTarget(id, fallbackIso){
   const current = rtsTargetMap[id] || fallbackIso || '';
   const val = prompt('Target date (YYYY-MM-DD):', current);
   if(val === null) return;
-  const trimmed = val.trim();
+  const trimmed = parseDateInput(val);
   if(trimmed) rtsTargetMap[id] = trimmed;
   else delete rtsTargetMap[id];
   saveRtsTargetMap();
@@ -4606,7 +4615,7 @@ function editRtsStartup(id){
   const current = startupMap[id] || '';
   const val = prompt('Start-up date (YYYY-MM-DD):', current);
   if(val === null) return;
-  const trimmed = val.trim();
+  const trimmed = parseDateInput(val);
   if(trimmed) startupMap[id] = trimmed;
   else delete startupMap[id];
   saveDownMaps();
