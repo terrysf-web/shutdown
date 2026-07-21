@@ -7333,7 +7333,7 @@ function renderDashboard(){
   renderGowningStatus();
   const huddleSystemDefs = [
     {system:'01-PURW-001', name:'Purified Water', parents:['1']},
-    {system:'01-WFIS-001', name:'WFI', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
+    {system:'01-WFIS-001/01-CSGT-001', name:'WFI/Clean Steam', parents:['2'], match:t=>/wfi/i.test(t.task||'') || String(t.id).startsWith('2.')},
     {system:'01-CSGT-001', name:'Clean Steam', parents:['2'], match:t=>/clean steam|csgt|cond rel|full rel/i.test(t.task||'')},
     {system:'01-PMES-001', name:'PMES System', parents:['3']},
     {system:'01-HPPS-001', name:'Steam', parents:['4']},
