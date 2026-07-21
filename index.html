@@ -7613,7 +7613,7 @@ function renderDashboard(){
       const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
       return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
     }
-    const rtsManualTasks = leaf.filter(t=>rtsMap[t.id]);
+    const rtsManualTasks = tasks.filter(t=>rtsMap[t.id]);
     const allRtsEntries = [
       ...rtsSystemItems.map(s=>{
         const targetIso = normalizeDateValue(releaseDateForSystem(s)) || '';
