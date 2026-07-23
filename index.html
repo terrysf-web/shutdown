@@ -4617,7 +4617,7 @@ function displayRtsDate(iso){
   if(!iso) return '';
   if(iso.includes('~')){
     const [a,b] = iso.split('~');
-    return displayDate(a) + '~' + displayDate(b);
+    return displayDate(a) + '-' + displayDate(b);
   }
   return displayDate(iso);
 }
