@@ -7671,8 +7671,15 @@ function renderDashboard(){
   if(rtsEl){
     const allRtsEntries = [
       ...rtsSystemItems.map(s=>{
+        const sysKey = 'sys:'+s.def.system;
         const targetIso = normalizeDateValue(releaseDateForSystem(s)) || '';
-        return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>—</td><td>${s.def.name}</td></tr>`};
+        const sysNewDateIso = rtsNewDateMap[sysKey]||'';
+        const sysNewDateVal = sysNewDateIso ? displayRtsDate(sysNewDateIso) : null;
+        const sysCompleteIso = startupMap[sysKey]||'';
+        const sysCompleteVal = sysCompleteIso ? displayDate(sysCompleteIso) : null;
+        const newDateTd = `<td style="cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td>`;
+        const completeTd = `<td style="cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td>`;
+        return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td>${newDateTd}${completeTd}<td>${s.def.name}</td></tr>`};
       }),
       ...rtsManualTasks.map(t=>{
         const fallbackTargetIso = normalizeDateValue(t.end)||'';
@@ -7809,7 +7816,14 @@ function renderDashboard(){
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
 
     const mbRtsEntries = [
-      ...rtsSystemItems.map(s=>({tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td>—</td><td>—</td><td>${esc(s.def.name)}</td></tr>`})),
+      ...rtsSystemItems.map(s=>{
+        const sysKey = 'sys:'+s.def.system;
+        const sysNewDateIso = rtsNewDateMap[sysKey]||'';
+        const sysNewDateVal = sysNewDateIso ? displayRtsDate(sysNewDateIso) : null;
+        const sysCompleteIso = startupMap[sysKey]||'';
+        const sysCompleteVal = sysCompleteIso ? displayDate(sysCompleteIso) : null;
+        return {tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td style="cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td><td style="cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td><td>${esc(s.def.name)}</td></tr>`};
+      }),
       ...rtsManualTasks.map(t=>{
         const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.end)||'';
         const newDIso = rtsNewDateMap[t.id]||'';
