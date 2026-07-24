@@ -6708,7 +6708,12 @@ function weeklyPlanExecutionData(asOfIso){
   const weeklyActualDone = weeklyScope.reduce((sum,t)=>{
     const st = statusMap[t.id]||t.status||'Pending';
     if(st==='Complete') return sum+1;
-    if(st==='In Progress') return sum + Math.min((taskProgressPct(t)||0)/100, 0.99);
+    if(st==='In Progress'){
+      try{
+        const pct = calculateTaskProgressPct(t)||0;
+        return sum + Math.min(pct/100, 0.99);
+      }catch(e){ return sum+0.5; }
+    }
     return sum;
   }, 0);
   const weeklyPlanDone = weeklyScope.length;
