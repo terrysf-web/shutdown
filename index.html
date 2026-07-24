@@ -6850,7 +6850,7 @@ function renderWeeklyPlanExecutionCards(){
     set('[data-weekly-state]', d.state.label);
     set('[data-weekly-gap]', d.gapText);
     setExplanation(card, 'weekly', d.explanation, d.state);
-    set('[data-weekly-plan-week]', `Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)} · ${d.weeklyActualDone}/${d.weeklyScopeCount} complete`);
+    set('[data-weekly-plan-week]', `Week of ${displayDate(d.range.start)} – ${displayDate(d.range.end)} · ${Math.round(d.weeklyActualDone*10)/10}/${d.weeklyScopeCount} complete`);
     card.setAttribute('aria-label', `Weekly Plan ${d.planPct} percent, Actual ${d.actualPct} percent, ${d.state.label}. ${d.gapText}${d.explanation.driver ? `. ${d.explanation.driver}` : ''}${d.explanation.action ? `. ${d.explanation.action}` : ''}`);
   });
   document.querySelectorAll('[data-execution-scope="overall"]').forEach(card=>{
