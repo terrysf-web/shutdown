@@ -6705,7 +6705,12 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
-  const weeklyActualDone = weeklyScope.filter(isComplete).length;
+  const weeklyActualDone = weeklyScope.reduce((sum,t)=>{
+    const st = statusMap[t.id]||t.status||'Pending';
+    if(st==='Complete') return sum+1;
+    if(st==='In Progress') return sum + Math.min((taskProgressPct(t)||0)/100, 0.99);
+    return sum;
+  }, 0);
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
   const weekDayIndex = _selDay === 0 ? 5 : _selDay === 6 ? 5 : Math.min(_selDay, 5);
