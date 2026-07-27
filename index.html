@@ -4566,6 +4566,18 @@ function loadEndImpact(){ try{ const s=localStorage.getItem('sd26_endImpact'); i
 let operationalStatusMap = {};
 function loadOperationalStatus(){ try{ const s=localStorage.getItem('sd26_opStatus_v1'); if(s) operationalStatusMap=JSON.parse(s); }catch(e){} }
 function saveOperationalStatus(){ try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){} }
+let systemTargetMap = {};
+function loadSystemTargetMap(){ try{ const s=localStorage.getItem('sd26_sys_target_v1'); if(s) systemTargetMap=JSON.parse(s); }catch(e){} }
+function saveSystemTargetMap(){ try{ localStorage.setItem('sd26_sys_target_v1', JSON.stringify(systemTargetMap)); }catch(e){} }
+function editSystemTargetDate(sysId, currentVal){
+  const val = prompt('Target Normal date (YYYY-MM-DD or M/D/YYYY):', currentVal||'');
+  if(val===null) return;
+  const trimmed = parseDateInput(val.trim());
+  if(trimmed) systemTargetMap[sysId]=trimmed;
+  else delete systemTargetMap[sysId];
+  saveSystemTargetMap();
+  if(typeof renderDashboard==='function') renderDashboard();
+}
 function setOperationalStatus(systemId, val){
   // 'Auto'를 선택하면 override 해제, 그 외엔 명시적으로 저장 (Normal 포함)
   if(val==='Auto') delete operationalStatusMap[systemId]; else operationalStatusMap[systemId]=val;
@@ -4573,6 +4585,9 @@ function setOperationalStatus(systemId, val){
   if(typeof renderDashboard==='function') renderDashboard();
 }
 loadOperationalStatus();
+loadSystemTargetMap();
+if(!systemTargetMap['01-PMES-001']) { systemTargetMap['01-PMES-001']='2026-08-07'; saveSystemTargetMap(); }
+if(!systemTargetMap['01-SMRT-001']) { systemTargetMap['01-SMRT-001']='2026-08-04'; saveSystemTargetMap(); }
 
 // ── Down/Up maps: childTaskId → date value (excel serial) ──
 let downMap = {};
@@ -7760,6 +7775,7 @@ function renderDashboard(){
     setHtml('mb-comm-summary', `Critical: ${criticalTasks.length}<br>Notification: ${notificationTasks.length}<br>Vendor Onsite: ${vendorOnsiteTasks.length}`);
 
     function systemTargetNormalDate(s){
+      if(systemTargetMap[s.def.system]) return displayDate(systemTargetMap[s.def.system]);
       const trackerActive = taskTrackerOosWindow(s.items);
       if(trackerActive && trackerActive.startupIso) return displayDate(trackerActive.startupIso);
       const releaseTask = s.items
@@ -7809,7 +7825,11 @@ function renderDashboard(){
         .sort();
       return suspendWindows.length ? displayDate(suspendWindows[0]) : 'TBD';
     }
-    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>`<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td>${systemTargetNormalDate(s)}</td></tr>`);
+    const systemRows = huddleSystems.filter(s=>s.status !== 'Normal').map(s=>{
+      const tDate = systemTargetNormalDate(s);
+      const tIso = systemTargetMap[s.def.system]||'';
+      return `<tr><td>${esc(s.def.system)}</td><td>${esc(s.def.name)}</td><td>${huddleStatusHtml(s.status)}</td><td style="cursor:pointer;text-decoration:underline dotted" onclick="editSystemTargetDate('${esc(s.def.system)}','${tIso}')" title="Click to set/edit target date">${tDate}</td></tr>`;
+    });
     const gowning = getGowningStatus ? getGowningStatus() : {dp:'Full Gowning', ds:'Full Gowning'};
     if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>${gowningSuspendTargetDate('dp')}</td></tr>`);
     if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>${gowningSuspendTargetDate('ds')}</td></tr>`);
