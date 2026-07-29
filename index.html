@@ -4570,7 +4570,7 @@ let systemTargetMap = {};
 function loadSystemTargetMap(){ try{ const s=localStorage.getItem('sd26_sys_target_v1'); if(s) systemTargetMap=JSON.parse(s); }catch(e){} }
 function saveSystemTargetMap(){
   try{ localStorage.setItem('sd26_sys_target_v1', JSON.stringify(systemTargetMap)); }catch(e){}
-  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
 }
 function editSystemTargetDate(sysId, currentVal){
   const val = prompt('Target Normal date (YYYY-MM-DD or M/D/YYYY):', currentVal||'');
@@ -4589,8 +4589,9 @@ function setOperationalStatus(systemId, val){
 }
 loadOperationalStatus();
 loadSystemTargetMap();
-if(!systemTargetMap['01-PMES-001']) { systemTargetMap['01-PMES-001']='2026-08-07'; saveSystemTargetMap(); }
-if(!systemTargetMap['01-SMRT-001']) { systemTargetMap['01-SMRT-001']='2026-08-04'; saveSystemTargetMap(); }
+if(!systemTargetMap['01-PMES-001']) systemTargetMap['01-PMES-001']='2026-08-07';
+if(!systemTargetMap['01-SMRT-001']) systemTargetMap['01-SMRT-001']='2026-08-04';
+try{ localStorage.setItem('sd26_sys_target_v1', JSON.stringify(systemTargetMap)); }catch(e){}
 
 // ── Down/Up maps: childTaskId → date value (excel serial) ──
 let downMap = {};
@@ -4617,7 +4618,7 @@ function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(r
 function saveRtsTargetMap(){ try{ localStorage.setItem('sd26_rts_target_v1', JSON.stringify(rtsTargetMap)); }catch(e){} }
 function saveRtsNewDateMap(){
   try{ localStorage.setItem('sd26_rts_newdate_v1', JSON.stringify(rtsNewDateMap)); }catch(e){}
-  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
 }
 function parseDateInput(s){
   s = (s||'').trim();
@@ -4908,7 +4909,7 @@ migrateOnHoldStatusToColumn();
 normalizeAllTaskIds();
 saveRtsMap();
 saveRtsTargetMap();
-saveRtsNewDateMap();
+try{ localStorage.setItem('sd26_rts_newdate_v1', JSON.stringify(rtsNewDateMap)); }catch(e){}
 saveDownMaps();
 
 function getAllSections(){ return [...new Set(tasks.map(t=>t.section))]; }
