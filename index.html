@@ -7897,7 +7897,7 @@ function renderDashboard(){
       ...allDelayedTasks.map(t=>t.id),
       ...activeLeaf.filter(t=>normalizeDateValue(t.newStart)||normalizeDateValue(t.newEnd)).map(t=>t.id)
     ]);
-    const noteItems = leaf.filter(t=>noteItemIds.has(t.id));
+    const noteItems = leaf.filter(t=>noteItemIds.has(t.id) && (statusMap[t.id]||t.status||'Pending')!=='Complete');
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
       const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
       const newDateText = delayedNewDate(t);
