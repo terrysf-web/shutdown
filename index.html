@@ -4568,7 +4568,10 @@ function loadOperationalStatus(){ try{ const s=localStorage.getItem('sd26_opStat
 function saveOperationalStatus(){ try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){} }
 let systemTargetMap = {};
 function loadSystemTargetMap(){ try{ const s=localStorage.getItem('sd26_sys_target_v1'); if(s) systemTargetMap=JSON.parse(s); }catch(e){} }
-function saveSystemTargetMap(){ try{ localStorage.setItem('sd26_sys_target_v1', JSON.stringify(systemTargetMap)); }catch(e){} }
+function saveSystemTargetMap(){
+  try{ localStorage.setItem('sd26_sys_target_v1', JSON.stringify(systemTargetMap)); }catch(e){}
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
 function editSystemTargetDate(sysId, currentVal){
   const val = prompt('Target Normal date (YYYY-MM-DD or M/D/YYYY):', currentVal||'');
   if(val===null) return;
@@ -4612,7 +4615,10 @@ function loadDownMaps(){
 }
 function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
 function saveRtsTargetMap(){ try{ localStorage.setItem('sd26_rts_target_v1', JSON.stringify(rtsTargetMap)); }catch(e){} }
-function saveRtsNewDateMap(){ try{ localStorage.setItem('sd26_rts_newdate_v1', JSON.stringify(rtsNewDateMap)); }catch(e){} }
+function saveRtsNewDateMap(){
+  try{ localStorage.setItem('sd26_rts_newdate_v1', JSON.stringify(rtsNewDateMap)); }catch(e){}
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+}
 function parseDateInput(s){
   s = (s||'').trim();
   if(!s) return '';
@@ -9093,6 +9099,7 @@ function setFirebaseSyncStatus(text, cls, title){
 function refreshSd26FromLocalStorage(){
   try{ if(typeof loadLocal === 'function') loadLocal(); }catch(e){}
   try{ if(typeof loadDownMaps === 'function') loadDownMaps(); }catch(e){}
+  try{ if(typeof loadSystemTargetMap === 'function') loadSystemTargetMap(); }catch(e){}
   try{ if(typeof loadEndImpact === 'function') loadEndImpact(); }catch(e){}
   try{ if(typeof loadVisualScope === 'function') loadVisualScope(); }catch(e){}
   try{ const s=localStorage.getItem('sd26_tl_v1'); tlData = s ? JSON.parse(s) : {}; }catch(e){}
