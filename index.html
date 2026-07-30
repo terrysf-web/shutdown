@@ -729,8 +729,9 @@ select.msf option:checked{background:#ddeeff}
   .mb-top-grid{grid-template-columns:1fr!important}
   .system-status-grid.compact{grid-template-columns:1fr!important}
   .huddle-top-layout,.huddle-middle-layout,.huddle-delay-layout,.huddle-bottom-layout{grid-template-columns:1fr!important}
-  .huddle-table{font-size:11px}
-  .huddle-table th,.huddle-table td{padding:5px 6px;white-space:normal}
+  .huddle-panel .huddle-table{font-size:11px;white-space:nowrap}
+  .huddle-panel .huddle-table th,.huddle-panel .huddle-table td{padding:5px 6px}
+  .huddle-panel{overflow-x:auto}
 }
 
 .firebase-sync-status{display:inline-flex;align-items:center;gap:5px;margin-left:8px;border-radius:999px;padding:2px 9px;background:rgba(255,255,255,.12);color:#d9e8f7;font-size:11px;font-weight:800;white-space:nowrap}
