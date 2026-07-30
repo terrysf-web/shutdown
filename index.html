@@ -558,10 +558,9 @@ body.edit-mode .wo-admin-only{display:inline-flex!important}
 .gowning-select option[value="Suspending - Blue scrub only"]{background:#8a5a08;color:#fff0bd;font-weight:800}
 .gowning-select option[value="Full Gowning"]{background:#1f6b42;color:#d7ffe5;font-weight:800}
 .huddle-wide{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-bottom:14px}
-.huddle-table{width:100%;border-collapse:collapse;font-size:12px}
-.huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px;white-space:nowrap}
-.huddle-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;vertical-align:top;white-space:nowrap}
-.huddle-table th:last-child,.huddle-table td:last-child{white-space:normal}
+.huddle-table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed}
+.huddle-table th{background:#223f5f;color:#cde;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.06em;padding:7px 9px;white-space:normal;word-break:break-word;overflow-wrap:break-word}
+.huddle-table td{padding:8px 9px;border-bottom:1px solid rgba(255,255,255,.08);color:#fff;vertical-align:top;white-space:normal;word-break:break-word;overflow-wrap:break-word}
 .vendor-onsite{color:#f0c040!important;font-weight:900}
 .huddle-table-legend{margin-top:8px;font-size:10px;color:#cde;text-align:right;letter-spacing:.03em}
 .huddle-panel-title.with-legend{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -803,9 +802,9 @@ select.msf option:checked{background:#ddeeff}
   .progress-kpi-sub{font-size:7px!important;margin-top:3px!important;white-space:nowrap!important}
   .progress-meter{height:6px!important;margin-top:4px!important}
   .huddle-panel-title{font-size:9px!important;letter-spacing:.05em!important;margin-bottom:5px!important;white-space:nowrap!important}
-  .system-status-grid.compact{grid-template-columns:1fr 1fr!important;gap:4px!important}
-  .system-status-row{grid-template-columns:78px minmax(96px,1fr) 54px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
-  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .system-status-grid.compact{grid-template-columns:1fr!important;gap:4px!important}
+  .system-status-row{grid-template-columns:95px minmax(110px,1fr) 70px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
+  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:normal!important;word-break:break-word!important;overflow-wrap:break-word!important}
   .system-pill,.huddle-status{font-size:7px!important;padding:2px 6px!important;white-space:nowrap!important}
   .gowning-list{gap:4px!important}
   .gowning-row{grid-template-columns:70px 1fr!important;padding:4px 6px!important;gap:5px!important;min-height:22px!important}
@@ -9973,9 +9972,9 @@ function renderRcVendor(items,start,end){
   .progress-kpi-sub{font-size:7px!important;margin-top:3px!important;white-space:nowrap!important}
   .progress-meter{height:6px!important;margin-top:4px!important}
   .huddle-panel-title{font-size:9px!important;letter-spacing:.05em!important;margin-bottom:5px!important;white-space:nowrap!important}
-  .system-status-grid.compact{grid-template-columns:1fr 1fr!important;gap:4px!important}
-  .system-status-row{grid-template-columns:78px minmax(96px,1fr) 54px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
-  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .system-status-grid.compact{grid-template-columns:1fr!important;gap:4px!important}
+  .system-status-row{grid-template-columns:95px minmax(110px,1fr) 70px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
+  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:normal!important;word-break:break-word!important;overflow-wrap:break-word!important}
   .system-pill,.huddle-status{font-size:7px!important;padding:2px 6px!important;white-space:nowrap!important}
   .gowning-list{gap:4px!important}
   .gowning-row{grid-template-columns:70px 1fr!important;padding:4px 6px!important;gap:5px!important;min-height:22px!important}
@@ -10142,9 +10141,9 @@ function renderRcMonthlyCalendar(items,start,end){
   .progress-kpi-sub{font-size:7px!important;margin-top:3px!important;white-space:nowrap!important}
   .progress-meter{height:6px!important;margin-top:4px!important}
   .huddle-panel-title{font-size:9px!important;letter-spacing:.05em!important;margin-bottom:5px!important;white-space:nowrap!important}
-  .system-status-grid.compact{grid-template-columns:1fr 1fr!important;gap:4px!important}
-  .system-status-row{grid-template-columns:78px minmax(96px,1fr) 54px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
-  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .system-status-grid.compact{grid-template-columns:1fr!important;gap:4px!important}
+  .system-status-row{grid-template-columns:95px minmax(110px,1fr) 70px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
+  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:normal!important;word-break:break-word!important;overflow-wrap:break-word!important}
   .system-pill,.huddle-status{font-size:7px!important;padding:2px 6px!important;white-space:nowrap!important}
   .gowning-list{gap:4px!important}
   .gowning-row{grid-template-columns:70px 1fr!important;padding:4px 6px!important;gap:5px!important;min-height:22px!important}
@@ -10482,9 +10481,9 @@ function rcExpandedBarRows(items,start,end){
   .progress-kpi-sub{font-size:7px!important;margin-top:3px!important;white-space:nowrap!important}
   .progress-meter{height:6px!important;margin-top:4px!important}
   .huddle-panel-title{font-size:9px!important;letter-spacing:.05em!important;margin-bottom:5px!important;white-space:nowrap!important}
-  .system-status-grid.compact{grid-template-columns:1fr 1fr!important;gap:4px!important}
-  .system-status-row{grid-template-columns:78px minmax(96px,1fr) 54px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
-  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important}
+  .system-status-grid.compact{grid-template-columns:1fr!important;gap:4px!important}
+  .system-status-row{grid-template-columns:95px minmax(110px,1fr) 70px!important;gap:5px!important;min-height:22px!important;padding:4px 6px!important;border-radius:4px!important}
+  .system-status-id,.system-status-name,.system-status-reason{font-size:8px!important;white-space:normal!important;word-break:break-word!important;overflow-wrap:break-word!important}
   .system-pill,.huddle-status{font-size:7px!important;padding:2px 6px!important;white-space:nowrap!important}
   .gowning-list{gap:4px!important}
   .gowning-row{grid-template-columns:70px 1fr!important;padding:4px 6px!important;gap:5px!important;min-height:22px!important}
