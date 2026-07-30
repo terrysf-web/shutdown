@@ -7860,7 +7860,7 @@ function renderDashboard(){
         const sysNewDateVal = sysNewDateIso ? displayRtsDate(sysNewDateIso) : null;
         const sysCompleteIso = startupMap[sysKey]||'';
         const sysCompleteVal = sysCompleteIso ? displayDate(sysCompleteIso) : null;
-        return {tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td><td style="cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td><td style="cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td><td>${esc(s.def.name)}</td></tr>`};
+        return {tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td style="white-space:nowrap">${releaseDateForSystem(s)}</td><td style="white-space:nowrap;cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td><td style="white-space:nowrap;cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td><td>${esc(s.def.name)}</td></tr>`};
       }),
       ...rtsManualTasks.map(t=>{
         const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.end)||'';
@@ -7870,7 +7870,7 @@ function renderDashboard(){
         const suVal = suIso ? displayDate(suIso) : null;
         const delayed = suVal && fbIso && suIso > fbIso;
         const suColor = delayed?'#f0c040':(suVal?'#fff':'#9fb4c8');
-        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td>${displayRtsDate(fbIso)||'TBD'}</td><td style="cursor:pointer;color:${newDVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(t.id)}')" title="Click to set/edit new date">${newDVal||'—'}</td><td style="cursor:pointer;color:${suColor};text-decoration:underline dotted" onclick="editRtsStartup('${esc(t.id)}')" title="Click to set/edit complete date">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
+        return {tIso:fbIso, html:`<tr><td>${esc(huddleSystemForTask(t))}</td><td style="white-space:nowrap">${displayRtsDate(fbIso)||'TBD'}</td><td style="white-space:nowrap;cursor:pointer;color:${newDVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(t.id)}')" title="Click to set/edit new date">${newDVal||'—'}</td><td style="white-space:nowrap;cursor:pointer;color:${suColor};text-decoration:underline dotted" onclick="editRtsStartup('${esc(t.id)}')" title="Click to set/edit complete date">${suVal||'—'}${delayed?' ⚠':''}</td><td>${esc(t.task)}</td></tr>`};
       })
     ].sort((a,b)=>(a.tIso||'9999').localeCompare(b.tIso||'9999'));
     setHtml('mb-rts-rows', mbRtsEntries.length ? mbRtsEntries.map(e=>e.html).join('') : '<tr><td colspan="5" style="color:#9fb4c8;font-style:italic">No RTS items.</td></tr>');
