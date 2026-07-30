@@ -6733,11 +6733,14 @@ function weeklyPlanExecutionData(asOfIso){
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
   const weeklyActualDone = weeklyScope.filter(isComplete).length;
+  const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
   const weekDayIndex = _selDay === 0 ? 5 : _selDay === 6 ? 5 : Math.min(_selDay, 5);
   const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
-  const actualPct = weeklyScope.length ? Math.round(weeklyActualDone/weeklyScope.length*100) : 0;
+  // Delayed tasks count as a negative offset (not just "not done") so an active
+  // delay visibly drags Actual below Plan, matching how the team reads risk.
+  const actualPct = weeklyScope.length ? Math.round(Math.max(0, weeklyActualDone - weeklyDelayedCount)/weeklyScope.length*100) : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
@@ -7740,10 +7743,13 @@ function renderDashboard(){
       .map(t=>{
         const note = String(notesMap[t.id] || t.notes || '').trim();
         const action = String(t.actionComment || '').trim();
+        const origIso = normalizeDateValue(t.end) || normalizeDateValue(t.start) || '';
+        const delayDays = origIso ? Math.max(1, Math.round((new Date(todayIso+'T00:00:00').getTime() - new Date(origIso+'T00:00:00').getTime())/86400000)) : null;
+        const delayBadge = delayDays ? ` <span style="background:#7a1a1a;color:#ffb4ac;font-size:9px;font-weight:900;padding:1px 6px;border-radius:999px;white-space:nowrap">${delayDays}d late</span>` : '';
         return `<tr>
           <td>${huddleSystemForTask(t)}</td>
           <td><b>${esc(t.id)}</b> ${esc(t.task)}</td>
-          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
+          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}${delayBadge}</td>
           <td>${note ? esc(note) : '<span style="color:#9fb4c8;font-style:italic">No note</span>'}</td>
           <td>${action ? esc(action) : '<span style="color:#9fb4c8;font-style:italic">No action</span>'}</td>
         </tr>`;
@@ -7911,7 +7917,12 @@ function renderDashboard(){
     ]);
     const noteItems = leaf.filter(t=>noteItemIds.has(t.id) && (statusMap[t.id]||t.status||'Pending')!=='Complete');
     setHtml('mb-note-rows', noteItems.length ? noteItems.map(t=>{
-      const note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      let note = t.actionComment || notesMap[t.id] || t.notes || (taskStatus(t)==='Delayed' ? 'Delayed / new date review' : 'New date entered');
+      if(taskStatus(t)==='Delayed'){
+        const origIso = normalizeDateValue(t.end) || normalizeDateValue(t.start) || '';
+        const delayDays = origIso ? Math.max(1, Math.round((new Date(todayIso+'T00:00:00').getTime() - new Date(origIso+'T00:00:00').getTime())/86400000)) : null;
+        if(delayDays) note = `[${delayDays}d late] ` + note;
+      }
       const newDateText = delayedNewDate(t);
       return `<tr><td>${huddleSystemForTask(t)}</td><td>${esc(t.task)}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="date" data-task-id="${esc(t.id)}" data-original="${esc(newDateText)}" title="Click to edit new start / target date">${newDateText}</td><td class="morning-editable-cell" contenteditable="true" data-morning-edit="note" data-task-id="${esc(t.id)}" data-original="${esc(note)}" title="Click to edit Morning Brief note">${esc(note)}</td></tr>`;
     }).join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No delay, new date, or special notes for this morning.</td></tr>');
