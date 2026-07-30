@@ -7743,13 +7743,10 @@ function renderDashboard(){
       .map(t=>{
         const note = String(notesMap[t.id] || t.notes || '').trim();
         const action = String(t.actionComment || '').trim();
-        const origIso = normalizeDateValue(t.end) || normalizeDateValue(t.start) || '';
-        const delayDays = origIso ? Math.max(1, Math.round((new Date(todayIso+'T00:00:00').getTime() - new Date(origIso+'T00:00:00').getTime())/86400000)) : null;
-        const delayBadge = delayDays ? ` <span style="background:#7a1a1a;color:#ffb4ac;font-size:9px;font-weight:900;padding:1px 6px;border-radius:999px;white-space:nowrap">${delayDays}d late</span>` : '';
         return `<tr>
           <td>${huddleSystemForTask(t)}</td>
           <td><b>${esc(t.id)}</b> ${esc(t.task)}</td>
-          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}${delayBadge}</td>
+          <td>${displayDate(t.end)||displayDate(t.start)||'TBD'}</td>
           <td>${note ? esc(note) : '<span style="color:#9fb4c8;font-style:italic">No note</span>'}</td>
           <td>${action ? esc(action) : '<span style="color:#9fb4c8;font-style:italic">No action</span>'}</td>
         </tr>`;
