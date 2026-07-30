@@ -7552,12 +7552,12 @@ function renderDashboard(){
         ${opStatusOptions.map(v=>`<option value="${v}"${v===selected?' selected':''}>${v==='Auto'?'Auto (자동)':v}</option>`).join('')}
       </select>`;
     }
-    // Task 3: Systems Status = OOS만 표시 (인라인 드롭다운 없음)
-    const oosSystems = huddleSystems.filter(s=>s.status==='OOS' || s.status==='Breakdown');
+    // Systems Status = OOS, Cond. REL, FUL REL 모두 표시 (인라인 드롭다운 없음)
+    const oosSystems = huddleSystems.filter(s=>s.status==='OOS' || s.status==='Breakdown' || s.status==='Cond. REL' || s.status==='FUL REL');
     systemStatusEl.innerHTML = (oosSystems.length ? oosSystems.map(s=>`<div class="system-status-row" style="grid-template-columns:108px minmax(100px,1fr) 60px">
       <div class="system-status-id" title="${s.def.system}">${s.def.system}</div>
       <div class="system-status-name" title="${s.def.name}">${s.def.name}</div>
-      <div class="system-pill oos">OOS</div>
+      <div class="system-pill ${pillClass(s.status)}">${s.status}</div>
     </div>`).join('') : '<div class="progress-empty" style="margin-bottom:8px">No OOS systems.</div>');
     // SET OPERATIONAL STATUS 모달 컨텐츠 렌더링
     const opContainer = document.getElementById('d-op-status-container');
