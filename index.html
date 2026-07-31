@@ -7185,7 +7185,9 @@ function setGowningStatus(area, value){
   const status = getGowningStatus();
   status[area] = value;
   try{ localStorage.setItem('sd26_gowning_status_v1', JSON.stringify(status)); }catch(e){}
+  try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
   renderGowningStatus();
+  if(typeof renderDashboard==='function') renderDashboard();
 }
 
 function showTab(tab, btn){
