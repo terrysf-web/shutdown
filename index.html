@@ -6717,7 +6717,10 @@ function weeklyPlanExecutionData(asOfIso){
     : workPointGlobal(selectedIso, 16);
   const active = tasks.filter(t=>!t.isParent && (statusMap[t.id]||t.status||'Pending')!=='N/A');
   const range = getWeekRange(selectedIso);
-  const targetEnd = t=>normalizeDateValue(t.newEnd) || normalizeDateValue(t.end) || normalizeDateValue(t.newStart) || normalizeDateValue(t.start);
+  // Use the ORIGINAL planned date (not newEnd) to decide which week a task belongs to.
+  // Otherwise a task delayed past this week disappears from this week's scope entirely,
+  // artificially inflating this week's Actual % instead of reflecting the miss.
+  const targetEnd = t=>normalizeDateValue(t.end) || normalizeDateValue(t.start) || normalizeDateValue(t.newEnd) || normalizeDateValue(t.newStart);
   const isComplete = t=>(statusMap[t.id]||t.status||'Pending')==='Complete';
 
   // Compare the time-phased plan with actual task progress.
