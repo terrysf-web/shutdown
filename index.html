@@ -4012,6 +4012,10 @@ APPENDIX 6.5B)</div>
       </div>
     </div>
     <div class="huddle-panel tight" style="margin-bottom:14px">
+      <div class="huddle-panel-title">Access Condition</div>
+      <div id="mb-gowning-status" class="gowning-list dashboard"></div>
+    </div>
+    <div class="huddle-panel tight" style="margin-bottom:14px">
       <div class="huddle-panel-title with-legend"><span>Today's In-Progress Tasks / Maintenance Activities</span><span class="huddle-table-legend"><span class="vendor-onsite">Yellow vendor</span> = vendor onsite</span></div>
       <table class="huddle-table small"><thead><tr><th>Progress</th><th>System ID</th><th>Event</th><th>Vendor</th><th>Start</th><th>Target</th><th>New</th><th>Status</th></tr></thead><tbody id="mb-maint-rows"></tbody></table>
     </div>
@@ -7849,6 +7853,11 @@ function renderDashboard(){
     if(gowning.dp !== 'Full Gowning') systemRows.push(`<tr><td>DP MFG Area</td><td>Access Condition</td><td>${esc(gowning.dp)}</td><td>${gowningSuspendTargetDate('dp')}</td></tr>`);
     if(gowning.ds !== 'Full Gowning') systemRows.push(`<tr><td>DS MFG Area</td><td>Access Condition</td><td>${esc(gowning.ds)}</td><td>${gowningSuspendTargetDate('ds')}</td></tr>`);
     setHtml('mb-system-rows', systemRows.length ? systemRows.join('') : '<tr><td colspan="4" style="color:#9fb4c8;font-style:italic">No OOS, returning, or special system status.</td></tr>');
+    const gowningCls = v => v==='Full Gowning' ? 'full' : 'suspend';
+    setHtml('mb-gowning-status', `
+      <div class="gowning-row"><div class="gowning-area">DP MFG Area</div><div class="gowning-select ${gowningCls(gowning.dp)}" style="display:flex;align-items:center">${esc(gowning.dp)}</div></div>
+      <div class="gowning-row"><div class="gowning-area">DS MFG Area</div><div class="gowning-select ${gowningCls(gowning.ds)}" style="display:flex;align-items:center">${esc(gowning.ds)}</div></div>
+    `);
 
     const mbRtsEntries = [
       ...rtsSystemItems.map(s=>{
