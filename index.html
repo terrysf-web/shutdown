@@ -6789,7 +6789,15 @@ function weeklyPlanExecutionData(asOfIso){
   const itemBasedPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
   const overallPlanDone = Math.round(overallScopeCount*itemBasedPlanPct/100);
   const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
-  const behind = planPct - actualPct;
+  // The displayed Weekly Plan % stays day-based (Mon=20%, Tue=40%, ...) so the
+  // number doesn't confusingly fluctuate hour to hour. But for deciding severity
+  // (On Track / Watch / Critical), use a time-phased plan within today so the
+  // dashboard doesn't cry "Critical Behind" the moment Monday morning starts
+  // before any work could possibly be done yet.
+  const priorDaysPlanPct = ((weekDayIndex - 1) / 5) * 100;
+  const todayPlanSlicePct = (1 / 5) * 100 * todayPlanFraction;
+  const planPctForState = weeklyScope.length ? Math.max(0, Math.min(100, priorDaysPlanPct + todayPlanSlicePct)) : 0;
+  const behind = planPctForState - actualPct;
   const state = weeklyExecutionState(behind);
   const overallBehind = itemBasedPlanPct - overallExecutionPct;
   const overallState = weeklyExecutionState(overallBehind);
