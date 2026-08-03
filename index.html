@@ -6739,7 +6739,15 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
-  const weeklyActualDone = weeklyScope.filter(isComplete).length;
+  const weeklyActualDone = weeklyScope.reduce((sum,t)=>{
+    const st = statusMap[t.id]||t.status||'Pending';
+    if(st==='Complete') return sum+1;
+    if(st==='In Progress'){
+      try{ return sum + Math.min((calculateTaskProgressPct(t)||0)/100, 0.99); }
+      catch(e){ return sum; }
+    }
+    return sum;
+  }, 0);
   const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
