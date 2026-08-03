@@ -6739,15 +6739,12 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
-  const weeklyActualDone = weeklyScope.reduce((sum,t)=>{
-    const st = statusMap[t.id]||t.status||'Pending';
-    if(st==='Complete') return sum+1;
-    if(st==='In Progress'){
-      try{ return sum + Math.min((calculateTaskProgressPct(t)||0)/100, 0.99); }
-      catch(e){ return sum; }
-    }
-    return sum;
-  }, 0);
+  // Complete-only, plus a Delayed penalty. This is the stable definition — an
+  // In-Progress fractional credit was tried twice and reverted both times because
+  // calculateTaskProgressPct measures elapsed time since a task's own start date,
+  // not progress made within this specific week, so it kept producing confusing
+  // jumps (e.g. 0% to 47%) unrelated to real work done. Do not reintroduce it.
+  const weeklyActualDone = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
   const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
