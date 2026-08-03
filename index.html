@@ -6810,7 +6810,8 @@ function weeklyPlanExecutionData(asOfIso){
   const overallExplanation = overallState.key === 'green'
     ? {...autoOverallExplanation, isCustom:false}
     : executionExplanationWithOverride('overall', selectedIso, autoOverallExplanation, risk);
-  const gapText = behind > 0 ? `${behind} pts behind plan` : (behind < 0 ? `${Math.abs(behind)} pts ahead of plan` : 'Actual matches plan');
+  const behindRounded = Math.round(behind);
+  const gapText = behindRounded > 0 ? `${behindRounded} pts behind plan` : (behindRounded < 0 ? `${Math.abs(behindRounded)} pts ahead of plan` : 'Actual matches plan');
   const overallGap = Math.abs(overallBehind).toFixed(1).replace(/\.0$/,'');
   const overallGapText = overallBehind > 0 ? `${overallGap} pts behind plan` : (overallBehind < 0 ? `${overallGap} pts ahead of plan` : 'Actual matches plan');
   return {selectedIso, planPct, actualPct, behind, state, range, activeCount:active.length,
