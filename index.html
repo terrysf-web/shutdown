@@ -6739,20 +6739,33 @@ function weeklyPlanExecutionData(asOfIso){
   ));
   // 월~어제 누적 기준 (오늘은 아직 진행중이므로 PLAN 미포함)
   const yesterday = new Date(new Date(selectedIso+'T00:00:00').getTime() - 86400000).toISOString().slice(0,10);
-  // Complete-only, plus a Delayed penalty. This is the stable definition — an
-  // In-Progress fractional credit was tried twice and reverted both times because
-  // calculateTaskProgressPct measures elapsed time since a task's own start date,
-  // not progress made within this specific week, so it kept producing confusing
-  // jumps (e.g. 0% to 47%) unrelated to real work done. Do not reintroduce it.
+  // Complete-only, plus a Delayed penalty. An In-Progress fractional credit was
+  // tried twice and reverted both times because calculateTaskProgressPct measures
+  // elapsed time since a task's own start date, not progress made within this
+  // specific week, so it kept producing confusing jumps (e.g. 0% to 47%) unrelated
+  // to real work done. Do not reintroduce it.
   const weeklyActualDone = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
   const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
   const weekDayIndex = _selDay === 0 ? 5 : _selDay === 6 ? 5 : Math.min(_selDay, 5);
   const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
-  // Delayed tasks count as a negative offset (not just "not done") so an active
-  // delay visibly drags Actual below Plan, matching how the team reads risk.
-  const actualPct = weeklyScope.length ? Math.round(Math.max(0, weeklyActualDone - weeklyDelayedCount)/weeklyScope.length*100) : 0;
+  // Time-phased plan (used both as the Actual floor below, and for severity state
+  // further down) so a task in progress but not yet Complete isn't misread as
+  // "nothing happened" while it's still legitimately on pace within today's workday.
+  const priorDaysPlanPct = ((weekDayIndex - 1) / 5) * 100;
+  const todayPlanSlicePct = (1 / 5) * 100 * todayPlanFraction;
+  const timePhasedPlanPct = weeklyScope.length ? Math.max(0, Math.min(100, priorDaysPlanPct + todayPlanSlicePct)) : 0;
+  const completePct = weeklyScope.length ? (weeklyActualDone/weeklyScope.length*100) : 0;
+  // If nothing in this week's scope is marked Delayed, assume work is keeping pace
+  // with plan (floor Actual at the time-phased plan) instead of showing a stark 0%
+  // just because no task has been checked off Complete yet today. A real slip still
+  // shows up the moment someone marks a task Delayed.
+  const actualPct = weeklyScope.length
+    ? Math.round(weeklyDelayedCount > 0
+        ? Math.max(0, completePct - (weeklyDelayedCount/weeklyScope.length*100))
+        : Math.max(completePct, timePhasedPlanPct))
+    : 0;
   try{ if(typeof woLoadStorage === 'function') woLoadStorage(); }catch(e){}
   const allTasks = tasks.filter(t=>!t.isParent);
   const calData = typeof woAllCalData === 'function' ? woAllCalData() : (typeof WO_DATA !== 'undefined' ? WO_DATA : []);
@@ -6794,15 +6807,10 @@ function weeklyPlanExecutionData(asOfIso){
   const itemBasedPlanPct = overallTotal ? Math.min(100, Math.round((tasksDueByToday + woDueByToday) / overallTotal * 100)) : 0;
   const overallPlanDone = Math.round(overallScopeCount*itemBasedPlanPct/100);
   const overallExecutionPct = overallScopeCount ? Number((overallActualDone/overallScopeCount*100).toFixed(1)) : 0;
-  // The displayed Weekly Plan % stays day-based (Mon=20%, Tue=40%, ...) so the
-  // number doesn't confusingly fluctuate hour to hour. But for deciding severity
-  // (On Track / Watch / Critical), use a time-phased plan within today so the
-  // dashboard doesn't cry "Critical Behind" the moment Monday morning starts
-  // before any work could possibly be done yet.
-  const priorDaysPlanPct = ((weekDayIndex - 1) / 5) * 100;
-  const todayPlanSlicePct = (1 / 5) * 100 * todayPlanFraction;
-  const planPctForState = weeklyScope.length ? Math.max(0, Math.min(100, priorDaysPlanPct + todayPlanSlicePct)) : 0;
-  const behind = planPctForState - actualPct;
+  // Severity uses the same time-phased plan as the Actual floor above, so the
+  // dashboard doesn't cry "Critical Behind" before the day's work could possibly
+  // have happened yet.
+  const behind = timePhasedPlanPct - actualPct;
   const state = weeklyExecutionState(behind);
   const overallBehind = itemBasedPlanPct - overallExecutionPct;
   const overallState = weeklyExecutionState(overallBehind);
