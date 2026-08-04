@@ -8333,17 +8333,8 @@ function renderTimeline(){
       .map(t=>{
         const parentId=String(t.id).split('.')[0];
         const parent=allT.find(p=>p.isParent&&String(p.id)===parentId);
-        // A Complete task always uses its real start/end date, overriding whatever
-        // Down/Start-Up dates were manually entered earlier in the Timeline edit
-        // table — otherwise a finished item can keep showing a stale/wrong bar
-        // (e.g. dates that were placeholders before the task actually wrapped up).
-        const isTaskComplete = (statusMap[t.id]||t.status||'Pending')==='Complete';
-        const downD = isTaskComplete
-          ? (xl(normalizeDateValue(t.newStart)) || xl(normalizeDateValue(t.start)) || (timelineDownMap[t.id]!=null ? xl(timelineDownMap[t.id]) : null))
-          : (timelineDownMap[t.id]!=null ? xl(timelineDownMap[t.id]) : null);
-        const upD = isTaskComplete
-          ? (xl(normalizeDateValue(t.newEnd)) || xl(normalizeDateValue(t.end)) || (timelineStartupMap[t.id]!=null ? xl(timelineStartupMap[t.id]) : null))
-          : (timelineStartupMap[t.id]!=null ? xl(timelineStartupMap[t.id]) : null);
+        const downD=timelineDownMap[t.id]!=null ? xl(timelineDownMap[t.id]) : null;
+        const upD=timelineStartupMap[t.id]!=null ? xl(timelineStartupMap[t.id]) : null;
         const newStartD=normalizeDateValue(t.newStart) ? new Date(normalizeDateValue(t.newStart)+'T00:00:00') : null;
         const newEndD=normalizeDateValue(t.newEnd) ? new Date(normalizeDateValue(t.newEnd)+'T00:00:00') : null;
         return {task:t,parent,parentId,downD,upD,newStartD,newEndD};
