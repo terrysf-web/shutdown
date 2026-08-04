@@ -9137,6 +9137,11 @@ let firebaseSharedApi = null;
 let firebaseSharedSavePending = false;
 let firebaseSharedApplyingRemote = false;
 let firebaseSharedLoadedRemote = false;
+// Snapshot of local sd26_ data captured the moment a save is queued before the
+// initial Firebase load finishes — restored after that load so edits made in
+// this window (e.g. changing Access Condition right after a page refresh)
+// don't get silently clobbered by the older remote data.
+let firebaseSharedPendingSnapshot = null;
 
 function setFirebaseSyncStatus(text, cls, title){
   const el = document.getElementById('firebaseSyncStatus');
@@ -9200,6 +9205,7 @@ function queueFirebaseSharedSave(){
   if(firebaseSharedApplyingRemote) return;
   if(!firebaseSharedApi || !firebaseSharedLoadedRemote){
     firebaseSharedSavePending = true;
+    try{ firebaseSharedPendingSnapshot = getSd26Snapshot(); }catch(e){}
     setFirebaseSyncStatus('Firebase: waiting', 'saving', 'Waiting for latest Firebase data before saving.');
     return;
   }
@@ -9301,7 +9307,22 @@ function queueFirebaseSharedSave(){
     load().then(()=>{
       if(firebaseSharedSavePending){
         firebaseSharedSavePending = false;
-        setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest data loaded. Please repeat the change to save it.');
+        // The load() above just overwrote localStorage with the remote snapshot,
+        // which would silently discard any edit made in the window before this
+        // load finished (e.g. an Access Condition change right after a refresh).
+        // Restore that edit on top, then save it for real instead of just
+        // telling the user to redo it.
+        const snap = firebaseSharedPendingSnapshot;
+        firebaseSharedPendingSnapshot = null;
+        if(snap && snap.data){
+          Object.keys(snap.data).forEach(k => {
+            if(k.indexOf('sd26_') === 0 && snap.data[k] != null) localStorage.setItem(k, String(snap.data[k]));
+          });
+          try{ refreshSd26FromLocalStorage(); }catch(e){}
+          save();
+        }else{
+          setFirebaseSyncStatus('Firebase: synced', 'ok', 'Latest data loaded. Please repeat the change to save it.');
+        }
       }
     });
 
