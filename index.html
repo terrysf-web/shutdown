@@ -8362,14 +8362,6 @@ function renderTimeline(){
         if(!maxD||d>maxD) maxD=new Date(d);
       });
     });
-    // Always span the full project period, not just whichever items are currently
-    // toggled Down/Start-up — otherwise the chart shrinks as early items resolve.
-    const projStartIso = typeof psProjectStart==='function' ? psProjectStart(allT) : null;
-    const projEndIso = typeof psProjectEnd==='function' ? psProjectEnd(allT) : null;
-    const projStartD = projStartIso ? new Date(projStartIso+'T00:00:00') : null;
-    const projEndD = projEndIso ? new Date(projEndIso+'T00:00:00') : null;
-    if(projStartD && (!minD || projStartD<minD)) minD=projStartD;
-    if(projEndD && (!maxD || projEndD>maxD)) maxD=projEndD;
     const rS=new Date(minD); rS.setDate(rS.getDate()-3);
     const rE=new Date(maxD); rE.setDate(rE.getDate()+3);
     const rangeToday=new Date(); rangeToday.setHours(0,0,0,0);
