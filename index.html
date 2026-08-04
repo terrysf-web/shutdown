@@ -8373,8 +8373,6 @@ function renderTimeline(){
     const rS=new Date(minD); rS.setDate(rS.getDate()-3);
     const rE=new Date(maxD); rE.setDate(rE.getDate()+3);
     const rangeToday=new Date(); rangeToday.setHours(0,0,0,0);
-    const currentMonthStart=new Date(rangeToday.getFullYear(), rangeToday.getMonth(), 1);
-    if(rE>=currentMonthStart && rS<currentMonthStart) rS.setTime(currentMonthStart.getTime());
 
     // ── Layout constants ─────────────────────────────────────────────────────
     const DW=26, LW=430, MH=24, DH=22, HDR=MH+DH, PAD=8;
