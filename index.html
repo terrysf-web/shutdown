@@ -11617,6 +11617,18 @@ function handleDailyHuddleUrlParams(){
     clone.style.overflow='visible';
     clone.style.boxSizing='border-box';
     clone.querySelectorAll('.dashboard-export-actions').forEach(function(el){ el.style.display='none'; });
+    // html2canvas can't reliably paint a native <select>'s closed-state background
+    // (it's OS-drawn, not a CSS-paintable region), so the Access Condition dropdowns
+    // can render with the wrong color/text in the captured image. Swap them for plain
+    // styled divs showing the same selected value before capturing.
+    clone.querySelectorAll('select.gowning-select').forEach(function(sel){
+      var div=document.createElement('div');
+      div.className='gowning-select '+(sel.value==='Full Gowning'?'full':'suspend');
+      div.style.display='flex';
+      div.style.alignItems='center';
+      div.textContent=sel.value;
+      sel.parentNode.replaceChild(div, sel);
+    });
     function apply(selector, styles){
       clone.querySelectorAll(selector).forEach(function(el){
         Object.keys(styles).forEach(function(k){ el.style[k]=styles[k]; });
