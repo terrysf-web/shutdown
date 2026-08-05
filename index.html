@@ -7724,7 +7724,11 @@ function renderDashboard(){
     .filter(s=>s.status==='Cond. REL' || s.status==='FUL REL')
     .sort((a,b)=>a.sortStart.localeCompare(b.sortStart) || a.def.system.localeCompare(b.def.system, undefined, {numeric:true}));
   function releaseDateForSystem(s){
-    const releaseTask = s.items.find(t=>(s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t)) && isComplete(t));
+    const matchesTask = t => s.status==='FUL REL' ? isFullRelTask(t) : isCondRelTask(t);
+    // Prefer the completed release task's date, but fall back to the planned
+    // end date of the matching (not-yet-complete) task instead of TBD — the
+    // tracker already has a target date even before the task is checked off.
+    const releaseTask = s.items.find(t=>matchesTask(t) && isComplete(t)) || s.items.find(matchesTask);
     return displayDate(releaseTask?.end || releaseTask?.start) || 'TBD';
   }
   const rtsManualTasks = tasks.filter(t=>rtsMap[t.id] && (statusMap[t.id]||t.status||'Pending')!=='Complete');
