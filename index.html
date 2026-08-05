@@ -11620,11 +11620,17 @@ function handleDailyHuddleUrlParams(){
     // can render with the wrong color/text in the captured image. Swap them for plain
     // styled divs showing the same selected value before capturing.
     clone.querySelectorAll('select.gowning-select').forEach(function(sel){
+      // Read the value from the live source element, not this clone's copy —
+      // cloneNode(true) doesn't reliably carry over a <select>'s current JS-set
+      // selection (only options wired to the HTML "selected" attribute survive
+      // consistently), so sel.value here can silently be the wrong option.
+      var liveSel=sel.id ? document.getElementById(sel.id) : null;
+      var val=liveSel ? liveSel.value : sel.value;
       var div=document.createElement('div');
-      div.className='gowning-select '+(sel.value==='Full Gowning'?'full':'suspend');
+      div.className='gowning-select '+(val==='Full Gowning'?'full':'suspend');
       div.style.display='flex';
       div.style.alignItems='center';
-      div.textContent=sel.value;
+      div.textContent=val;
       sel.parentNode.replaceChild(div, sel);
     });
     function apply(selector, styles){
