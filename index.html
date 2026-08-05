@@ -7713,9 +7713,9 @@ function renderDashboard(){
         <td>${huddleSystemForTask(t)}</td>
         <td>${t.task}</td>
         <td class="${vendorOnsite?'vendor-onsite':''}">${vendor}</td>
-        <td>${displayStart}</td>
-        <td>${displayTarget}</td>
-        <td>${newDateText}</td>
+        <td style="white-space:nowrap">${displayStart}</td>
+        <td style="white-space:nowrap">${displayTarget}</td>
+        <td style="white-space:nowrap">${newDateText}</td>
         <td>${huddleStatusHtml(st)}</td>
       </tr>`;
     }).join('') : '<tr><td colspan="8" style="color:#9fb4c8;font-style:italic">No active maintenance activities.</td></tr>';
