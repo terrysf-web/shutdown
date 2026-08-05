@@ -7695,8 +7695,8 @@ function renderDashboard(){
       })
       .slice()
       .sort((a,b)=>{
-        const as = normalizeDateValue(a.start) || normalizeDateValue(a.end) || '';
-        const bs = normalizeDateValue(b.start) || normalizeDateValue(b.end) || '';
+        const as = normalizeDateValue(a.end) || normalizeDateValue(a.start) || '';
+        const bs = normalizeDateValue(b.end) || normalizeDateValue(b.start) || '';
         return as.localeCompare(bs) || String(a.id).localeCompare(String(b.id), undefined, {numeric:true});
       });
     maintEl.innerHTML = maintItems.length ? maintItems.map(t=>{
