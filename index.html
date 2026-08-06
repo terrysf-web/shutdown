@@ -4613,6 +4613,7 @@ let taskTrackerStartupOosMap = {};
 let rtsMap = {};
 let rtsTargetMap = {};
 let rtsNewDateMap = {};
+let rtsNoteMap = {};
 function loadDownMaps(){
   try{ const d=localStorage.getItem('sd26_down_v2'); if(d) downMap=JSON.parse(d); }catch(e){}
   try{ const u=localStorage.getItem('sd26_startup_v2'); if(u){ const raw=JSON.parse(u); Object.keys(raw).forEach(k=>{raw[k]=parseDateInput(raw[k]);}); startupMap=raw; } }catch(e){}
@@ -4623,9 +4624,14 @@ function loadDownMaps(){
   try{ const r=localStorage.getItem('sd26_rts_v1'); if(r) rtsMap=JSON.parse(r); }catch(e){}
   try{ const t=localStorage.getItem('sd26_rts_target_v1'); if(t) rtsTargetMap=JSON.parse(t); }catch(e){}
   try{ const n=localStorage.getItem('sd26_rts_newdate_v1'); if(n) rtsNewDateMap=JSON.parse(n); }catch(e){}
+  try{ const nt=localStorage.getItem('sd26_rts_note_v1'); if(nt) rtsNoteMap=JSON.parse(nt); }catch(e){}
 }
 function saveRtsMap(){ try{ localStorage.setItem('sd26_rts_v1', JSON.stringify(rtsMap)); }catch(e){} }
 function saveRtsTargetMap(){ try{ localStorage.setItem('sd26_rts_target_v1', JSON.stringify(rtsTargetMap)); }catch(e){} }
+function saveRtsNoteMap(){
+  try{ localStorage.setItem('sd26_rts_note_v1', JSON.stringify(rtsNoteMap)); }catch(e){}
+  try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
+}
 function saveRtsNewDateMap(){
   try{ localStorage.setItem('sd26_rts_newdate_v1', JSON.stringify(rtsNewDateMap)); }catch(e){}
   try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
@@ -4681,6 +4687,16 @@ function editRtsStartup(id){
   if(trimmed) startupMap[id] = trimmed;
   else delete startupMap[id];
   saveDownMaps();
+  if(typeof renderDashboard==='function') renderDashboard();
+}
+function editRtsNote(id, fallbackText){
+  const current = rtsNoteMap[id] != null ? rtsNoteMap[id] : (fallbackText||'');
+  const val = prompt('Note:', current);
+  if(val === null) return;
+  const trimmed = val.trim();
+  if(trimmed) rtsNoteMap[id] = trimmed;
+  else delete rtsNoteMap[id];
+  saveRtsNoteMap();
   if(typeof renderDashboard==='function') renderDashboard();
 }
 function toggleRts(id, checked){
@@ -7743,9 +7759,15 @@ function renderDashboard(){
         const sysNewDateVal = sysNewDateIso ? displayRtsDate(sysNewDateIso) : null;
         const sysCompleteIso = startupMap[sysKey]||'';
         const sysCompleteVal = sysCompleteIso ? displayDate(sysCompleteIso) : null;
-        const newDateTd = `<td style="cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td>`;
+        // Delayed if it slipped to a later New Date than the original target, or
+        // (once complete) actually finished after the target — either way this
+        // should read the same as the manual RTS rows' delay warning.
+        const sysDelayed = targetIso && ((sysNewDateIso && sysNewDateIso > targetIso) || (sysCompleteIso && sysCompleteIso > targetIso));
+        const newDateTd = `<td style="cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted${sysDelayed?';font-weight:bold':''}" onclick="editRtsNewDate('${esc(sysKey)}')" title="${sysDelayed?`Delayed (target: ${displayDate(targetIso)})`:'Click to set/edit new date'}">${sysNewDateVal||'—'}${sysDelayed?' ⚠':''}</td>`;
         const completeTd = `<td style="cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td>`;
-        return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td>${newDateTd}${completeTd}<td>${s.def.name}</td></tr>`};
+        const sysNoteVal = rtsNoteMap[sysKey];
+        const noteTd = `<td style="cursor:pointer;text-decoration:underline dotted" onclick="editRtsNote('${esc(sysKey)}','${esc(s.def.name)}')" title="Click to add/edit a note">${esc(sysNoteVal || s.def.name)}</td>`;
+        return {targetIso, html:`<tr><td>${huddleStatusHtml(s.status)}</td><td>${s.def.system}</td><td>${releaseDateForSystem(s)}</td>${newDateTd}${completeTd}${noteTd}</tr>`};
       }),
       ...rtsManualTasks.map(t=>{
         const fallbackTargetIso = normalizeDateValue(t.end)||'';
@@ -7898,7 +7920,10 @@ function renderDashboard(){
         const sysNewDateVal = sysNewDateIso ? displayRtsDate(sysNewDateIso) : null;
         const sysCompleteIso = startupMap[sysKey]||'';
         const sysCompleteVal = sysCompleteIso ? displayDate(sysCompleteIso) : null;
-        return {tIso:normalizeDateValue(releaseDateForSystem(s))||'', html:`<tr><td>${s.def.system}</td><td style="white-space:nowrap">${releaseDateForSystem(s)}</td><td style="white-space:nowrap;cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsNewDate('${esc(sysKey)}')" title="Click to set/edit new date">${sysNewDateVal||'—'}</td><td style="white-space:nowrap;cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td><td>${esc(s.def.name)}</td></tr>`};
+        const mbTargetIso = normalizeDateValue(releaseDateForSystem(s))||'';
+        const sysDelayed = mbTargetIso && ((sysNewDateIso && sysNewDateIso > mbTargetIso) || (sysCompleteIso && sysCompleteIso > mbTargetIso));
+        const sysNoteVal = rtsNoteMap[sysKey];
+        return {tIso:mbTargetIso, html:`<tr><td>${s.def.system}</td><td style="white-space:nowrap">${releaseDateForSystem(s)}</td><td style="white-space:nowrap;cursor:pointer;color:${sysNewDateVal?'#f0c040':'#9fb4c8'};text-decoration:underline dotted${sysDelayed?';font-weight:bold':''}" onclick="editRtsNewDate('${esc(sysKey)}')" title="${sysDelayed?`Delayed (target: ${displayDate(mbTargetIso)})`:'Click to set/edit new date'}">${sysNewDateVal||'—'}${sysDelayed?' ⚠':''}</td><td style="white-space:nowrap;cursor:pointer;color:${sysCompleteVal?'#fff':'#9fb4c8'};text-decoration:underline dotted" onclick="editRtsStartup('${esc(sysKey)}')" title="Click to set/edit complete date">${sysCompleteVal||'—'}</td><td style="cursor:pointer;text-decoration:underline dotted" onclick="editRtsNote('${esc(sysKey)}','${esc(s.def.name)}')" title="Click to add/edit a note">${esc(sysNoteVal || s.def.name)}</td></tr>`};
       }),
       ...rtsManualTasks.map(t=>{
         const fbIso = rtsTargetMap[t.id]||normalizeDateValue(t.end)||'';
