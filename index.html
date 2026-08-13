@@ -4575,7 +4575,10 @@ function loadEndImpact(){ try{ const s=localStorage.getItem('sd26_endImpact'); i
 // ── Operational Status: 시스템별 수동 설정 ──
 let operationalStatusMap = {};
 function loadOperationalStatus(){ try{ const s=localStorage.getItem('sd26_opStatus_v1'); if(s) operationalStatusMap=JSON.parse(s); }catch(e){} }
-function saveOperationalStatus(){ try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){} }
+function saveOperationalStatus(){
+  try{ localStorage.setItem('sd26_opStatus_v1', JSON.stringify(operationalStatusMap)); }catch(e){}
+  try{ if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave(); }catch(e){}
+}
 let systemTargetMap = {};
 function loadSystemTargetMap(){ try{ const s=localStorage.getItem('sd26_sys_target_v1'); if(s) systemTargetMap=JSON.parse(s); }catch(e){} }
 function saveSystemTargetMap(){
@@ -9133,7 +9136,7 @@ async function tryAutoLoadSharedData(){
     try{ incomingTaskCount = JSON.parse((payload.data && payload.data.sd26_tasks_v3) || '[]').length || 0; }catch(e){}
     if(incoming && incoming === lastLoaded && (!incomingTaskCount || localTaskCount >= incomingTaskCount)) return;
     if(payload && payload.data){
-      const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
+      const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
       Object.keys(payload.data).forEach(k => {
         if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
       });
@@ -9194,6 +9197,7 @@ function setFirebaseSyncStatus(text, cls, title){
 function refreshSd26FromLocalStorage(){
   try{ if(typeof loadLocal === 'function') loadLocal(); }catch(e){}
   try{ if(typeof loadDownMaps === 'function') loadDownMaps(); }catch(e){}
+  try{ if(typeof loadOperationalStatus === 'function') loadOperationalStatus(); }catch(e){}
   try{ if(typeof loadSystemTargetMap === 'function') loadSystemTargetMap(); }catch(e){}
   try{ if(typeof loadEndImpact === 'function') loadEndImpact(); }catch(e){}
   try{ if(typeof loadVisualScope === 'function') loadVisualScope(); }catch(e){}
@@ -9221,7 +9225,7 @@ function applyFirebaseSharedPayload(payload, opts){
   opts = opts || {};
   if(!payload || !payload.data) return false;
   firebaseSharedApplyingRemote = true;
-  const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_opStatus_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
+  const LOCAL_ONLY_KEYS = ['sd26_rts_v1','sd26_rts_target_v1','sd26_startup_v2','sd26_down_v2'];
   Object.keys(payload.data).forEach(k => {
     if(k.indexOf('sd26_') === 0 && payload.data[k] != null && !LOCAL_ONLY_KEYS.includes(k)) localStorage.setItem(k, String(payload.data[k]));
   });
