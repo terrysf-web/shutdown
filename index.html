@@ -6764,7 +6764,17 @@ function weeklyPlanExecutionData(asOfIso){
   // elapsed time since a task's own start date, not progress made within this
   // specific week, so it kept producing confusing jumps (e.g. 0% to 47%) unrelated
   // to real work done. Do not reintroduce it.
-  const weeklyActualDone = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Complete').length;
+  // A task counts toward this week's Actual only if it was actually completed
+  // during this week (by completedAt) — not just because its (possibly pushed-out)
+  // target date happens to land in this week while it was really finished earlier
+  // or later. Without that check, a task overdue from last week that gets its
+  // target extended into this week reads as instant 100% the moment the week
+  // starts, even though no work happened yet this week.
+  const weeklyActualDone = weeklyScope.filter(t=>{
+    if((statusMap[t.id]||t.status||'Pending')!=='Complete') return false;
+    const completedAt = normalizeDateValue(t.completedAt);
+    return completedAt ? (completedAt >= range.start && completedAt <= range.end) : true;
+  }).length;
   const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
