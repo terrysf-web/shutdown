@@ -6773,7 +6773,10 @@ function weeklyPlanExecutionData(asOfIso){
   const weeklyActualDone = weeklyScope.filter(t=>{
     if((statusMap[t.id]||t.status||'Pending')!=='Complete') return false;
     const completedAt = normalizeDateValue(t.completedAt);
-    return completedAt ? (completedAt >= range.start && completedAt <= range.end) : true;
+    // No recorded completion date means we genuinely don't know when this
+    // finished — don't assume it happened this week just because its target
+    // date does. That assumption is exactly what caused Monday-morning 100%.
+    return completedAt ? (completedAt >= range.start && completedAt <= range.end) : false;
   }).length;
   const weeklyDelayedCount = weeklyScope.filter(t=>(statusMap[t.id]||t.status||'Pending')==='Delayed').length;
   const weeklyPlanDone = weeklyScope.length;
