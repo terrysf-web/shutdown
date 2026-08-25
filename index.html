@@ -7724,6 +7724,7 @@ function renderDashboard(){
         const st = statusMap[t.id] || t.status || 'Pending';
         if(st === 'In Progress') return taskOverlapsCurrentWorkWindow(t);
         if(st === 'Delayed') return hasOriginalStartArrived(t) && taskOverlapsCurrentWorkWindow(t);
+        if(st === 'On Hold') return taskOverlapsCurrentWorkWindow(t);
         return false;
       })
       .slice()
