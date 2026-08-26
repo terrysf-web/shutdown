@@ -6782,17 +6782,13 @@ function weeklyPlanExecutionData(asOfIso){
   const weeklyPlanDone = weeklyScope.length;
   const _selDay = new Date(selectedIso+'T00:00:00').getDay();
   const weekDayIndex = _selDay === 0 ? 5 : _selDay === 6 ? 5 : Math.min(_selDay, 5);
-  // Plan % = share of this week's scope whose target date has already arrived —
-  // item-based, matching how Actual is counted, instead of a plain calendar-day
-  // fraction. A day-based Plan compared against an item-based Actual could show
-  // a false "ahead of plan" gap even when a task finished exactly on its planned
-  // day (e.g. 1 of 2 items due today done today read as 50% Actual vs a 40%
-  // day-elapsed Plan, instead of 50% vs 50%).
-  const weeklyPlanDueByToday = weeklyScope.filter(t=>{
-    const due = targetEnd(t);
-    return due && due <= selectedIso;
-  }).length;
-  const planPct = weeklyScope.length ? Math.round(weeklyPlanDueByToday / weeklyScope.length * 100) : 0;
+  // Reverted back to a plain calendar-day fraction: item-based Plan (share of
+  // scope whose target date has arrived) was more "correct" but with a small
+  // weekly scope it can sit unchanged for multiple days (e.g. stuck at 50%
+  // Mon-Wed if the only two items are due Sat and Thu), which read as broken.
+  // Day-based Plan moves every day even though it can occasionally show a
+  // task finishing on-time as "ahead of plan" — a smaller, more legible glitch.
+  const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
   // Time-phased plan (used both as the Actual floor below, and for severity state
   // further down) so a task in progress but not yet Complete isn't misread as
   // "nothing happened" while it's still legitimately on pace within today's workday.
