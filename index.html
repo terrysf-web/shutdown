@@ -6788,7 +6788,7 @@ function weeklyPlanExecutionData(asOfIso){
   // Mon-Wed if the only two items are due Sat and Thu), which read as broken.
   // Day-based Plan moves every day even though it can occasionally show a
   // task finishing on-time as "ahead of plan" — a smaller, more legible glitch.
-  const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0;
+  const planPct = weeklyScope.length ? Math.round(weekDayIndex / 5 * 100) : 0; // redeploy-nudge
   // Time-phased plan (used both as the Actual floor below, and for severity state
   // further down) so a task in progress but not yet Complete isn't misread as
   // "nothing happened" while it's still legitimately on pace within today's workday.
