@@ -940,6 +940,7 @@ select.msf option:checked{background:#ddeeff}
       <button onclick="exportSnapshot()" style="background:#2e7d32;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="현재 상태를 파일로 저장">📥 Export</button>
       <button onclick="document.getElementById('importExcelInput').click()" style="background:#1a5c8a;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="새 셧다운 플랜 엑셀을 업로드해서 Task Tracker를 교체">📤 Import Excel</button>
       <input type="file" id="importExcelInput" accept=".xlsx,.xls" style="display:none" onchange="handleImportExcelFile(this.files[0])">
+      <button onclick="startNewSeason()" style="background:#8a4b1a;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="엑셀 없이 앱에서 바로 새 셧다운 시즌 시작 (작업 목록은 템플릿으로 유지, 날짜/상태만 초기화)">🆕 New Season</button>
       <span id="firebaseSyncStatus" class="firebase-sync-status off" title="Hosted site only">Firebase: connecting</span>
     </div>
   </div>
@@ -6150,6 +6151,63 @@ function parseShutdownPlanWorkbook(wb){
   });
 
   return {sections, tasks:allTasks, total:allTasks.length};
+}
+
+function startNewSeason(){
+  const activeCount = tasks.filter(t=>!t.isParent).length;
+  const proceed = confirm(
+    `엑셀 없이 앱에서 새 셧다운 시즌을 시작합니다.\n\n` +
+    `현재 작업 목록(${activeCount}개, 담당자/벤더/섹션 포함)은 템플릿으로 그대로 유지되고,\n` +
+    `날짜/진행상태/완료기록/노트만 초기화됩니다.\n` +
+    `(필요 없는 작업은 나중에 Edit Mode에서 Delete, 새 작업은 Insert Below로 추가 가능)\n\n` +
+    `현재 데이터는 교체 전 브라우저에 자동 백업됩니다.\n\n계속하시겠습니까?`
+  );
+  if(!proceed) return;
+
+  try{
+    const archive = {
+      savedAt: new Date().toISOString(),
+      projectStartDate, projectEndDate,
+      tasks: JSON.parse(JSON.stringify(tasks)),
+      statusMap: JSON.parse(JSON.stringify(statusMap)),
+      notesMap: JSON.parse(JSON.stringify(notesMap))
+    };
+    localStorage.setItem('sd26_season_archive_'+Date.now(), JSON.stringify(archive));
+  }catch(e){}
+
+  const newStart = prompt('새 프로젝트 시작일을 입력하세요 (YYYY-MM-DD)', projectStartDate || '');
+  if(newStart===null) return;
+  const newEnd = prompt('새 프로젝트 종료일을 입력하세요 (YYYY-MM-DD, 모르면 비워두세요)', '');
+
+  tasks.forEach(t=>{
+    if(t.isParent) return;
+    t.start=null; t.end=null; t.newStart=null; t.newEnd=null; t.days=null;
+    t.status='Pending'; t.completedAt=null; t.notes=''; t.actionComment='';
+    t.critical=false; t.notification=false; t.vendorOnsite=false;
+    t.onHold=false; t.onHoldDate=null; t.onHoldProgress=null;
+    statusMap[t.id]='Pending'; notesMap[t.id]='';
+  });
+
+  projectStartDate = newStart || null;
+  projectEndDate = newEnd || null;
+  const psEl=document.getElementById('projectStartInput'), peEl=document.getElementById('projectEndInput');
+  if(psEl) psEl.value = projectStartDate || '';
+  if(peEl) peEl.value = projectEndDate || '';
+
+  [WO_CAL_STATUS_KEY, WO_PM_STATUS_KEY, WO_CAL_COMPLETED_KEY, WO_PM_COMPLETED_KEY].forEach(k=>{
+    try{ localStorage.removeItem(k); }catch(e){}
+  });
+
+  editMode = true;
+  const editBtn=document.getElementById('editToggleBtn');
+  if(editBtn) editBtn.textContent='Edit Mode: On';
+  dirty = true;
+  updateDerivedFields();
+  refreshFilters();
+  render();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  alert('새 시즌이 시작되었습니다.\n작업 목록(담당자/벤더/섹션)은 그대로 유지됐고, 날짜와 진행상태는 초기화됐습니다.\nEdit Mode가 켜져 있으니 각 작업의 Start/End 날짜를 바로 입력해주세요.');
 }
 
 render();
