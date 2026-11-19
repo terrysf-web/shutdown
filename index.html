@@ -6012,6 +6012,24 @@ function toggleAdvancedFilters(){
   btn.textContent = open ? 'Less Filters' : 'More Filters';
 }
 
+function resetOtherTabsState(){
+  const keysToClear = [
+    'sd26_down_v2','sd26_startup_v2','sd26_endImpact',
+    'sd26_gowning_status_v1','sd26_opStatus_v1',
+    'sd26_rts_v1','sd26_rts_target_v1','sd26_rts_newdate_v1','sd26_rts_note_v1',
+    'sd26_sys_target_v1',
+    'sd26_task_tracker_down_oos_v1','sd26_task_tracker_startup_oos_v1',
+    'sd26_timeline_down_v1','sd26_timeline_startup_v1','sd26_tl_v1',
+    (typeof WO_CAL_STATUS_KEY!=='undefined'?WO_CAL_STATUS_KEY:'sd26_wo_status_v1'),
+    (typeof WO_PM_STATUS_KEY!=='undefined'?WO_PM_STATUS_KEY:'sd26_wo_pm_status_v1'),
+    (typeof WO_CAL_COMPLETED_KEY!=='undefined'?WO_CAL_COMPLETED_KEY:'sd26_wo_cal_completed_v1'),
+    (typeof WO_PM_COMPLETED_KEY!=='undefined'?WO_PM_COMPLETED_KEY:'sd26_wo_pm_completed_v1'),
+    (typeof WEEKLY_SUMMARY_KEY!=='undefined'?WEEKLY_SUMMARY_KEY:'sd26_weekly_summary_v1'),
+    (typeof EXECUTION_EXPLANATION_KEY!=='undefined'?EXECUTION_EXPLANATION_KEY:'sd26_execution_explanations_v1')
+  ];
+  keysToClear.forEach(k=>{ try{ localStorage.removeItem(k); }catch(e){} });
+}
+
 function addDaysIso(iso, delta){
   if(!iso || !delta) return iso;
   const d = new Date(`${iso}T00:00:00`);
@@ -6094,13 +6112,15 @@ function handleImportExcelFile(file){
           if(psEl) psEl.value = projectStartDate || '';
           if(peEl) peEl.value = projectEndDate || '';
         }
+        resetOtherTabsState();
         updateDerivedFields();
         dirty = true;
         saveLocal();
         refreshFilters();
         render();
         if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-        alert(`${parsed.total}개 작업을 가져왔습니다. 공유 중인 동료 화면에도 곧 반영됩니다.`);
+        alert(`${parsed.total}개 작업을 가져왔습니다. 다른 탭(RTS, System Status, Access Condition, Timeline 등)의 정보도 모두 초기화됐습니다.\n공유 중인 동료 화면에도 곧 반영됩니다. 잠시 후 화면이 새로고침됩니다.`);
+        setTimeout(()=>location.reload(), 1500);
       }catch(err){
         alert('엑셀을 읽는 중 오류가 발생했습니다: '+err.message);
       }finally{
@@ -6262,6 +6282,8 @@ function loadPreviousSeason(){
   if(psEl) psEl.value = projectStartDate || '';
   if(peEl) peEl.value = projectEndDate || '';
 
+  resetOtherTabsState();
+
   editMode = true;
   const editBtn=document.getElementById('editToggleBtn');
   if(editBtn) editBtn.textContent='Edit Mode: On';
@@ -6271,7 +6293,8 @@ function loadPreviousSeason(){
   render();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-  alert('예전 시즌을 불러왔습니다. 필요한 부분만 수정하시면 됩니다 (Edit Mode 켜짐).');
+  alert('예전 시즌을 불러왔습니다. 다른 탭(RTS, System Status, Access Condition, Timeline 등)의 정보도 모두 초기화됐습니다.\n필요한 부분만 수정하시면 됩니다. 잠시 후 화면이 새로고침됩니다.');
+  setTimeout(()=>location.reload(), 1500);
 }
 
 function startNewSeason(){
@@ -6315,9 +6338,7 @@ function startNewSeason(){
   if(psEl) psEl.value = projectStartDate || '';
   if(peEl) peEl.value = projectEndDate || '';
 
-  [WO_CAL_STATUS_KEY, WO_PM_STATUS_KEY, WO_CAL_COMPLETED_KEY, WO_PM_COMPLETED_KEY].forEach(k=>{
-    try{ localStorage.removeItem(k); }catch(e){}
-  });
+  resetOtherTabsState();
 
   editMode = true;
   const editBtn=document.getElementById('editToggleBtn');
@@ -6328,7 +6349,8 @@ function startNewSeason(){
   render();
   saveLocal();
   if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
-  alert('새 시즌이 시작되었습니다.\n작업 목록(담당자/벤더/섹션)은 그대로 유지됐고, 날짜와 진행상태는 초기화됐습니다.\nEdit Mode가 켜져 있으니 각 작업의 Start/End 날짜를 바로 입력해주세요.');
+  alert('새 시즌이 시작되었습니다.\n작업 목록(담당자/벤더/섹션)은 그대로 유지됐고, 날짜/진행상태와 다른 탭(RTS, System Status, Access Condition, Timeline 등)의 정보도 모두 초기화됐습니다.\n잠시 후 화면이 새로고침됩니다.');
+  setTimeout(()=>location.reload(), 1500);
 }
 
 render();
