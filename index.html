@@ -941,6 +941,7 @@ select.msf option:checked{background:#ddeeff}
       <button onclick="document.getElementById('importExcelInput').click()" style="background:#1a5c8a;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="새 셧다운 플랜 엑셀을 업로드해서 Task Tracker를 교체">📤 Import Excel</button>
       <input type="file" id="importExcelInput" accept=".xlsx,.xls" style="display:none" onchange="handleImportExcelFile(this.files[0])">
       <button onclick="startNewSeason()" style="background:#8a4b1a;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="엑셀 없이 앱에서 바로 새 셧다운 시즌 시작 (작업 목록은 템플릿으로 유지, 날짜/상태만 초기화)">🆕 New Season</button>
+      <button onclick="loadPreviousSeason()" style="background:#5c3a8a;color:#fff;border:none;padding:6px 14px;border-radius:5px;font-size:13px;font-weight:600;cursor:pointer;margin-left:6px" title="저장된 예전 시즌(작년 등)을 불러와서 그대로 수정">📂 Load Previous Season</button>
       <span id="firebaseSyncStatus" class="firebase-sync-status off" title="Hosted site only">Firebase: connecting</span>
     </div>
   </div>
@@ -6151,6 +6152,76 @@ function parseShutdownPlanWorkbook(wb){
   });
 
   return {sections, tasks:allTasks, total:allTasks.length};
+}
+
+function listSeasonArchives(){
+  const list = [];
+  for(let i=0;i<localStorage.length;i++){
+    const key = localStorage.key(i);
+    if(!key || !key.startsWith('sd26_season_archive_')) continue;
+    try{
+      const data = JSON.parse(localStorage.getItem(key));
+      list.push({key, savedAt:data.savedAt, projectStartDate:data.projectStartDate, projectEndDate:data.projectEndDate, count:(data.tasks||[]).filter(t=>!t.isParent).length});
+    }catch(e){}
+  }
+  list.sort((a,b)=> (b.savedAt||'').localeCompare(a.savedAt||''));
+  return list;
+}
+
+function loadPreviousSeason(){
+  const archives = listSeasonArchives();
+  if(!archives.length){
+    alert('아직 저장된 예전 시즌이 없습니다.\n"New Season" 버튼을 누르면 그 시점의 플랜이 자동으로 저장되어, 다음부터 여기서 불러올 수 있습니다.');
+    return;
+  }
+  const listText = archives.map((a,i)=>
+    `${i+1}. ${new Date(a.savedAt).toLocaleString()} — ${a.projectStartDate||'?'} ~ ${a.projectEndDate||'?'} (작업 ${a.count}개)`
+  ).join('\n');
+  const choice = prompt(`불러올 시즌 번호를 입력하세요:\n\n${listText}`, '1');
+  if(choice===null) return;
+  const idx = parseInt(choice,10)-1;
+  if(isNaN(idx) || idx<0 || idx>=archives.length){ alert('잘못된 번호입니다.'); return; }
+  const picked = archives[idx];
+
+  const proceed = confirm(
+    `"${new Date(picked.savedAt).toLocaleString()}" 시즌(작업 ${picked.count}개)을 불러옵니다.\n` +
+    `현재 화면의 데이터는 교체 전 자동 백업됩니다.\n\n계속하시겠습니까?`
+  );
+  if(!proceed) return;
+
+  try{
+    const archive = {
+      savedAt: new Date().toISOString(),
+      projectStartDate, projectEndDate,
+      tasks: JSON.parse(JSON.stringify(tasks)),
+      statusMap: JSON.parse(JSON.stringify(statusMap)),
+      notesMap: JSON.parse(JSON.stringify(notesMap))
+    };
+    localStorage.setItem('sd26_season_archive_'+Date.now(), JSON.stringify(archive));
+  }catch(e){}
+
+  const data = JSON.parse(localStorage.getItem(picked.key));
+  tasks = data.tasks || [];
+  Object.keys(statusMap).forEach(k=>delete statusMap[k]);
+  Object.keys(notesMap).forEach(k=>delete notesMap[k]);
+  Object.assign(statusMap, data.statusMap || {});
+  Object.assign(notesMap, data.notesMap || {});
+  projectStartDate = data.projectStartDate || null;
+  projectEndDate = data.projectEndDate || null;
+  const psEl=document.getElementById('projectStartInput'), peEl=document.getElementById('projectEndInput');
+  if(psEl) psEl.value = projectStartDate || '';
+  if(peEl) peEl.value = projectEndDate || '';
+
+  editMode = true;
+  const editBtn=document.getElementById('editToggleBtn');
+  if(editBtn) editBtn.textContent='Edit Mode: On';
+  dirty = true;
+  updateDerivedFields();
+  refreshFilters();
+  render();
+  saveLocal();
+  if(typeof queueFirebaseSharedSave === 'function') queueFirebaseSharedSave();
+  alert('예전 시즌을 불러왔습니다. 필요한 부분만 수정하시면 됩니다 (Edit Mode 켜짐).');
 }
 
 function startNewSeason(){
