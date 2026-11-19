@@ -6012,6 +6012,44 @@ function toggleAdvancedFilters(){
   btn.textContent = open ? 'Less Filters' : 'More Filters';
 }
 
+function addDaysIso(iso, delta){
+  if(!iso || !delta) return iso;
+  const d = new Date(`${iso}T00:00:00`);
+  d.setDate(d.getDate() + delta);
+  return d.toISOString().slice(0,10);
+}
+function calendarDaysBetween(fromIso, toIso){
+  const a = new Date(`${fromIso}T00:00:00`);
+  const b = new Date(`${toIso}T00:00:00`);
+  return Math.round((b - a) / 86400000);
+}
+function earliestTaskStart(taskList){
+  const starts = taskList.filter(t=>!t.isParent && t.start).map(t=>t.start).sort();
+  return starts.length ? starts[0] : null;
+}
+function shiftTaskDates(taskList, deltaDays){
+  if(!deltaDays) return;
+  taskList.forEach(t=>{
+    if(t.start) t.start = addDaysIso(t.start, deltaDays);
+    if(t.end) t.end = addDaysIso(t.end, deltaDays);
+    if(t.newStart) t.newStart = addDaysIso(t.newStart, deltaDays);
+    if(t.newEnd) t.newEnd = addDaysIso(t.newEnd, deltaDays);
+  });
+}
+function promptNewStartAndShift(taskList, oldProjectStart, oldProjectEnd){
+  const anchor = oldProjectStart || earliestTaskStart(taskList);
+  if(!anchor) return {newStart:null, newEnd:oldProjectEnd, delta:0};
+  const newStart = prompt(
+    `이 플랜의 기준 시작일은 ${anchor} 입니다.\n새 프로젝트 시작일을 입력하면 모든 작업의 날짜가 그 차이만큼 자동으로 이동합니다.\n(비워두면 날짜를 그대로 유지)`,
+    anchor
+  );
+  if(!newStart) return {newStart:oldProjectStart, newEnd:oldProjectEnd, delta:0};
+  const delta = calendarDaysBetween(anchor, newStart);
+  shiftTaskDates(taskList, delta);
+  const newEnd = oldProjectEnd ? addDaysIso(oldProjectEnd, delta) : null;
+  return {newStart, newEnd, delta};
+}
+
 function loadSheetJs(cb){
   if(window.XLSX){ cb(); return; }
   const script=document.createElement('script');
@@ -6041,11 +6079,21 @@ function handleImportExcelFile(file){
         );
         if(!ok) return;
         try{ localStorage.setItem('sd26_tasks_v3_backup_'+Date.now(), localStorage.getItem('sd26_tasks_v3')||'[]'); }catch(err){}
+
+        const {newStart, newEnd} = promptNewStartAndShift(parsed.tasks, null, null);
+
         tasks = parsed.tasks;
         Object.keys(statusMap).forEach(k=>delete statusMap[k]);
         Object.keys(notesMap).forEach(k=>delete notesMap[k]);
         tasks.forEach(t=>{ statusMap[t.id]='Pending'; notesMap[t.id]=''; });
         customTaskCounter = 1;
+        if(newStart){
+          projectStartDate = newStart;
+          projectEndDate = newEnd;
+          const psEl=document.getElementById('projectStartInput'), peEl=document.getElementById('projectEndInput');
+          if(psEl) psEl.value = projectStartDate || '';
+          if(peEl) peEl.value = projectEndDate || '';
+        }
         updateDerivedFields();
         dirty = true;
         saveLocal();
@@ -6206,8 +6254,10 @@ function loadPreviousSeason(){
   Object.keys(notesMap).forEach(k=>delete notesMap[k]);
   Object.assign(statusMap, data.statusMap || {});
   Object.assign(notesMap, data.notesMap || {});
-  projectStartDate = data.projectStartDate || null;
-  projectEndDate = data.projectEndDate || null;
+
+  const {newStart, newEnd} = promptNewStartAndShift(tasks, data.projectStartDate, data.projectEndDate);
+  projectStartDate = newStart || data.projectStartDate || null;
+  projectEndDate = newEnd || data.projectEndDate || null;
   const psEl=document.getElementById('projectStartInput'), peEl=document.getElementById('projectEndInput');
   if(psEl) psEl.value = projectStartDate || '';
   if(peEl) peEl.value = projectEndDate || '';
